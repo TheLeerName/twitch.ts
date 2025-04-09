@@ -1,6 +1,113 @@
 import { AdvancedFetch as fetch, AdvancedRequestInit as RequestInit } from './advanced-fetch';
 
 export namespace EventSub {
+	export async function startWebSocket(access_token: string) {
+		const response = await Request.OAuth2Validate(access_token);
+		if (response.status !== 200) throw `ValidateError: token isn't valid.\n${JSON.stringify(response)}`;
+
+		const connection = new Connection(new WebSocket(WebSocketURL), {
+			client_id: response.client_id,
+			token: access_token,
+			login: response.login,
+			scopes: response.scopes,
+			user_id: response.user_id,
+			expires_in: response.expires_in
+		});
+
+		await new Promise<void>(resolve => {
+			connection.ws.onmessage = e => {
+				const message: Message.Any = JSON.parse(e.data);
+				if (Message.isSessionWelcome(message)) {
+					connection.session = message.payload.session;
+					resolve();
+				}
+			};
+		});
+
+		async function onMessage(e: MessageEvent) {
+			if (connection.keepalive_timeout) {
+				clearTimeout(connection.keepalive_timeout);
+				delete connection.keepalive_timeout;
+			}
+
+			const message: Message.Any = JSON.parse(e.data);
+			connection.onMessage(message);
+			if (Message.isSessionWelcome(message)) {
+				const is_reconnected = connection.session.status === "reconnecting";
+				connection.session = message.payload.session;
+				connection.onSessionWelcome(message, is_reconnected);
+			}
+			else if (Message.isSessionKeepalive(message)) {
+				connection.keepalive_timeout = setTimeout(() => connection.ws.close(4005, `NetworkTimeout: client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds + 2) * 1000);
+				connection.onSessionKeepalive(message);
+			}
+			else if (Message.isSessionReconnect(message)) {
+				connection.session.status = "reconnecting";
+				connection.ws.onmessage = (_) => {};
+				connection.ws.onclose = (_) => {};
+				connection.ws = new WebSocket(message.payload.session.reconnect_url);
+				connection.ws.onmessage = onMessage;
+				connection.ws.onclose = onClose;
+
+				connection.onSessionReconnect(message);
+			}
+			else if (Message.isNotification(message)) {
+				connection.onNotification(message);
+			}
+			else if (Message.isRevocation(message)) {
+				connection.onRevocation(message);
+			}
+		}
+		async function onClose(e: CloseEvent) {
+			setTimeout(() => {
+				connection.ws = new WebSocket(WebSocketURL);
+				connection.ws.onmessage = onMessage;
+				connection.ws.onclose = onClose;
+			}, 500);
+
+			connection.onClose(e.code, e.reason);
+		}
+
+		connection.ws.onmessage = onMessage;
+		connection.ws.onclose = onClose;
+
+		return connection;
+	}
+
+	export const WebSocketURL = "wss://eventsub.wss.twitch.tv/ws";
+
+	export class Connection {
+		ws: WebSocket;
+		access: Connection.Access;
+		session: Connection.Session;
+
+		keepalive_timeout?: NodeJS.Timeout | number;
+
+		constructor(ws: WebSocket, access: Connection.Access) {
+			this.ws = ws;
+			this.access = access;
+		}
+
+		async onClose(code: number, reason: string) {}
+		async onMessage(message: Message.Any) {}
+		async onSessionWelcome(message: Message.SessionWelcome, is_reconnected: boolean) {}
+		async onSessionKeepalive(message: Message.SessionKeepalive) {}
+		async onNotification(message: Message.Notification) {}
+		async onSessionReconnect(message: Message.SessionReconnect) {}
+		async onRevocation(message: Message.Revocation) {}
+	}
+	export namespace Connection {
+		export type Session = EventSub.Session<"connected" | "reconnecting">;
+		export type Access = {
+			client_id: string;
+			token: string;
+			login: string;
+			scopes: string[];
+			user_id: string;
+			expires_in: number;
+		};
+	}
+
 	/** An object that contains information about the connection. */
 	export interface Session<Status extends string = "connected", KeepaliveTimeoutSeconds extends number | null = number, ReconnectURL extends string | null = null> {
 		/** An ID that uniquely identifies this WebSocket connection. Use this ID to set the `session_id` field in all [subscription requests](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events). */
@@ -11,8 +118,6 @@ export namespace EventSub {
 		keepalive_timeout_seconds: KeepaliveTimeoutSeconds;
 		/** The URL to reconnect to if you get a [Reconnect message](https://dev.twitch.tv/docs/eventsub/websocket-reference/#reconnect-message). */
 		reconnect_url: ReconnectURL;
-		/** Not officially documented by Twitch */
-		recovery_url: null;
 		/** The UTC date and time that the connection was created. */
 		connected_at: string;
 	}
@@ -334,7 +439,7 @@ export namespace EventSub {
 			metadata: Metadata<"session_reconnect">;
 			/** An object that contains the message. */
 			payload: {
-				/** An object that contains information about the reconnection. */
+				/** An object that contains information about the connection. */
 				session: Session<"reconnecting", null, string>;
 			};
 		}
