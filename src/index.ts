@@ -1,8 +1,8 @@
 import { AdvancedFetch as fetch, AdvancedRequestInit as RequestInit } from './advanced-fetch';
 
 export namespace EventSub {
-	export async function startWebSocket(access_token: string) {
-		const response = await Request.OAuth2Validate(access_token);
+	export async function startWebSocket(access_token: string, validateData?: ResponseBody.OAuth2Validate) {
+		const response = validateData ?? await Request.OAuth2Validate(access_token);
 		if (response.status !== 200) throw `ValidateError: token isn't valid.\n${JSON.stringify(response)}`;
 
 		const connection = new Connection(new WebSocket(WebSocketURL), {
