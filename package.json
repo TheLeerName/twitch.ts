@@ -1,6 +1,6 @@
 {
 	"name": "twitch.ts",
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
@@ -11,6 +11,7 @@
 		"dist/**/*"
 	],
 	"devDependencies": {
-		"@types/node": "^22.14.0"
+		"@types/node": "^22.14.0",
+		"typescript": "^5.8.3"
 	}
 }
