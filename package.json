@@ -1,0 +1,7 @@
+{
+	"name": "twitch.ts",
+	"version": "1.0.0",
+	"devDependencies": {
+		"@types/node": "^22.14.0"
+	}
+}
