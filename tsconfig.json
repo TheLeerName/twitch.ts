@@ -1,28 +1,25 @@
 {
 	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"esModuleInterop": true,
-		"strict": true,
-		"moduleResolution": "node",
+		"target": "ES2020",
+		"module": "NodeNext",
+		"lib": ["ES2020", "DOM"],
+		"moduleResolution": "nodenext",
 		"typeRoots": [
 			"node_modules/@types"
 		],
-		"forceConsistentCasingInFileNames": true,
-		"useUnknownInCatchVariables": false,
-		"experimentalDecorators": true,
-		"strictPropertyInitialization": false,
-		"emitDecoratorMetadata": true,
-		"removeComments": true,
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+		"emitDeclarationOnly": false,
+		"strict": true,
+		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"declaration": true
+		"declaration": true,
+
+		"allowJs": true
 	},
+	"include": ["src/**/*.ts"],
 	"exclude": [
-		"node_modules"
-	],
-	"include": [
-		"src"
+		"node_modules",
+		"src/**/test.ts"
 	]
-  }
+}

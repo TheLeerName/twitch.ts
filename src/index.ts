@@ -1,28 +1,69 @@
-import { AdvancedFetch as fetch, AdvancedRequestInit as RequestInit } from './advanced-fetch';
+export interface AdvancedRequestInit extends RequestInit {
+	/** URL search/query parameters */
+	search?: Record<string, string | number | undefined>;
+	/** URL hash/fragment parameters */
+	hash?: Record<string, string | number | undefined>;
+	/** If `timeout < 0`, RequestTimeout will be disabled */
+	timeout?: number;
+}
+/**
+ * Basic `fetch()` function, but with some improvements:
+ * - `init.search`  - URL search/query parameters
+ * - `init.hash`    - URL hash/fragment parameters
+ * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`
+ */
+export function AdvancedFetch(input: string, init?: AdvancedRequestInit): Promise<Response> {
+	if (!init) init = {};
+	var timeout = AdvancedFetchGlobalTimeout;
+
+	if (init.search) {
+		var postfix = "?";
+		var added = false;
+		for (let [k, v] of Object.entries(init.search)) if (v) {
+			postfix += encodeURI(`${k}=${v}&`);
+			added = true;
+		}
+		if (added)
+			input += postfix.substring(0, postfix.length - 1);
+		delete init.search;
+	}
+	if (init.hash) {
+		var postfix = "#";
+		var added = false;
+		for (let [k, v] of Object.entries(init.hash)) if (v) {
+			input += encodeURI(`${k}=${v}&`);
+			added = true;
+		}
+		if (added)
+			input += postfix.substring(0, postfix.length - 1);
+		delete init.hash;
+	}
+	if (init.timeout) {
+		timeout = init.timeout;
+		delete init.timeout;
+	}
+	if (timeout > 0 && !init.signal) {
+		const controller = new AbortController();
+		init.signal = controller.signal;
+		setTimeout(() => controller.abort("RequestTimeout"), timeout);
+	}
+
+	return fetch(input, init);
+}
+
+/** in milliseconds */
+export var AdvancedFetchGlobalTimeout = 5000;
 
 export namespace EventSub {
-	export async function startWebSocket(access_token: string, validateData?: ResponseBody.OAuth2Validate) {
-		const response = validateData ?? await Request.OAuth2Validate(access_token);
-		if (response.status !== 200) throw `ValidateError: token isn't valid.\n${JSON.stringify(response)}`;
+	/**
+	 * Starts WebSocket for subscribing and getting EventSub events
+	 * - Reconnects in `reconnect_ms`, if WebSocket was closed
+	 * @param reconnect_ms If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
+	 */
+	export function startWebSocket(token_data: Authorization.User, reconnect_ms?: number) {
+		if (!reconnect_ms) reconnect_ms = 500;
 
-		const connection = new Connection(new WebSocket(WebSocketURL), {
-			client_id: response.client_id,
-			token: access_token,
-			login: response.login,
-			scopes: response.scopes,
-			user_id: response.user_id,
-			expires_in: response.expires_in
-		});
-
-		await new Promise<void>(resolve => {
-			connection.ws.onmessage = e => {
-				const message: Message.Any = JSON.parse(e.data);
-				if (Message.isSessionWelcome(message)) {
-					connection.session = message.payload.session;
-					resolve();
-				}
-			};
-		});
+		const connection = new Connection(new WebSocket(WebSocketURL), token_data);
 
 		async function onMessage(e: MessageEvent) {
 			if (connection.keepalive_timeout) {
@@ -30,8 +71,8 @@ export namespace EventSub {
 				delete connection.keepalive_timeout;
 			}
 
-			const message: Message.Any = JSON.parse(e.data);
-			connection.onMessage(message);
+			const message: Message = JSON.parse(e.data);
+			await connection.onMessage(message);
 			if (Message.isSessionWelcome(message)) {
 				const is_reconnected = connection.session.status === "reconnecting";
 				connection.session = message.payload.session;
@@ -43,8 +84,8 @@ export namespace EventSub {
 			}
 			else if (Message.isSessionReconnect(message)) {
 				connection.session.status = "reconnecting";
-				connection.ws.onmessage = (_) => {};
-				connection.ws.onclose = (_) => {};
+				connection.ws.onmessage = _ => {};
+				connection.ws.onclose = _ => {};
 				connection.ws = new WebSocket(message.payload.session.reconnect_url);
 				connection.ws.onmessage = onMessage;
 				connection.ws.onclose = onClose;
@@ -63,7 +104,7 @@ export namespace EventSub {
 				connection.ws = new WebSocket(WebSocketURL);
 				connection.ws.onmessage = onMessage;
 				connection.ws.onclose = onClose;
-			}, 500);
+			}, reconnect_ms);
 
 			connection.onClose(e.code, e.reason);
 		}
@@ -78,34 +119,52 @@ export namespace EventSub {
 
 	export class Connection {
 		ws: WebSocket;
-		access: Connection.Access;
-		session: Connection.Session;
+		/** User access token data */
+		authorization: Authorization.User;
+		/** EventSub session, do not use it **before** first `onSessionWelcome()` message */
+		session!: Connection.Session;
 
+		/** ID of timer which closes connection if WebSocket isn't received any message within `session.keepalive_timeout_seconds`, becomes `undefined` if any message was received */
 		keepalive_timeout?: NodeJS.Timeout | number;
 
-		constructor(ws: WebSocket, access: Connection.Access) {
+		constructor(ws: WebSocket, authorization: Authorization.User) {
 			this.ws = ws;
-			this.access = access;
+			this.authorization = authorization;
 		}
 
+		/**
+		 * Calls on closing WebSocket
+		 * @param code WebSocket connection close code
+		 * @param reason WebSocket connection close reason
+		 */
 		async onClose(code: number, reason: string) {}
-		async onMessage(message: Message.Any) {}
+		/** Calls on getting any EventSub message, any specified message callback will be called **after** this callback */
+		async onMessage(message: Message) {}
+		/**
+		 * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
+		 * - For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `is_reconnected` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
+		 * @param is_reconnected If its not first `session_welcome` message, if `false`, then you can subscribe to events
+		 */
 		async onSessionWelcome(message: Message.SessionWelcome, is_reconnected: boolean) {}
+		/** Calls on getting `session_keepalive` message, these messages indicates that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#keepalive-message) */
 		async onSessionKeepalive(message: Message.SessionKeepalive) {}
+		/** Calls on getting `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
 		async onNotification(message: Message.Notification) {}
+		/** Calls on getting `session_reconnect` message, these messages are sent if the edge server that the client is connected to needs to be swapped. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#reconnect-message) */
 		async onSessionReconnect(message: Message.SessionReconnect) {}
+		/** Calls on getting `revocation` message, these messages are sent if Twitch revokes a subscription. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#revocation-message) */
 		async onRevocation(message: Message.Revocation) {}
+
+		/** Closes the connection with code `1000` */
+		protected async close() {
+			await this.onClose(1000, `ClientRefused: Client closed the connection`);
+			this.ws.onclose = _ => {};
+			this.ws.onmessage = _ => {};
+			this.ws.close();
+		}
 	}
 	export namespace Connection {
 		export type Session = EventSub.Session<"connected" | "reconnecting">;
-		export type Access = {
-			client_id: string;
-			token: string;
-			login: string;
-			scopes: string[];
-			user_id: string;
-			expires_in: number;
-		};
 	}
 
 	/** An object that contains information about the connection. */
@@ -175,7 +234,7 @@ export namespace EventSub {
 			/** An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message). */
 			session_id: string;
 		}
-		/** @param session_id An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message). */
+		/** @param session_id An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message) */
 		export function Transport(session_id: string): Transport {return {method: "websocket", session_id}}
 		export namespace Transport {
 			/** Defines the transport details that you want Twitch to use when sending you event notifications. */
@@ -192,6 +251,11 @@ export namespace EventSub {
 
 		/** The `channel.chat.message` subscription type sends a notification when any user sends a message to a channel’s chat room. Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage) */
 		export type ChannelChatMessage = Subscription<"channel.chat.message", "1", Condition.ChannelChatMessage, Transport>;
+		/**
+		 * @param session_id An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message)
+		 * @param broadcaster_user_id The User ID of the channel to receive chat message events for
+		 * @param user_id The User ID to read chat as, usually just id of token owner
+		 */
 		export function ChannelChatMessage(session_id: string, broadcaster_user_id: string, user_id: string): ChannelChatMessage {
 			return {type: "channel.chat.message", version: "1", condition: {broadcaster_user_id, user_id}, transport: Transport(session_id)}
 		}
@@ -394,13 +458,13 @@ export namespace EventSub {
 		}
 	}
 
+	export type Message = Message.SessionWelcome | Message.SessionKeepalive | Message.Notification | Message.SessionReconnect | Message.Revocation;
 	export namespace Message {
-		export type Any = SessionWelcome | SessionKeepalive | Notification | SessionReconnect | Revocation;
-		export function isSessionWelcome(data: Any): data is SessionWelcome { return data.metadata.message_type === "session_welcome" }
-		export function isSessionKeepalive(data: Any): data is SessionKeepalive { return data.metadata.message_type === "session_keepalive" }
-		export function isNotification(data: Any): data is Notification { return data.metadata.message_type === "notification" }
-		export function isSessionReconnect(data: Any): data is SessionReconnect { return data.metadata.message_type === "session_reconnect" }
-		export function isRevocation(data: Any): data is Revocation { return data.metadata.message_type === "revocation" }
+		export function isSessionWelcome(data: Message): data is SessionWelcome { return data.metadata.message_type === "session_welcome" }
+		export function isSessionKeepalive(data: Message): data is SessionKeepalive { return data.metadata.message_type === "session_keepalive" }
+		export function isNotification(data: Message): data is Notification { return data.metadata.message_type === "notification" }
+		export function isSessionReconnect(data: Message): data is SessionReconnect { return data.metadata.message_type === "session_reconnect" }
+		export function isRevocation(data: Message): data is Revocation { return data.metadata.message_type === "revocation" }
 
 		/** Defines the first message that the EventSub WebSocket server sends after your client connects to the server. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message) */
 		export interface SessionWelcome {
@@ -451,6 +515,40 @@ export namespace EventSub {
 			/** An object that contains the message. */
 			payload: Payload<Subscription, "authorization_revoked" | "user_removed" | "version_removed">;
 		}
+	}
+}
+
+export type Authorization = Authorization.App | Authorization.User;
+export namespace Authorization {
+	/** Specifies data of [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) */
+	export interface App {
+		/** The access token you specified in first argument of `Request.OAuth2Validate` */
+		token: string;
+		/** Client ID which belongs to this access token */
+		client_id: string;
+		/** Authorization scopes which contains this access token */
+		scopes: string[];
+		/** How long, in seconds, the token is valid for */
+		expires_in: number;
+		/** Type of token */
+		type: "app";
+	}
+	/** Specifies data of [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) */
+	export interface User {
+		/** The access token you specified in first argument of `Request.OAuth2Validate` */
+		token: string;
+		/** Client ID which belongs to this access token */
+		client_id: string;
+		/** Authorization scopes which contains this access token */
+		scopes: string[];
+		/** How long, in seconds, the token is valid for */
+		expires_in: number;
+		/** User login associated to owner of token */
+		user_login: string;
+		/** User id associated to owner of token */
+		user_id: string;
+		/** Type of token */
+		type: "user";
 	}
 }
 
@@ -537,13 +635,7 @@ export namespace ResponseBody {
 	/** https://dev.twitch.tv/docs/api/reference/#remove-blocked-term */
 	export type RemoveBlockedTerm = ResponseBody<204>;
 	/** https://dev.twitch.tv/docs/authentication/validate-tokens/#how-to-validate-a-token */
-	export interface OAuth2Validate extends ResponseBody {
-		client_id: string;
-		login: string;
-		scopes: string[];
-		user_id: string;
-		expires_in: number;
-	}
+	export type OAuth2Validate = Authorization & ResponseBody;
 	/** https://dev.twitch.tv/docs/authentication/revoke-tokens/#revoking-access-tokens */
 	export type OAuth2Revoke = ResponseBody;
 	/** https://dev.twitch.tv/docs/api/reference/#get-users */
@@ -663,7 +755,8 @@ export namespace ResponseBodyError {
 	export type RemoveBlockedTerm = ResponseBodyError<401 | 403>;
 	/** https://dev.twitch.tv/docs/authentication/validate-tokens/#how-to-validate-a-token */
 	export interface OAuth2Validate extends ResponseBodyError<401> {
-		access_token: string;
+		/** The access token you specified in first argument of `Request.OAuth2Validate` */
+		token: string;
 	}
 	/** https://dev.twitch.tv/docs/authentication/revoke-tokens/#revoking-access-token */
 	export type OAuth2Revoke = ResponseBodyError<404>;
@@ -681,46 +774,50 @@ export namespace ResponseBodyError {
 	export type SearchCategories = ResponseBodyError<401>;
 }
 
+function getErrorMessage(method: string, error: unknown): string {
+	if (error instanceof Error) return `(${method}) ${error.message}`;
+	if (typeof error === 'string') return `(${method}) ${error}`;
+	return `(${method}) Unknown error`;
+}
+
 export namespace Request {
 	/**
 	 * Gets the broadcaster’s list of non-private, blocked words or phrases. These are the terms that the broadcaster or moderator added manually or that were denied by AutoMod. [Read More](https://dev.twitch.tv/docs/api/reference/#get-blocked-terms)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked_terms** or **moderator:manage:blocked_terms** scope
+	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked_terms** or **moderator:manage:blocked_terms** scope
 	 * @param broadcaster_id The ID of the broadcaster that owns the list of blocked terms
-	 * @param moderator_id 	The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value
 	 */
-	export async function GetBlockedTerms(client_id: string, access_token: string, broadcaster_id: string, moderator_id: string, first?: string, after?: string, init?: RequestInit) {
+	export async function GetBlockedTerms(authorization: Authorization.User, broadcaster_id: string, first?: string, after?: string, init?: AdvancedRequestInit) {
 		try {
+			if (!(authorization.scopes.includes("moderator:read:blocked_terms") || authorization.scopes.includes("moderator:manage:blocked_terms"))) return {status: 401, message: "The user access token must include moderator:read:blocked_terms or moderator:manage:blocked_terms scope."} as ResponseBodyError.GetBlockedTerms;
 			const url = "https://api.twitch.tv/helix/moderation/blocked_terms";
 			if (!init) init = {};
 			if (!init.method) init.method = "GET";
 			if (!init.headers) init.headers = {
-				"Authorization": `Bearer ${access_token}`,
-				"Client-Id": client_id,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
-			if (!init.search) init.search = {broadcaster_id, moderator_id, first, after};
+			if (!init.search) init.search = {broadcaster_id, moderator_id: authorization.user_id, first, after};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			return response as ResponseBody.GetBlockedTerms | ResponseBodyError.GetBlockedTerms;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.GetBlockedTerms;
+			return {status: 400, message: getErrorMessage("GetBlockedTerms", e)} as ResponseBodyError.GetBlockedTerms;
 		}
 	}
 	/**
-	 * Adds a word or phrase to the broadcaster’s list of blocked terms. These are the terms that the broadcaster doesn’t want used in their chat room. [Read More](https://dev.twitch.tv/docs/api/reference/#add-blocked-term)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:blocked_terms** or **moderator:manage:blocked_terms** scope.
+	 * Adds a word or phrase as token owner to the broadcaster’s list of blocked terms. These are the terms that the broadcaster doesn’t want used in their chat room. [Read More](https://dev.twitch.tv/docs/api/reference/#add-blocked-term)
+	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked_terms** scope
 	 * @param broadcaster_id The ID of the broadcaster that owns the list of blocked terms
-	 * @param moderator_id 	The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token
 	 * @param text The word or phrase to block from being used in the broadcaster’s chat room. The term must contain a minimum of 2 characters and may contain up to a maximum of 500 characters. Terms may include a wildcard character (*). The wildcard character must appear at the beginning or end of a word or set of characters. For example, \*foo or foo\*. If the blocked term already exists, the response contains the existing blocked term
 	 */
-	export async function AddBlockedTerm(client_id: string, access_token: string, broadcaster_id: string, moderator_id: string, text: string, init?: RequestInit) {
+	export async function AddBlockedTerm(authorization: Authorization.User, broadcaster_id: string, text: string, init?: AdvancedRequestInit) {
 		try {
+			if (!authorization.scopes.includes("moderator:manage:blocked_terms")) return {status: 401, message: "The user access token must include moderator:manage:blocked_terms scope."} as ResponseBodyError.AddBlockedTerm;
 			if (text.length < 2) throw "The length of the term in the text field is too short. The term must contain a minimum of 2 characters.";
 			if (text.length > 500) throw "The length of the term in the text field is too long. The term may contain up to a maximum of 500 characters.";
 
@@ -728,79 +825,87 @@ export namespace Request {
 			if (!init) init = {};
 			if (!init.method) init.method = "POST";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
-			if (!init.search) init.search = {broadcaster_id, moderator_id};
+			if (!init.search) init.search = {broadcaster_id, moderator_id: authorization.user_id};
 			if (!init.body) init.body = JSON.stringify({text});
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			if (response.status === 200) response.data = response.data[0];
 			return response as ResponseBody.AddBlockedTerm | ResponseBodyError.AddBlockedTerm;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.AddBlockedTerm;
+			return {status: 400, message: getErrorMessage("AddBlockedTerm", e)} as ResponseBodyError.AddBlockedTerm;
 		}
 	}
 	/**
-	 * Removes the word or phrase from the broadcaster’s list of blocked terms. [Read More](https://dev.twitch.tv/docs/api/reference/#remove-blocked-term)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked_terms** scope
+	 * Removes the word or phrase as token owner from the broadcaster’s list of blocked terms. [Read More](https://dev.twitch.tv/docs/api/reference/#remove-blocked-term)
+	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:blocked_terms** scope
 	 * @param broadcaster_id The ID of the broadcaster that owns the list of blocked terms
-	 * @param moderator_id 	The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the user ID in the user access token
 	 * @param id The ID of the blocked term to remove from the broadcaster’s list of blocked terms
 	 */
-	export async function RemoveBlockedTerm(client_id: string, access_token: string, broadcaster_id: string, moderator_id: string, id: string, init?: RequestInit) {
+	export async function RemoveBlockedTerm(authorization: Authorization.User, broadcaster_id: string, id: string, init?: AdvancedRequestInit) {
 		try {
+			if (!authorization.scopes.includes("moderator:manage:blocked_terms")) return {status: 401, message: "The user access token must include moderator:manage:blocked_terms scope."} as ResponseBodyError.RemoveBlockedTerm;
+
 			const url = "https://api.twitch.tv/helix/moderation/blocked_terms";
 			if (!init) init = {};
 			if (!init.method) init.method = "DELETE";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`
 			};
-			if (!init.search) init.search = {broadcaster_id, moderator_id, id};
+			if (!init.search) init.search = {broadcaster_id, moderator_id: authorization.user_id, id};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			if (request.status === 204) return {status: 204} as ResponseBody.RemoveBlockedTerm;
 			else return await request.json() as ResponseBodyError.RemoveBlockedTerm;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.RemoveBlockedTerm;
+			return {status: 400, message: getErrorMessage("RemoveBlockedTerm", e)} as ResponseBodyError.RemoveBlockedTerm;
 		}
 	}
 	/**
 	 * Validates access token and if its valid, returns data of it. [Read More](https://dev.twitch.tv/docs/authentication/validate-tokens/#how-to-validate-a-token)
-	 * @param access_token The access token to validate
+	 * @param authorization Access token data or token itself to validate
 	 */
-	export async function OAuth2Validate(access_token: string, init?: RequestInit) {
+	export async function OAuth2Validate(token_data: string | Authorization, init?: AdvancedRequestInit) {
+		const token = typeof token_data === "string" ? token_data : token_data.token;
+
 		try {
-			if (access_token.length < 1) return {status: 401, message: "invalid access token"} as ResponseBodyError.OAuth2Validate;
+			if (token.length < 1) return {status: 401, message: "invalid access token"} as ResponseBodyError.OAuth2Validate;
 
 			const url = "https://id.twitch.tv/oauth2/validate";
 			if (!init) init = {};
 			if (!init.method) init.method = "GET";
 			if (!init.headers) init.headers = {
-				"Authorization": `Bearer ${access_token}`
+				"Authorization": `Bearer ${token}`
 			};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
+			response.token = token;
+			if (response.status === 200) {
+				if (!response.scopes) response.scopes = [];
+				response.user_login = response.login;
+				delete response.login;
+				response.type = (response.user_id || response.user_login) ? "user" : "app";
+			}
 			return response as ResponseBody.OAuth2Validate | ResponseBodyError.OAuth2Validate;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.OAuth2Validate;
+			return {status: 400, message: getErrorMessage("OAuth2Validate", e), token} as ResponseBodyError.OAuth2Validate;
 		}
 	}
 	/**
 	 * If your app no longer needs an access token, you can revoke it by this method. [Read More](https://dev.twitch.tv/docs/authentication/revoke-tokens/#revoking-access-token)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token The access token to revoke
+	 * @param authorization Access token data to revoke
 	 */
-	export async function OAuth2Revoke(client_id: string, access_token: string, init?: RequestInit) {
+	export async function OAuth2Revoke(authorization: Authorization, init?: AdvancedRequestInit) {
 		try {
-			if (access_token.length < 1) throw "invalid access token";
+			if (authorization.token.length < 1) throw "invalid access token";
 
 			const url = "https://id.twitch.tv/oauth2/revoke";
 			if (!init) init = {};
@@ -808,187 +913,187 @@ export namespace Request {
 			if (!init.headers) init.headers = {
 				"Content-Type": "application/x-www-form-urlencoded"
 			};
-			if (!init.search) init.search = {client_id, token: access_token};
+			if (!init.search) init.search = {client_id: authorization.client_id, token: authorization.token};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			if (request.status === 200) return {status: 200} as ResponseBody.OAuth2Revoke;
 			else return await request.json() as ResponseBodyError.OAuth2Revoke;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.OAuth2Revoke;
+			return {status: 400, message: getErrorMessage("OAuth2Revoke", e)} as ResponseBodyError.OAuth2Revoke;
 		}
 	}
 	/**
-	 * Creates an EventSub subscription. [Read More](https://dev.twitch.tv/docs/api/reference/#create-eventsub-subscription)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token
+	 * Creates an EventSub subscription. If you using `EventSub.startWebSocket` method, you must use this function in `onSessionWelcome` callback. [Read More](https://dev.twitch.tv/docs/api/reference/#create-eventsub-subscription)
+	 * @param authorization
 	 * 1. If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token. If the subscription type requires user authorization, the user must have granted your app (client ID) permissions to receive those events before you subscribe to them. For example, to subscribe to [channel.subscribe](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) events, your app must get a user access token that includes the `channel:read:subscriptions` scope, which adds the required permission to your app access token’s client ID
 	 * 2. If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. If the subscription type requires user authorization, the token must include the required scope. However, if the subscription type doesn’t include user authorization, the token may include any scopes or no scopes
 	 * 3. If you use [Conduits to receive events](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/), the request must specify an app access token. The request will fail if you use a user access token
 	 * @param subscription `EventSub.Subscription` type to subscribe
 	 */
-	export async function CreateEventSubSubscription<Subscription extends EventSub.Subscription>(client_id: string, access_token: string, subscription: Subscription, init?: RequestInit) {
+	export async function CreateEventSubSubscription<Subscription extends EventSub.Subscription>(authorization: Authorization, subscription: Subscription, init?: AdvancedRequestInit) {
 		try {
 			const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
 			if (!init) init = {};
 			if (!init.method) init.method = "POST";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
 			if (!init.body) init.body = JSON.stringify(subscription);
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			if (response.status === 202) response.data = response.data[0];
 
 			return response as ResponseBody.CreateEventSubSubscription<Subscription> | ResponseBodyError.CreateEventSubSubscription;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.CreateEventSubSubscription;
+			return {status: 400, message: getErrorMessage("CreateEventSubSubscription", e)} as ResponseBodyError.CreateEventSubSubscription;
 		}
 	}
 	/**
 	 * Deletes an EventSub subscription. [Read More(https://dev.twitch.tv/docs/api/reference/#delete-eventsub-subscription)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token
+	 * @param authorization
 	 * 1. If you use [webhooks to receive events](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the request must specify an app access token. The request will fail if you use a user access token
 	 * 2. If you use [WebSockets to receive events](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the request must specify a user access token. The request will fail if you use an app access token. The token may include any scopes
 	 * @param id The ID of the subscription to delete
 	 */
-	export async function DeleteEventSubSubscription(client_id: string, access_token: string, id: string, init?: RequestInit) {
+	export async function DeleteEventSubSubscription(authorization: Authorization, id: string, init?: AdvancedRequestInit) {
 		try {
 			const url = "https://api.twitch.tv/helix/eventsub/subscriptions";
 			if (!init) init = {};
 			if (!init.method) init.method = "DELETE";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
 			if (!init.search) init.search = {id};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			if (request.status === 204) return {status: 204} as ResponseBody.DeleteEventSubSubscription;
 			else return await request.json() as ResponseBodyError.DeleteEventSubSubscription;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.DeleteEventSubSubscription;
+			return {status: 400, message: getErrorMessage("DeleteEventSubSubscription", e)} as ResponseBodyError.DeleteEventSubSubscription;
 		}
 	}
 	/**
 	 * Gets information about one or more users. [Read More](https://dev.twitch.tv/docs/api/reference/#get-users)
-	 * 1. You may look up users using their user ID, login name, or both but the sum total of the number of users you may look up is 100. For example, you may specify 50 IDs and 50 names or 100 IDs or names, but you cannot specify 100 IDs and 100 names.
-	 * 2. If you don’t specify IDs or login names, the request returns information about the user in the access token if you specify a user access token.
-	 * 3. To include the user’s verified email address in the response, you must use a user access token that includes the **user:read:email** scope.
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [App access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
-	 * @param id The ID of the user to get. To specify more than one user, include the id parameter for each user to get. For example, `id=1234&id=5678`. The maximum number of IDs you may specify is 100
-	 * @param login The login name of the user to get. To specify more than one user, include the login parameter for each user to get. For example, `login=foo&login=bar`. The maximum number of login names you may specify is 100
+	 * @param authorization [App access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+	 * @param query Specifies query of request:
+	 * - You may look up users using their user ID, login name, or both but the sum total of the number of users you may look up is 100. For example, you may specify 50 IDs and 50 names or 100 IDs or names, but you cannot specify 100 IDs and 100 names.
+	 * - If you don’t specify IDs or login names, the request returns information about the user in the access token if you specify a user access token.
+	 * - To include the user’s verified email address in the response, you must use a user access token that includes the **user:read:email** scope.
 	 */
-	export async function GetUsers(client_id: string, access_token: string, id?: string, login?: string, init?: RequestInit) {
+	export async function GetUsers(authorization: Authorization, query: {
+		/** The ID of the user to get. To specify more than one user, include the id parameter for each user to get. For example, `id=1234&id=5678`. The maximum number of IDs you may specify is 100 */
+		id?: string;
+		/** The login name of the user to get. To specify more than one user, include the login parameter for each user to get. For example, `login=foo&login=bar`. The maximum number of login names you may specify is 100 */
+		login?: string;
+	}, init?: AdvancedRequestInit)
+	{
 		try {
 			const url = "https://api.twitch.tv/helix/users";
 			if (!init) init = {};
 			if (!init.method) init.method = "GET";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`
 			};
-			if (!init.search) init.search = {id, login};
+			if (!init.search) init.search = query;
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			return response as ResponseBody.GetUsers | ResponseBodyError.GetUsers;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.GetUsers;
+			return {status: 400, message: getErrorMessage("GetUsers", e)} as ResponseBodyError.GetUsers;
 		}
 	}
 	/**
-	 * Sends a message to the broadcaster’s chat room. [Read More](https://dev.twitch.tv/docs/api/reference/#send-chat-message)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [App access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status
+	 * Sends a message as token owner to the broadcaster’s chat room. [Read More](https://dev.twitch.tv/docs/api/reference/#send-chat-message)
+	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the `user:write:chat` scope
 	 * @param broadcaster_id The ID of the broadcaster whose chat room the message will be sent to
-	 * @param sender_id The ID of the user sending the message. This ID must match the user ID in the user access token
 	 * @param message The message to send. The message is limited to a maximum of 500 characters. Chat messages can also include emoticons. To include emoticons, use the name of the emote. The names are case sensitive. Don’t include colons around the name (e.g., :bleedPurple:). If Twitch recognizes the name, Twitch converts the name to the emote before writing the chat message to the chat room
 	 * @param reply_parent_message_id The ID of the chat message being replied to
 	 */
-	export async function SendChatMessage(client_id: string, access_token: string, broadcaster_id: string, sender_id: string, message: string, reply_parent_message_id?: string, init?: RequestInit) {
+	export async function SendChatMessage(authorization: Authorization.User, broadcaster_id: string, message: string, reply_parent_message_id?: string, init?: AdvancedRequestInit) {
 		try {
+			if (!authorization.scopes.includes("user:write:chat")) return {status: 401, message: "The user access token must include user:write:chat scope."} as ResponseBodyError.SendChatMessage;
+
 			const url = "https://api.twitch.tv/helix/chat/messages";
 			if (!init) init = {};
 			if (!init.method) init.method = "POST";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
-			if (!init.search) init.search = {broadcaster_id, sender_id, message, reply_parent_message_id};
+			if (!init.search) init.search = {broadcaster_id, sender_id: authorization.user_id, message, reply_parent_message_id};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			if (response.status === 200) response.data = response.data[0];
 			return response as ResponseBody.SendChatMessage | ResponseBodyError.SendChatMessage;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.SendChatMessage;
+			return {status: 400, message: getErrorMessage("SendChatMessage", e)} as ResponseBodyError.SendChatMessage;
 		}
 	}
 	/**
-	 * Updates a channel’s properties. [Read More](https://dev.twitch.tv/docs/api/reference/#modify-channel-information)
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope
-	 * @param broadcaster_id The ID of the broadcaster whose channel you want to update. This ID must match the user ID in the user access token
+	 * Updates a channel’s properties of token owner. [Read More](https://dev.twitch.tv/docs/api/reference/#modify-channel-information)
+	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope
 	 * @param body All fields are optional, but you must specify at least one field
 	 */
-	export async function ModifyChannelInformation(client_id: string, access_token: string, broadcaster_id: string, body: RequestBody.ModifyChannelInformation, init?: RequestInit) {
+	export async function ModifyChannelInformation(authorization: Authorization.User, body: RequestBody.ModifyChannelInformation, init?: AdvancedRequestInit) {
 		try {
+			if (!authorization.scopes.includes("channel:manage:broadcast")) return {status: 401, message: "The user access token must include channel:manage:broadcast scope."} as ResponseBodyError.ModifyChannelInformation;
 			if (Object.keys(body).length === 0) throw `You must specify at least one field in request body!`;
 
 			const url = "https://api.twitch.tv/helix/channels";
 			if (!init) init = {};
 			if (!init.method) init.method = "PATCH";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
-			if (!init.search) init.search = {broadcaster_id};
+			if (!init.search) init.search = {broadcaster_id: authorization.user_id};
 			if (!init.body) init.body = JSON.stringify(body);
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			if (request.status === 204) return {status: 204} as ResponseBody.ModifyChannelInformation;
 			else return await request.json() as ResponseBodyError.ModifyChannelInformation;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.ModifyChannelInformation;
+			return {status: 400, message: getErrorMessage("ModifyChannelInformation", e)} as ResponseBodyError.ModifyChannelInformation;
 		}
 	}
 	/** Gets the games or categories that match the specified query. [Read More](https://dev.twitch.tv/docs/api/reference/#search-categories)
 	 * - To match, the category’s name must contain all parts of the query string. For example, if the query string is 42, the response includes any category name that contains 42 in the title. If the query string is a phrase like *love computer*, the response includes any category name that contains the words love and computer anywhere in the name. The comparison is case insensitive.
-	 * @param client_id Your app’s client ID. See [Registering your app](https://dev.twitch.tv/docs/authentication/register-app)
-	 * @param access_token [App access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
+	 * @param authorization [App access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) or [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)
 	 * @param query The search string
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function SearchCategories(client_id: string, access_token: string, query: string, first?: number, after?: string, init?: RequestInit) {
+	export async function SearchCategories(authorization: Authorization, query: string, first?: number, after?: string, init?: AdvancedRequestInit) {
 		try {
 			const url = "https://api.twitch.tv/helix/search/categories";
 			if (!init) init = {};
 			if (!init.method) init.method = "GET";
 			if (!init.headers) init.headers = {
-				"Client-Id": client_id,
-				"Authorization": `Bearer ${access_token}`,
+				"Client-Id": authorization.client_id,
+				"Authorization": `Bearer ${authorization.token}`,
 				"Content-Type": "application/json"
 			};
 			if (!init.search) init.search = {query, first, after};
 
-			const request = await fetch(url, init);
+			const request = await AdvancedFetch(url, init);
 			const response: any = await request.json();
 			response.status = request.status;
 			return response as ResponseBody.SearchCategories | ResponseBodyError.SearchCategories;
 		} catch(e) {
-			return {status: 400, message: e.toString()} as ResponseBodyError.SearchCategories;
+			return {status: 400, message: getErrorMessage("SearchCategories", e)} as ResponseBodyError.SearchCategories;
 		}
 	} 
 }

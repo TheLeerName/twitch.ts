@@ -1,17 +1,24 @@
 {
 	"name": "twitch.ts",
-	"version": "1.1.1",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"scripts": {
-		"build": "npx tsc",
-		"prepublish": "npm run build"
+	"version": "1.2.0",
+	"main": "./dist/index.js",
+	"module": "./dist/browser/index.js",
+	"types": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./dist/index.js",
+			"import": "./dist/browser/index.js",
+			"types": "./dist/types/index.d.ts"
+		}
 	},
-	"files": [
-		"dist/**/*"
-	],
+	"files": ["dist"],
+	"scripts": {
+		"clean": "rimraf dist/",
+		"build": "npm run clean && npx tsc -p tsconfig.json && npx tsc -p tsconfig.node.json && npx tsc -p tsconfig.browser.json"
+	},
 	"devDependencies": {
 		"@types/node": "^22.14.0",
+		"rimraf": "^6.0.1",
 		"typescript": "^5.8.3"
 	}
 }
