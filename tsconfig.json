@@ -8,6 +8,7 @@
 			"node_modules/@types"
 		],
 		"rootDir": "./src",
+		"outDir": "./dist",
 		"declarationDir": "./dist/types",
 		"emitDeclarationOnly": false,
 		"strict": true,
@@ -19,7 +20,6 @@
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": [
-		"node_modules",
-		"src/**/test.ts"
+		"node_modules"
 	]
 }

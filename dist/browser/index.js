@@ -1,17 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Request = exports.EventSub = exports.AdvancedFetchGlobalTimeout = void 0;
-exports.AdvancedFetch = AdvancedFetch;
 /**
  * Basic `fetch()` function, but with some improvements:
  * - `init.search`  - URL search/query parameters
  * - `init.hash`    - URL hash/fragment parameters
  * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`
  */
-function AdvancedFetch(input, init) {
+export function AdvancedFetch(input, init) {
     if (!init)
         init = {};
-    var timeout = exports.AdvancedFetchGlobalTimeout;
+    var timeout = AdvancedFetchGlobalTimeout;
     if (init.search) {
         var postfix = "?";
         var added = false;
@@ -48,8 +44,8 @@ function AdvancedFetch(input, init) {
     return fetch(input, init);
 }
 /** in milliseconds */
-exports.AdvancedFetchGlobalTimeout = 5000;
-var EventSub;
+export var AdvancedFetchGlobalTimeout = 5000;
+export var EventSub;
 (function (EventSub) {
     /**
      * Starts WebSocket for subscribing and getting EventSub events
@@ -175,7 +171,7 @@ var EventSub;
             Notification.isChannelChatMessage = isChannelChatMessage;
         })(Notification = Message.Notification || (Message.Notification = {}));
     })(Message = EventSub.Message || (EventSub.Message = {}));
-})(EventSub || (exports.EventSub = EventSub = {}));
+})(EventSub || (EventSub = {}));
 function getErrorMessage(method, error) {
     if (error instanceof Error)
         return `(${method}) ${error.message}`;
@@ -183,7 +179,7 @@ function getErrorMessage(method, error) {
         return `(${method}) ${error}`;
     return `(${method}) Unknown error`;
 }
-var Request;
+export var Request;
 (function (Request) {
     /**
      * Gets the broadcaster’s list of non-private, blocked words or phrases. These are the terms that the broadcaster or moderator added manually or that were denied by AutoMod. [Read More](https://dev.twitch.tv/docs/api/reference/#get-blocked-terms)
@@ -564,4 +560,4 @@ var Request;
         }
     }
     Request.SearchCategories = SearchCategories;
-})(Request || (exports.Request = Request = {}));
+})(Request || (Request = {}));

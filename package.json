@@ -1,6 +1,6 @@
 {
 	"name": "twitch.ts",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"main": "./dist/index.js",
 	"module": "./dist/browser/index.js",
 	"types": "./dist/types/index.d.ts",
@@ -14,7 +14,7 @@
 	"files": ["dist"],
 	"scripts": {
 		"clean": "rimraf dist/",
-		"build": "npm run clean && npx tsc -p tsconfig.json && npx tsc -p tsconfig.node.json && npx tsc -p tsconfig.browser.json"
+		"build": "npm run clean && npx tsc -p tsconfig.json && npx tsc -p tsconfig.browser.json"
 	},
 	"devDependencies": {
 		"@types/node": "^22.14.0",
