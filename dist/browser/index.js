@@ -2,7 +2,7 @@
  * Basic `fetch()` function, but with some improvements:
  * - `init.search`  - URL search/query parameters
  * - `init.hash`    - URL hash/fragment parameters
- * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`
+ * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`, works only if value more than `0`
  */
 export function AdvancedFetch(input, init) {
     if (!init)
@@ -64,7 +64,7 @@ export var EventSub;
             const message = JSON.parse(e.data);
             await connection.onMessage(message);
             if (Message.isSessionWelcome(message)) {
-                const is_reconnected = connection.session.status === "reconnecting";
+                const is_reconnected = connection.session?.status === "reconnecting";
                 connection.session = message.payload.session;
                 connection.onSessionWelcome(message, is_reconnected);
             }

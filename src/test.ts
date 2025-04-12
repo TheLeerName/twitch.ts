@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Request, EventSub } from './index';
 
-const data_save_file = "previous_subscriptions_id.json";
+const data_save_file = "data.json";
 const data: {subscriptions_id: string[] } = fs.existsSync(data_save_file) ? JSON.parse(fs.readFileSync(data_save_file).toString()) : {subscriptions_id: []};
 function saveData() {
 	fs.writeFileSync(data_save_file, JSON.stringify(data));
@@ -13,64 +13,80 @@ function criticalError(message?: any, ...optionalParams: any[]) {
 }
 
 async function subscribeToEvents(connection: EventSub.Connection, events: EventSub.Subscription[]) {
-	const prev_subscriptions_id_length = data.subscriptions_id.length;
+	const result = {total: 0, max_total_cost: 0, total_cost: 0};
 
+	console.log(`Subscribing to events...`);
 	for (const event of events) {
 		const create_subscription = await Request.CreateEventSubSubscription(connection.authorization, event);
 		if (create_subscription.status === 202) {
-			console.log(`Subscribed to ${event.type} event\n\tresponse: ${create_subscription}\n`);
-			data.subscriptions_id.push(create_subscription.data.id);
-		} else criticalError(`Failed to subscribe to ${event.type} event\n\tresponse: ${create_subscription}\n`);
-	}
+			console.log(`\t${event.type}: ${JSON.stringify(create_subscription.data)}`);
 
-	if (data.subscriptions_id.length !== prev_subscriptions_id_length) saveData();
+			result.total++;
+			result.max_total_cost = create_subscription.max_total_cost;
+			result.total_cost = create_subscription.total_cost;
+			data.subscriptions_id.push(create_subscription.data.id);
+		} else criticalError(`\nFailed to subscribe to ${event.type} event\n\tresponse: ${JSON.stringify(create_subscription)}\n`);
+	}
+	saveData();
+	console.log(`\tresult: ${JSON.stringify(result)}\nCompleted!\n`);
 }
 
 async function main() {
 	try {
-		const authorization = await Request.OAuth2Validate(process.argv[2]);
-		if (authorization.status !== 200) throw `Token isn't valid\n\tresponse: ${authorization}\n`;
-		if (authorization.type !== "user") throw `Token isn't user access token\n\tresponse: ${authorization}\n`;
-		console.log(`Token is valid\n\tresponse: ${authorization}\n`);
-
-		const broadcaster_login = process.argv[3];
-		const get_users = await Request.GetUsers(authorization, {login: broadcaster_login});
-		if (get_users.status !== 200) throw `User ${broadcaster_login} not found!`;
-		const { data: [broadcaster] } = get_users;
-		console.log(`Found ${broadcaster.display_name} channel\n\tresponse: ${broadcaster}\n\tbroadcaster_id: ${broadcaster.id}\n`);
+		console.log(`Validating token...`);
+		const token = process.argv[2];
+		console.log(`\ttoken: ${token}`);
+		const authorization = await Request.OAuth2Validate(token);
+		console.log(`\tresponse: ${JSON.stringify(authorization)}`);
+		if (authorization.status !== 200) throw `Token isn't valid!\n`;
+		if (authorization.type !== "user") throw `Token isn't user access token!\n`;
+		console.log(`Completed!\n`);
 
 		if (data.subscriptions_id.length > 0) {
 			console.log(`Deleting previous subscriptions...`);
 			for (const id of data.subscriptions_id) {
 				const delete_sub = await Request.DeleteEventSubSubscription(authorization, id);
-				console.log(`\t${id}: ${delete_sub}`);
+				console.log(`\t${id}: ${JSON.stringify(delete_sub)}`);
 			}
 			data.subscriptions_id = [];
 			console.log(`Completed!\n`);
 		}
 
+		console.log(`Trying to find broadcaster id...`);
+		const broadcaster_login = process.argv[3];
+		console.log(`\trequested_login: ${broadcaster_login}`);
+		const get_users = await Request.GetUsers(authorization, {login: broadcaster_login});
+		console.log(`\tresponse: ${JSON.stringify(get_users)}`);
+		if (get_users.status !== 200) throw `User ${broadcaster_login} not found!\n`;
+		const { data: [broadcaster] } = get_users;
+		console.log(`\tbroadcaster_id: ${broadcaster.id}\nCompleted!\n`);
+
+		console.log(`Opening WebSocket session...`);
 		const connection = EventSub.startWebSocket(authorization);
-		console.log(`Opened WebSocket session\n\turl: ${connection.ws.url}\n`);
+		console.log(`\turl: ${connection.ws.url}`);
 		connection.onSessionWelcome = async(message, is_reconnected) => {
-			console.log(`Received ${message.metadata.message_type} message\n\tsession: ${message.payload.session}\n`);
-			if (!is_reconnected) subscribeToEvents(connection, [
+			console.log(`Received ${message.metadata.message_type} message\n\tsession: ${JSON.stringify(message.payload.session)}\n`);
+			if (!is_reconnected) await subscribeToEvents(connection, [
 				EventSub.Subscription.ChannelChatMessage(connection.session.id, broadcaster.id, connection.authorization.user_id),
 				// put other EventSub.Subscription.<...> here
 			]);
+			console.log(`Now try to send message !ping in ${broadcaster.display_name} twitch channel`);
+			console.log(`Listening for events...\n`);
 		}
 		connection.onNotification = async(message) => {
-			console.log(`Received ${message.metadata.message_type}#${message.payload.subscription.type} message\n\tpayload: ${message.payload}`);
+			console.log(`Received ${message.metadata.message_type} message with ${message.payload.subscription.type} event\n\tevent: ${JSON.stringify(message.payload.event)}`);
 			if (EventSub.Message.Notification.isChannelChatMessage(message)) {
 				const event = message.payload.event;
 				const text = event.message.text;
 				console.log(`\tchatter_name: ${event.chatter_user_name}\n\ttext: ${text}`);
 				if (text.startsWith("!ping")) {
 					const send_chat_message = await Request.SendChatMessage(connection.authorization, event.broadcaster_user_id, "Pong!", event.message_id);
-					console.log(`\tsend_chat_message: ${send_chat_message}`);
+					console.log(`\tsend_chat_message: ${JSON.stringify(send_chat_message)}`);
 				}
 			}
 			console.log(``);
 		}
+		console.log(`Completed!\n`);
 	} catch(e) {
 		console.error(e);
 	}

@@ -10,7 +10,7 @@ export interface AdvancedRequestInit extends RequestInit {
  * Basic `fetch()` function, but with some improvements:
  * - `init.search`  - URL search/query parameters
  * - `init.hash`    - URL hash/fragment parameters
- * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`
+ * - `init.timeout` - time in milliseconds after which request will be aborted with reason `RequestTimeout`, works only if value more than `0`
  */
 export function AdvancedFetch(input: string, init?: AdvancedRequestInit): Promise<Response> {
 	if (!init) init = {};
@@ -74,7 +74,7 @@ export namespace EventSub {
 			const message: Message = JSON.parse(e.data);
 			await connection.onMessage(message);
 			if (Message.isSessionWelcome(message)) {
-				const is_reconnected = connection.session.status === "reconnecting";
+				const is_reconnected = connection.session?.status === "reconnecting";
 				connection.session = message.payload.session;
 				connection.onSessionWelcome(message, is_reconnected);
 			}
@@ -282,6 +282,8 @@ export namespace EventSub {
 			/** The UTC date and time that the subscription was created. */
 			created_at: string;
 		};
+		/** The event’s data. For information about the event’s data, see the subscription type’s description in [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types). */
+		event: any;
 	}
 	export namespace Payload {
 		export interface ChannelChatMessage extends Payload<Subscription.ChannelChatMessage> {
@@ -492,9 +494,7 @@ export namespace EventSub {
 			payload: Payload_;
 		}
 		export namespace Notification {
-			export function isChannelChatMessage(data: EventSub.Message.Notification): data is ChannelChatMessage { return data.metadata.subscription_type === "channel.chat.message" && data.metadata.subscription_version === "1" }
-			/** Defines a message that the EventSub WebSocket server sends your client when the `channel.chat.message` event occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#notification-message) */
-			export type ChannelChatMessage = Message.Notification<Payload.ChannelChatMessage>;
+			export function isChannelChatMessage(data: EventSub.Message.Notification): data is Notification<Payload.ChannelChatMessage> { return data.metadata.subscription_type === "channel.chat.message" && data.metadata.subscription_version === "1" }
 		}
 
 		/** Defines the message that the EventSub WebSocket server sends if the server must drop the connection. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#reconnect-message) */
