@@ -5730,7 +5730,7 @@ export namespace ResponseBody {
 			content_classification_labels: string[];
 			/** Boolean flag indicating if the channel has branded content. */
 			is_branded_content: boolean;
-		}
+		}[];
 	}
 	export type ModifyChannelInformation = ResponseBody<true, 204>;
 	export interface GetChannelEditors extends ResponseBody {
@@ -5775,7 +5775,7 @@ export namespace ResponseBody {
 			user_login: string;
 			/** The user’s display name. */
 			user_name: string;
-		};
+		}[];
 		/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 		pagination?: {
 			/** The cursor used to get the next page of results. Use the cursor to set the request’s `after` query parameter. */
