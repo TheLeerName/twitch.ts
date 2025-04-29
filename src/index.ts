@@ -5755,7 +5755,7 @@ export namespace ResponseBody {
 			broadcaster_name: string;
 			/** The UTC timestamp when the user started following the broadcaster. */
 			followed_at: string;
-		};
+		}[];
 		/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 		pagination?: {
 			/** The cursor used to get the next page of results. Use the cursor to set the request’s `after` query parameter. */
