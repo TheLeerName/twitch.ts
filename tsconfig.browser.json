@@ -8,6 +8,7 @@
 	},
 	"exclude": [
 		"node_modules",
-		"src/**/test.ts"
+		"src/**/test.ts",
+		"src/**/test-authorization-code.ts",
 	]
 }

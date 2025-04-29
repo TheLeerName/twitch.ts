@@ -1,6 +1,12 @@
 import fs from 'fs';
 import { Request, EventSub, Authorization } from './index';
 
+// To run:
+// node dist/test.js <user_access_token> <broadcaster_login>
+// Opens WebSocket session of EventSub
+// Subscribes to channel.chat.message event with connecting to specified broadcaster stream chat which prints to terminal chatter name and message text from any sended message using user access token (from authorization code or implicit grant flow)
+// Also has code to process chat commands (try to write !ping to twitch chat after connecting to chat with this script) and send answer to chat
+
 const scopes = [
 	"user:read:chat",
 	"user:write:chat",
@@ -39,7 +45,7 @@ async function subscribeToEvents(connection: EventSub.Connection, events: EventS
 async function main() {
 	try {
 		// printing to console the authorization link
-		//console.log(Authorization.authorizeURL("<specify_here_your_client_id>", "<specify_here_your_redirect_uri>", scopes));
+		//console.log(Authorization.URL.Token("<specify_here_your_client_id>", "<specify_here_your_redirect_uri>", scopes));
 
 		const token: string | undefined = process.argv[2];
 		if (!token) throw `You must specify Twitch Access Token in third argument!\n`;

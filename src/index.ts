@@ -5368,20 +5368,37 @@ export namespace Authorization {
 		return body_;
 	}
 
-	/**
-	 * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
-	 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
-	 * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
-	 * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
-	 * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
-	 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
-	 */
-	export function authorizeURL(client_id: string, redirect_uri: string, scopes: Scope[], force_verify: boolean = false, state?: string): string {
-		var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
-		if (scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
-		if (force_verify) url += `&force_verify=true`;
-		if (state) url += `&state=${state}`;
-		return url;
+	export namespace URL {
+		/**
+		 * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
+		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+		 * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
+		 * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+		 * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+		 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+		 */
+		export function Token(client_id: string, redirect_uri: string, scopes?: Scope[], force_verify: boolean = false, state?: string): string {
+			var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+			if (scopes && scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
+			if (force_verify) url += `&force_verify=true`;
+			if (state) url += `&state=${state}`;
+			return url;
+		}
+		/**
+		 * Creates a authorize URL for getting user access token via [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+		 * @param redirect_uri Your app’s registered redirect URI. The authorization code is sent to this URI.
+		 * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+		 * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+		 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+		 */
+		export function Code(client_id: string, redirect_uri: string, scopes?: Scope[], force_verify: boolean = false, state?: string): string {
+			var url = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+			if (scopes && scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
+			if (force_verify) url += `&force_verify=true`;
+			if (state) url += `&state=${state}`;
+			return url;
+		}
 	}
 }
 
@@ -7275,7 +7292,7 @@ export namespace ResponseBody {
 		export interface AuthorizationCode<S extends Authorization.Scope[]> extends ResponseBody {
 			/** User access token gotten with authorization code grant flow */
 			access_token: string;
-			/** How long, in seconds, the token is valid for */
+			/** How long, in seconds, the access token is valid for */
 			expires_in: number;
 			/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
 			refresh_token: string;
@@ -7287,6 +7304,8 @@ export namespace ResponseBody {
 		export interface RefreshToken<S extends Authorization.Scope[]> extends ResponseBody {
 			/** User access token gotten with authorization code grant flow */
 			access_token: string;
+			/** How long, in seconds, the access token is valid for */
+			expires_in: number;
 			/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
 			refresh_token: string;
 			/** Authorization scopes which contains this access token */
@@ -9161,7 +9180,7 @@ export namespace Request {
 		export async function ClientCredentials(client_id: string, client_secret: string): Promise<ResponseBody.OAuth2Token.ClientCredentials | ResponseBodyError> {
 			try {
 				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
-					"Content-Type": "x-www-form-urlencoded parameters"
+					"Content-Type": "x-www-form-urlencoded"
 				}).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
 				return await getResponse(request);
 			} catch(e) { return getError(e) }
@@ -9176,9 +9195,13 @@ export namespace Request {
 		export async function AuthorizationCode<S extends Authorization.Scope[]>(client_id: string, client_secret: string, redirect_uri: string, code: string): Promise<ResponseBody.OAuth2Token.AuthorizationCode<S> | ResponseBodyError> {
 			try {
 				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
-					"Content-Type": "x-www-form-urlencoded parameters"
-				}).setSearch({ client_id, client_secret, redirect_uri, grant_type: "authorization_code" }).fetch();
-				return await getResponse(request);
+					"Content-Type": "x-www-form-urlencoded"
+				}).setSearch({ client_id, client_secret, redirect_uri, code, grant_type: "authorization_code" }).fetch();
+				const response: any = await getResponse(request);
+				if (request.ok) {
+					if (!response.scopes) response.scopes = [];
+				}
+				return response;
 			} catch(e) { return getError(e) }
 		}
 		/**
@@ -9190,9 +9213,13 @@ export namespace Request {
 		export async function RefreshToken<S extends Authorization.Scope[]>(client_id: string, client_secret: string, refresh_token: string): Promise<ResponseBody.OAuth2Token.RefreshToken<S> | ResponseBodyError> {
 			try {
 				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
-					"Content-Type": "x-www-form-urlencoded parameters"
+					"Content-Type": "x-www-form-urlencoded"
 				}).setSearch({ client_id, client_secret, refresh_token, grant_type: "refresh_token" }).fetch();
-				return await getResponse(request);
+				const response: any = await getResponse(request);
+				if (request.ok) {
+					if (!response.scopes) response.scopes = [];
+				}
+				return response;
 			} catch(e) { return getError(e) }
 		}
 	}

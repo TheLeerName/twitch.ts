@@ -1524,25 +1524,47 @@ export var Authorization;
         return body_;
     }
     Authorization.fromResponseBodyOAuth2Validate = fromResponseBodyOAuth2Validate;
-    /**
-     * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
-     * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
-     * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
-     * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
-     * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
-     * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
-     */
-    function authorizeURL(client_id, redirect_uri, scopes, force_verify = false, state) {
-        var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
-        if (scopes.length > 0)
-            url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
-        if (force_verify)
-            url += `&force_verify=true`;
-        if (state)
-            url += `&state=${state}`;
-        return url;
-    }
-    Authorization.authorizeURL = authorizeURL;
+    let URL;
+    (function (URL) {
+        /**
+         * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
+         * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+         * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
+         * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+         * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+         * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+         */
+        function Token(client_id, redirect_uri, scopes, force_verify = false, state) {
+            var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+            if (scopes && scopes.length > 0)
+                url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
+            if (force_verify)
+                url += `&force_verify=true`;
+            if (state)
+                url += `&state=${state}`;
+            return url;
+        }
+        URL.Token = Token;
+        /**
+         * Creates a authorize URL for getting user access token via [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+         * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+         * @param redirect_uri Your app’s registered redirect URI. The authorization code is sent to this URI.
+         * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+         * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+         * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+         */
+        function Code(client_id, redirect_uri, scopes, force_verify = false, state) {
+            var url = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+            if (scopes && scopes.length > 0)
+                url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
+            if (force_verify)
+                url += `&force_verify=true`;
+            if (state)
+                url += `&state=${state}`;
+            return url;
+        }
+        URL.Code = Code;
+    })(URL = Authorization.URL || (Authorization.URL = {}));
 })(Authorization || (Authorization = {}));
 function getError(error) {
     var message = `Unknown error`;
@@ -3793,4 +3815,71 @@ export var Request;
         }
     }
     Request.OAuth2Revoke = OAuth2Revoke;
+    let OAuth2Token;
+    (function (OAuth2Token) {
+        /**
+         * Gets app access token from [client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
+         * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+         * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+         */
+        async function ClientCredentials(client_id, client_secret) {
+            try {
+                const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+                    "Content-Type": "x-www-form-urlencoded"
+                }).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
+                return await getResponse(request);
+            }
+            catch (e) {
+                return getError(e);
+            }
+        }
+        OAuth2Token.ClientCredentials = ClientCredentials;
+        /**
+         * Gets user access token and refresh token from [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+         * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+         * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+         * @param redirect_uri Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) redirect URI.
+         * @param code The code that the `/authorize` response returned in the `code` query parameter.
+         */
+        async function AuthorizationCode(client_id, client_secret, redirect_uri, code) {
+            try {
+                const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+                    "Content-Type": "x-www-form-urlencoded"
+                }).setSearch({ client_id, client_secret, redirect_uri, code, grant_type: "authorization_code" }).fetch();
+                const response = await getResponse(request);
+                if (request.ok) {
+                    if (!response.scopes)
+                        response.scopes = [];
+                }
+                return response;
+            }
+            catch (e) {
+                return getError(e);
+            }
+        }
+        OAuth2Token.AuthorizationCode = AuthorizationCode;
+        /**
+         * Gets user access token from refresh token. [Read More](https://dev.twitch.tv/docs/authentication/refresh-tokens/#how-to-use-a-refresh-token)
+         * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+         * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+         * @param refresh_token The refresh token issued to the client.
+         */
+        async function RefreshToken(client_id, client_secret, refresh_token) {
+            try {
+                const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+                    "Content-Type": "x-www-form-urlencoded"
+                }).setSearch({ client_id, client_secret, refresh_token, grant_type: "refresh_token" }).fetch();
+                const response = await getResponse(request);
+                if (request.ok) {
+                    if (!response.scopes)
+                        response.scopes = [];
+                }
+                return response;
+            }
+            catch (e) {
+                return getError(e);
+            }
+        }
+        OAuth2Token.RefreshToken = RefreshToken;
+    })(OAuth2Token = Request.OAuth2Token || (Request.OAuth2Token = {}));
 })(Request || (Request = {}));
