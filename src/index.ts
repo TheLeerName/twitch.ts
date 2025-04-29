@@ -9088,8 +9088,8 @@ export namespace Request {
 	 * Validates access token and if its valid, returns data of it. [Read More](https://dev.twitch.tv/docs/authentication/validate-tokens/#how-to-validate-a-token)
 	 * @param authorization Access token data or token itself to validate
 	 */
-	export async function OAuth2Validate<S extends Authorization.Scope[], T extends string>(token_data: T | Authorization<S>): Promise<ResponseBody.OAuth2Validate<S> | ResponseBodyError.OAuth2Validate<T>> {
-		const token = (typeof token_data === "string" ? token_data : token_data.token) as T;
+	export async function OAuth2Validate<S extends Authorization.Scope[]>(token_data: Authorization<S>["token"] | Authorization<S>): Promise<ResponseBody.OAuth2Validate<S> | ResponseBodyError.OAuth2Validate<Authorization<S>["token"]>> {
+		const token = typeof token_data === "string" ? token_data : token_data.token;
 		if (token.length < 1) return getError("#401 invalid access token");
 		try {
 			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/validate", "GET").setHeaders({
