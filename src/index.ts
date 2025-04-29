@@ -113,7 +113,7 @@ export namespace EventSub {
 	 * - Reconnects in `reconnect_ms`, if WebSocket was closed
 	 * @param reconnect_ms If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
 	 */
-	export function startWebSocket<S extends Authorization.Scope>(token_data: Authorization.User<S>, reconnect_ms?: number) {
+	export function startWebSocket<S extends Authorization.Scope[]>(token_data: Authorization.User<S>, reconnect_ms?: number) {
 		if (!reconnect_ms) reconnect_ms = 500;
 
 		const connection = new Connection(new WebSocket(WebSocketURL), token_data);
@@ -179,7 +179,7 @@ export namespace EventSub {
 		'websocket_connection_unused' | 'websocket_internal_error' | 'websocket_network_timeout' |
 		'websocket_network_error' | 'websocket_failed_to_reconnect';
 
-	export class Connection<S extends Authorization.Scope = Authorization.Scope> {
+	export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]> {
 		ws: WebSocket;
 		/** User access token data */
 		authorization: Authorization.User<S>;
@@ -229,6 +229,9 @@ export namespace EventSub {
 	}
 	export namespace Connection {
 		export type Session = EventSub.Session<"connected" | "reconnecting">;
+		export function is<S extends Authorization.Scope[]>(connection: any): connection is Connection<S> {
+			return connection.ws != null && connection.authorization != null;
+		}
 	}
 
 	/** Definition of the subscription. */
@@ -695,12 +698,15 @@ export namespace EventSub {
 		 */
 		export type AutomodMessageHold = Subscription<"automod.message.hold", "1", Condition.AutomodMessageHold, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the broadcaster (channel).
-		 * @param moderator_user_id User ID of the moderator.
 		 */
-		export function AutomodMessageHold(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodMessageHold {
-			return { transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodMessageHold(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodMessageHold {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -712,12 +718,15 @@ export namespace EventSub {
 		*/
 		export type AutomodMessageHoldV2 = Subscription<"automod.message.hold", "2", Condition.AutomodMessageHold, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the broadcaster (channel).
-		 * @param moderator_user_id User ID of the moderator.
 		 */
-		export function AutomodMessageHoldV2(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodMessageHoldV2 {
-			return { transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodMessageHoldV2(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodMessageHoldV2 {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -729,12 +738,15 @@ export namespace EventSub {
 		*/
 		export type AutomodMessageUpdate = Subscription<"automod.message.update", "1", Condition.AutomodMessageUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-		 * @param moderator_user_id User ID of the moderator.
 		 */
-		export function AutomodMessageUpdate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodMessageUpdate {
-			return { transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodMessageUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodMessageUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -746,12 +758,15 @@ export namespace EventSub {
 		*/
 		export type AutomodMessageUpdateV2 = Subscription<"automod.message.update", "2", Condition.AutomodMessageUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-		 * @param moderator_user_id User ID of the moderator.
 		 */
-		export function AutomodMessageUpdateV2(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodMessageUpdateV2 {
-			return { transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodMessageUpdateV2(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodMessageUpdateV2 {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -763,12 +778,15 @@ export namespace EventSub {
 		*/
 		export type AutomodSettingsUpdate = Subscription<"automod.settings.update", "1", Condition.AutomodSettingsUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-		 * @param moderator_user_id User ID of the moderator.
 		 */
-		export function AutomodSettingsUpdate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodSettingsUpdate {
-			return { transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodSettingsUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodSettingsUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -780,12 +798,15 @@ export namespace EventSub {
 		*/
 		export type AutomodTermsUpdate = Subscription<"automod.terms.update", "1", Condition.AutomodTermsUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-		 * @param moderator_user_id User ID of the moderator creating the subscription. Maximum: 1.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
+		 * @param broadcaster_user_id User ID of the broadcaster (channel).
 		 */
-		export function AutomodTermsUpdate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): AutomodTermsUpdate {
-			return { transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function AutomodTermsUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): AutomodTermsUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -804,11 +825,14 @@ export namespace EventSub {
 		*/
 		export type ChannelBitsUse = Subscription<"channel.bits.use", "1", Condition.ChannelBitsUse, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The user ID of the channel broadcaster. Maximum: 1.
 		 */
-		export function ChannelBitsUse(transport: Transport, broadcaster_user_id: string): ChannelBitsUse {
-			return { transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelBitsUse(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelBitsUse {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/** 
@@ -818,11 +842,14 @@ export namespace EventSub {
 		 */
 		export type ChannelUpdate = Subscription<"channel.update", "2", Condition.ChannelUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get updates for.
 		 */
-		export function ChannelUpdate(transport: Transport, broadcaster_user_id: string): ChannelUpdate {
-			return { transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
+		export function ChannelUpdate(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
 		}
 
 		/** 
@@ -832,12 +859,15 @@ export namespace EventSub {
 		 */
 		export type ChannelFollow = Subscription<"channel.follow", "2", Condition.ChannelFollow, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get follow notifications for.
-		 * @param moderator_user_id The ID of the moderator of the channel you want to get follow notifications for. If you have authorization from the broadcaster rather than a moderator, specify the broadcaster’s user ID here.
 		 */
-		export function ChannelFollow(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelFollow {
-			return { transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelFollow(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelFollow {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/** 
@@ -847,11 +877,14 @@ export namespace EventSub {
 		 */
 		export type ChannelAdBreakBegin = Subscription<"channel.ad_break.begin", "1", Condition.ChannelAdBreakBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_id The ID of the broadcaster that you want to get Channel Ad Break begin notifications for. Maximum: 1
 		 */
-		export function ChannelAdBreakBegin(transport: Transport, broadcaster_id: string): ChannelAdBreakBegin {
-			return { transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
+		export function ChannelAdBreakBegin(connection: Connection | {transport: Transport}, broadcaster_id: string): ChannelAdBreakBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
+			else return { transport: connection.transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
 		}
 
 		/** 
@@ -861,12 +894,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatClear = Subscription<"channel.chat.clear", "1", Condition.ChannelChatClear, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat clear events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatClear(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatClear {
-			return { transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatClear(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatClear {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/** 
@@ -876,12 +912,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatClearUserMessages = Subscription<"channel.chat.clear_user_messages", "1", Condition.ChannelChatClearUserMessages, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat clear user messages events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatClearUserMessages(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatClearUserMessages {
-			return { transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatClearUserMessages(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatClearUserMessages {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -891,12 +930,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatMessage = Subscription<"channel.chat.message", "1", Condition.ChannelChatMessage, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id The User ID of the channel to receive chat message events for.
-		 * @param user_id The User ID to read chat as.
 		 */
-		export function ChannelChatMessage(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatMessage {
-			return { transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatMessage(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatMessage {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -906,12 +948,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatMessageDelete = Subscription<"channel.chat.message_delete", "1", Condition.ChannelChatMessageDelete, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat message delete events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatMessageDelete(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatMessageDelete {
-			return { transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatMessageDelete(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatMessageDelete {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -921,12 +966,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatNotification = Subscription<"channel.chat.notification", "1", Condition.ChannelChatNotification, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat notification events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatNotification(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatNotification {
-			return { transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatNotification(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatNotification {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -936,12 +984,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatSettingsUpdate = Subscription<"channel.chat_settings.update", "1", Condition.ChannelChatSettingsUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat settings update events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatSettingsUpdate(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatSettingsUpdate {
-			return { transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatSettingsUpdate(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatSettingsUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -951,12 +1002,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatUserMessageHold = Subscription<"channel.chat.user_message_hold", "1", Condition.ChannelChatUserMessageHold, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat message events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatUserMessageHold(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatUserMessageHold {
-			return { transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatUserMessageHold(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatUserMessageHold {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -966,12 +1020,15 @@ export namespace EventSub {
 		 */
 		export type ChannelChatUserMessageUpdate = Subscription<"channel.chat.user_message_update", "1", Condition.ChannelChatUserMessageUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `user_id` — The user ID to read chat as.
 		 * @param broadcaster_user_id User ID of the channel to receive chat message events for.
-		 * @param user_id The user ID to read chat as.
 		 */
-		export function ChannelChatUserMessageUpdate(transport: Transport, broadcaster_user_id: string, user_id: string): ChannelChatUserMessageUpdate {
-			return { transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id } };
+		export function ChannelChatUserMessageUpdate(connection: Connection | {transport: Transport, user_id: string}, broadcaster_user_id: string): ChannelChatUserMessageUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
 		}
 
 		/**
@@ -981,11 +1038,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSharedChatSessionBegin = Subscription<"channel.shared_chat.begin", "1", Condition.ChannelSharedChatSessionBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The User ID of the channel to receive shared chat session begin events for.
 		 */
-		export function ChannelSharedChatSessionBegin(transport: Transport, broadcaster_user_id: string): ChannelSharedChatSessionBegin {
-			return { transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSharedChatSessionBegin(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSharedChatSessionBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -995,11 +1055,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSharedChatSessionUpdate = Subscription<"channel.shared_chat.update", "1", Condition.ChannelSharedChatSessionUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The User ID of the channel to receive shared chat session update events for.
 		 */
-		export function ChannelSharedChatSessionUpdate(transport: Transport, broadcaster_user_id: string): ChannelSharedChatSessionUpdate {
-			return { transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSharedChatSessionUpdate(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSharedChatSessionUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1009,11 +1072,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSharedChatSessionEnd = Subscription<"channel.shared_chat.end", "1", Condition.ChannelSharedChatSessionEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The User ID of the channel to receive shared chat session end events for.
 		 */
-		export function ChannelSharedChatSessionEnd(transport: Transport, broadcaster_user_id: string): ChannelSharedChatSessionEnd {
-			return { transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSharedChatSessionEnd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSharedChatSessionEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1023,11 +1089,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSubscribe = Subscription<"channel.subscribe", "1", Condition.ChannelSubscribe, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscribe notifications for.
 		 */
-		export function ChannelSubscribe(transport: Transport, broadcaster_user_id: string): ChannelSubscribe {
-			return { transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSubscribe(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSubscribe {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1037,11 +1106,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSubscriptionEnd = Subscription<"channel.subscription.end", "1", Condition.ChannelSubscriptionEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscription end notifications for.
 		 */
-		export function ChannelSubscriptionEnd(transport: Transport, broadcaster_user_id: string): ChannelSubscriptionEnd {
-			return { transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSubscriptionEnd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSubscriptionEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1051,11 +1123,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSubscriptionGift = Subscription<"channel.subscription.gift", "1", Condition.ChannelSubscriptionGift, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscription gift notifications for.
 		 */
-		export function ChannelSubscriptionGift(transport: Transport, broadcaster_user_id: string): ChannelSubscriptionGift {
-			return { transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSubscriptionGift(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSubscriptionGift {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1065,11 +1140,14 @@ export namespace EventSub {
 		 */
 		export type ChannelSubscriptionMessage = Subscription<"channel.subscription.message", "1", Condition.ChannelSubscriptionMessage, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get resubscription chat message notifications for.
 		 */
-		export function ChannelSubscriptionMessage(transport: Transport, broadcaster_user_id: string): ChannelSubscriptionMessage {
-			return { transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelSubscriptionMessage(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelSubscriptionMessage {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1079,11 +1157,14 @@ export namespace EventSub {
 		 */
 		export type ChannelCheer = Subscription<"channel.cheer", "1", Condition.ChannelCheer, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get cheer notifications for.
 		 */
-		export function ChannelCheer(transport: Transport, broadcaster_user_id: string): ChannelCheer {
-			return { transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelCheer(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelCheer {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1093,11 +1174,14 @@ export namespace EventSub {
 		 */
 		export type ChannelRaid = Subscription<"channel.raid", "1", Condition.ChannelRaid, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param condition The condition of this subscription type.
 		 */
-		export function ChannelRaid(transport: Transport, condition: Condition.ChannelRaid): ChannelRaid {
-			return { transport, type: "channel.raid", version: "1", condition };
+		export function ChannelRaid(connection: Connection | {transport: Transport}, condition: Condition.ChannelRaid): ChannelRaid {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.raid", version: "1", condition };
+			else return { transport: connection.transport, type: "channel.raid", version: "1", condition };
 		}
 
 		/**
@@ -1107,11 +1191,14 @@ export namespace EventSub {
 		 */
 		export type ChannelBan = Subscription<"channel.ban", "1", Condition.ChannelBan, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get ban notifications for.
 		 */
-		export function ChannelBan(transport: Transport, broadcaster_user_id: string): ChannelBan {
-			return { transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelBan(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelBan {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1121,11 +1208,14 @@ export namespace EventSub {
 		 */
 		export type ChannelUnban = Subscription<"channel.unban", "1", Condition.ChannelUnban, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get unban notifications for.
 		 */
-		export function ChannelUnban(transport: Transport, broadcaster_user_id: string): ChannelUnban {
-			return { transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelUnban(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelUnban {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1135,12 +1225,15 @@ export namespace EventSub {
 		 */
 		export type ChannelUnbanRequestCreate = Subscription<"channel.unban_request.create", "1", Condition.ChannelUnbanRequestCreate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param moderator_user_id The ID of the user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The ID of the broadcaster you want to get chat unban request notifications for. Maximum: 1.
 		 */
-		export function ChannelUnbanRequestCreate(transport: Transport, moderator_user_id: string, broadcaster_user_id: string): ChannelUnbanRequestCreate {
-			return { transport, type: "channel.unban_request.create", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+		export function ChannelUnbanRequestCreate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelUnbanRequestCreate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.unban_request.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.unban_request.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1154,12 +1247,15 @@ export namespace EventSub {
 		 */
 		export type ChannelUnbanRequestResolve = Subscription<"channel.unban_request.resolve", "1", Condition.ChannelUnbanRequestResolve, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param moderator_user_id The ID of the user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The ID of the broadcaster you want to get unban request resolution notifications for. Maximum: 1.
 		 */
-		export function ChannelUnbanRequestResolve(transport: Transport, moderator_user_id: string, broadcaster_user_id: string): ChannelUnbanRequestResolve {
-			return { transport, type: "channel.unban_request.resolve", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+		export function ChannelUnbanRequestResolve(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelUnbanRequestResolve {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.unban_request.resolve", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.unban_request.resolve", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1176,12 +1272,15 @@ export namespace EventSub {
 		 */
 		export type ChannelModerate = Subscription<"channel.moderate", "1", Condition.ChannelModerate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The user ID of the broadcaster.
-		 * @param moderator_user_id The user ID of the moderator.
 		 */
-		export function ChannelModerate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelModerate {
-			return { transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelModerate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelModerate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1202,12 +1301,15 @@ export namespace EventSub {
 		export type ChannelModerateV2 = Subscription<"channel.moderate", "2", Condition.ChannelModerate, Transport>;
 
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The user ID of the broadcaster.
-		 * @param moderator_user_id The user ID of the moderator.
 		 */
-		export function ChannelModerateV2(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelModerateV2 {
-			return { transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelModerateV2(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelModerateV2 {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1217,11 +1319,14 @@ export namespace EventSub {
 		 */
 		export type ChannelModeratorAdd = Subscription<"channel.moderator.add", "1", Condition.ChannelModeratorAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get moderator addition notifications for.
 		 */
-		export function ChannelModeratorAdd(transport: Transport, broadcaster_user_id: string): ChannelModeratorAdd {
-			return { transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelModeratorAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelModeratorAdd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1231,11 +1336,14 @@ export namespace EventSub {
 		 */
 		export type ChannelModeratorRemove = Subscription<"channel.moderator.remove", "1", Condition.ChannelModeratorRemove, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to get moderator removal notifications for.
 		 */
-		export function ChannelModeratorRemove(transport: Transport, broadcaster_user_id: string): ChannelModeratorRemove {
-			return { transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelModeratorRemove(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelModeratorRemove {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1245,12 +1353,15 @@ export namespace EventSub {
 		 */
 		export type ChannelGuestStarSessionBegin = Subscription<"channel.guest_star_session.begin", "beta", Condition.ChannelGuestStarSessionBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-		 * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
 		 */
-		export function ChannelGuestStarSessionBegin(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelGuestStarSessionBegin {
-			return { transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelGuestStarSessionBegin(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelGuestStarSessionBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1260,12 +1371,15 @@ export namespace EventSub {
 		 */
 		export type ChannelGuestStarSessionEnd = Subscription<"channel.guest_star_session.end", "beta", Condition.ChannelGuestStarSessionEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-		 * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
 		 */
-		export function ChannelGuestStarSessionEnd(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelGuestStarSessionEnd {
-			return { transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelGuestStarSessionEnd(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelGuestStarSessionEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1275,12 +1389,15 @@ export namespace EventSub {
 		 */
 		export type ChannelGuestStarGuestUpdate = Subscription<"channel.guest_star_guest.update", "beta", Condition.ChannelGuestStarGuestUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-		 * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
 		 */
-		export function ChannelGuestStarGuestUpdate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelGuestStarGuestUpdate {
-			return { transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelGuestStarGuestUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelGuestStarGuestUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1290,12 +1407,15 @@ export namespace EventSub {
 		 */
 		export type ChannelGuestStarSettingsUpdate = Subscription<"channel.guest_star_settings.update", "beta", Condition.ChannelGuestStarSettingsUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-		 * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
 		 */
-		export function ChannelGuestStarSettingsUpdate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelGuestStarSettingsUpdate {
-			return { transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelGuestStarSettingsUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelGuestStarSettingsUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1305,11 +1425,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsAutomaticRewardRedemptionAdd = Subscription<"channel.channel_points_automatic_reward_redemption.add", "1", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points reward add notifications for.
 		 */
-		export function ChannelPointsAutomaticRewardRedemptionAdd(transport: Transport, broadcaster_user_id: string): ChannelPointsAutomaticRewardRedemptionAdd {
-			return { transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPointsAutomaticRewardRedemptionAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPointsAutomaticRewardRedemptionAdd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1319,11 +1442,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsAutomaticRewardRedemptionAddV2 = Subscription<"channel.channel_points_automatic_reward_redemption.add", "2", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points reward add notifications for.
 		 */
-		export function ChannelPointsAutomaticRewardRedemptionAddV2(transport: Transport, broadcaster_user_id: string): ChannelPointsAutomaticRewardRedemptionAddV2 {
-			return { transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
+		export function ChannelPointsAutomaticRewardRedemptionAddV2(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPointsAutomaticRewardRedemptionAddV2 {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1333,11 +1459,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsCustomRewardAdd = Subscription<"channel.channel_points_custom_reward.add", "1", Condition.ChannelPointsCustomRewardAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward add notifications for.
 		 */
-		export function ChannelPointsCustomRewardAdd(transport: Transport, broadcaster_user_id: string): ChannelPointsCustomRewardAdd {
-			return { transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPointsCustomRewardAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPointsCustomRewardAdd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1347,12 +1476,15 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsCustomRewardUpdate = Subscription<"channel.channel_points_custom_reward.update", "1", Condition.ChannelPointsCustomRewardUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward update notifications for.
 		 * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
 		 */
-		export function ChannelPointsCustomRewardUpdate(transport: Transport, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardUpdate {
-			return { transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+		export function ChannelPointsCustomRewardUpdate(connection: Connection | {transport: Transport}, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1362,12 +1494,15 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsCustomRewardRemove = Subscription<"channel.channel_points_custom_reward.remove", "1", Condition.ChannelPointsCustomRewardRemove, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward remove notifications for.
 		 * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
 		 */
-		export function ChannelPointsCustomRewardRemove(transport: Transport, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRemove {
-			return { transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
+		export function ChannelPointsCustomRewardRemove(connection: Connection | {transport: Transport}, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRemove {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
 		}
 
 		/**
@@ -1377,12 +1512,15 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsCustomRewardRedemptionAdd = Subscription<"channel.channel_points_custom_reward_redemption.add", "1", Condition.ChannelPointsCustomRewardRedemptionAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward redemption add notifications for.
 		 * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
 		 */
-		export function ChannelPointsCustomRewardRedemptionAdd(transport: Transport, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRedemptionAdd {
-			return { transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+		export function ChannelPointsCustomRewardRedemptionAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRedemptionAdd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
 		}
 
 		/**
@@ -1392,12 +1530,15 @@ export namespace EventSub {
 		 */
 		export type ChannelPointsCustomRewardRedemptionUpdate = Subscription<"channel.channel_points_custom_reward_redemption.update", "1", Condition.ChannelPointsCustomRewardRedemptionUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward redemption update notifications for.
 		 * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
 		 */
-		export function ChannelPointsCustomRewardRedemptionUpdate(transport: Transport, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRedemptionUpdate {
-			return { transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+		export function ChannelPointsCustomRewardRedemptionUpdate(connection: Connection | {transport: Transport}, broadcaster_user_id: string, reward_id?: string): ChannelPointsCustomRewardRedemptionUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+			else return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
 		}
 
 		/**
@@ -1407,11 +1548,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPollBegin = Subscription<"channel.poll.begin", "1", Condition.ChannelPollBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll begin” notifications will be received.
 		 */
-		export function ChannelPollBegin(transport: Transport, broadcaster_user_id: string): ChannelPollBegin {
-			return { transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPollBegin(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPollBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1421,11 +1565,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPollProgress = Subscription<"channel.poll.progress", "1", Condition.ChannelPollProgress, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll progress” notifications will be received.
 		 */
-		export function ChannelPollProgress(transport: Transport, broadcaster_user_id: string): ChannelPollProgress {
-			return { transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPollProgress(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPollProgress {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1435,11 +1582,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPollEnd = Subscription<"channel.poll.end", "1", Condition.ChannelPollEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll end” notifications will be received.
 		 */
-		export function ChannelPollEnd(transport: Transport, broadcaster_user_id: string): ChannelPollEnd {
-			return { transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPollEnd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPollEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1449,11 +1599,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPredictionBegin = Subscription<"channel.prediction.begin", "1", Condition.ChannelPredictionBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction begin” notifications will be received.
 		 */
-		export function ChannelPredictionBegin(transport: Transport, broadcaster_user_id: string): ChannelPredictionBegin {
-			return { transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPredictionBegin(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPredictionBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1463,11 +1616,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPredictionProgress = Subscription<"channel.prediction.progress", "1", Condition.ChannelPredictionProgress, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction progress” notifications will be received.
 		 */
-		export function ChannelPredictionProgress(transport: Transport, broadcaster_user_id: string): ChannelPredictionProgress {
-			return { transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPredictionProgress(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPredictionProgress {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1477,11 +1633,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPredictionLock = Subscription<"channel.prediction.lock", "1", Condition.ChannelPredictionLock, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction lock” notifications will be received.
 		 */
-		export function ChannelPredictionLock(transport: Transport, broadcaster_user_id: string): ChannelPredictionLock {
-			return { transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPredictionLock(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPredictionLock {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1491,11 +1650,14 @@ export namespace EventSub {
 		 */
 		export type ChannelPredictionEnd = Subscription<"channel.prediction.end", "1", Condition.ChannelPredictionEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction end” notifications will be received.
 		 */
-		export function ChannelPredictionEnd(transport: Transport, broadcaster_user_id: string): ChannelPredictionEnd {
-			return { transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelPredictionEnd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelPredictionEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1507,12 +1669,15 @@ export namespace EventSub {
 		 */
 		export type ChannelSuspiciousUserUpdate = Subscription<"channel.suspicious_user.update", "1", Condition.ChannelSuspiciousUserUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param moderator_user_id The ID of a user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the channel to receive chat unban request notifications for.
 		 */
-		export function ChannelSuspiciousUserUpdate(transport: Transport, moderator_user_id: string, broadcaster_user_id: string): ChannelSuspiciousUserUpdate {
-			return { transport, type: "channel.suspicious_user.update", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+		export function ChannelSuspiciousUserUpdate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelSuspiciousUserUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.suspicious_user.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.suspicious_user.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1524,12 +1689,15 @@ export namespace EventSub {
 		 */
 		export type ChannelSuspiciousUserMessage = Subscription<"channel.suspicious_user.message", "1", Condition.ChannelSuspiciousUserMessage, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param moderator_user_id The ID of a user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id User ID of the channel to receive chat message events for.
 		 */
-		export function ChannelSuspiciousUserMessage(transport: Transport, moderator_user_id: string, broadcaster_user_id: string): ChannelSuspiciousUserMessage {
-			return { transport, type: "channel.suspicious_user.message", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+		export function ChannelSuspiciousUserMessage(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelSuspiciousUserMessage {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.suspicious_user.message", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.suspicious_user.message", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1539,11 +1707,14 @@ export namespace EventSub {
 		 */
 		export type ChannelVipAdd = Subscription<"channel.vip.add", "1", Condition.ChannelVipAdd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The User ID of the broadcaster (channel) Maximum: 1
 		 */
-		export function ChannelVipAdd(transport: Transport, broadcaster_user_id: string): ChannelVipAdd {
-			return { transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelVipAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelVipAdd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1553,11 +1724,14 @@ export namespace EventSub {
 		 */
 		export type ChannelVipRemove = Subscription<"channel.vip.remove", "1", Condition.ChannelVipRemove, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The User ID of the broadcaster (channel) Maximum: 1
 		 */
-		export function ChannelVipRemove(transport: Transport, broadcaster_user_id: string): ChannelVipRemove {
-			return { transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelVipRemove(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelVipRemove {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1567,12 +1741,15 @@ export namespace EventSub {
 		 */
 		export type ChannelWarningAcknowledge = Subscription<"channel.warning.acknowledge", "1", Condition.ChannelWarningAcknowledge, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The User ID of the broadcaster.
-		 * @param moderator_user_id The User ID of the moderator.
 		 */
-		export function ChannelWarningAcknowledge(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelWarningAcknowledge {
-			return { transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelWarningAcknowledge(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelWarningAcknowledge {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1582,12 +1759,15 @@ export namespace EventSub {
 		 */
 		export type ChannelWarningSend = Subscription<"channel.warning.send", "1", Condition.ChannelWarningSend, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The User ID of the broadcaster.
-		 * @param moderator_user_id The User ID of the moderator.
 		 */
-		export function ChannelWarningSend(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelWarningSend {
-			return { transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelWarningSend(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelWarningSend {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1597,11 +1777,14 @@ export namespace EventSub {
 		 */
 		export type ChannelCharityCampaignDonate = Subscription<"channel.charity_campaign.donate", "1", Condition.ChannelCharityCampaignDonate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster whose charity campaign donations you want to receive notifications for.
 		 */
-		export function ChannelCharityCampaignDonate(transport: Transport, broadcaster_user_id: string): ChannelCharityCampaignDonate {
-			return { transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelCharityCampaignDonate(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelCharityCampaignDonate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1613,11 +1796,14 @@ export namespace EventSub {
 		 */
 		export type ChannelCharityCampaignStart = Subscription<"channel.charity_campaign.start", "1", Condition.ChannelCharityCampaignStart, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster whose charity campaign start events you want to receive notifications for.
 		 */
-		export function ChannelCharityCampaignStart(transport: Transport, broadcaster_user_id: string): ChannelCharityCampaignStart {
-			return { transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelCharityCampaignStart(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelCharityCampaignStart {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1631,11 +1817,14 @@ export namespace EventSub {
 		 */
 		export type ChannelCharityCampaignProgress = Subscription<"channel.charity_campaign.progress", "1", Condition.ChannelCharityCampaignProgress, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster whose charity campaign progress events you want to receive notifications for.
 		 */
-		export function ChannelCharityCampaignProgress(transport: Transport, broadcaster_user_id: string): ChannelCharityCampaignProgress {
-			return { transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelCharityCampaignProgress(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelCharityCampaignProgress {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1645,11 +1834,14 @@ export namespace EventSub {
 		 */
 		export type ChannelCharityCampaignStop = Subscription<"channel.charity_campaign.stop", "1", Condition.ChannelCharityCampaignStop, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster whose charity campaign stop events you want to receive notifications for.
 		 */
-		export function ChannelCharityCampaignStop(transport: Transport, broadcaster_user_id: string): ChannelCharityCampaignStop {
-			return { transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelCharityCampaignStop(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelCharityCampaignStop {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1659,12 +1851,15 @@ export namespace EventSub {
 		 */
 		export type ConduitShardDisabled = Subscription<"conduit.shard.disabled", "1", Condition.ConduitShardDisabled, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param client_id Your application’s client id. The provided client_id must match the client ID in the application access token.
+		 * @param connection
+		 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `client_id` — Your application’s client id. The provided client_id must match the client ID in the application access token.
 		 * @param conduit_id Optional. The conduit ID to receive events for. If omitted, events for all of this client’s conduits are sent.
 		 */
-		export function ConduitShardDisabled(transport: Transport, client_id: string, conduit_id?: string): ConduitShardDisabled {
-			return { transport, type: "conduit.shard.disabled", version: "1", condition: { client_id, conduit_id } };
+		export function ConduitShardDisabled(connection: Connection | {transport: Transport, client_id: string}, conduit_id?: string): ConduitShardDisabled {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "conduit.shard.disabled", version: "1", condition: { client_id: connection.authorization.client_id, conduit_id } };
+			else return { transport: connection.transport, type: "conduit.shard.disabled", version: "1", condition: { client_id: connection.client_id, conduit_id } };
 		}
 
 		/**
@@ -1676,13 +1871,16 @@ export namespace EventSub {
 		 */
 		export type DropEntitlementGrant = Subscription<"drop.entitlement.grant", "1", Condition.DropEntitlementGrant, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param organization_id The organization ID of the organization that owns the game on the developer portal.
 		 * @param category_id Optional. The category (or game) ID of the game for which entitlement notifications will be received.
 		 * @param campaign_id Optional. The campaign ID for a specific campaign for which entitlement notifications will be received.
 		 */
-		export function DropEntitlementGrant(transport: Transport, organization_id: string, category_id?: string, campaign_id?: string): DropEntitlementGrant {
-			return { transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
+		export function DropEntitlementGrant(connection: Connection | {transport: Transport}, organization_id: string, category_id?: string, campaign_id?: string): DropEntitlementGrant {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
+			else return { transport: connection.transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
 		}
 
 		/**
@@ -1694,11 +1892,14 @@ export namespace EventSub {
 		 */
 		export type ExtensionBitsTransactionCreate = Subscription<"extension.bits_transaction.create", "1", Condition.ExtensionBitsTransactionCreate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param extension_client_id The client ID of the extension.
+		 * @param connection
+		 * If using `Connection` object, `extension_client_id` gets from `authorization.client_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `extension_client_id` — The client ID of the extension.
 		 */
-		export function ExtensionBitsTransactionCreate(transport: Transport, extension_client_id: string): ExtensionBitsTransactionCreate {
-			return { transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id } };
+		export function ExtensionBitsTransactionCreate(connection: Connection | {transport: Transport, extension_client_id: string}): ExtensionBitsTransactionCreate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id: connection.authorization.client_id } };
+			else return { transport: connection.transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id: connection.extension_client_id } };
 		}
 
 		/**
@@ -1710,11 +1911,14 @@ export namespace EventSub {
 		 */
 		export type ChannelGoalBegin = Subscription<"channel.goal.begin", "1", Condition.ChannelGoalBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+		 * @param connection
+		 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
 		 */
-		export function ChannelGoalBegin(transport: Transport, broadcaster_user_id: string): ChannelGoalBegin {
-			return { transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelGoalBegin(connection: Connection | {transport: Transport, broadcaster_user_id: string}): ChannelGoalBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
 		}
 
 		/**
@@ -1726,11 +1930,14 @@ export namespace EventSub {
 		 */
 		export type ChannelGoalProgress = Subscription<"channel.goal.progress", "1", Condition.ChannelGoalProgress, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+		 * @param connection
+		 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
 		 */
-		export function ChannelGoalProgress(transport: Transport, broadcaster_user_id: string): ChannelGoalProgress {
-			return { transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelGoalProgress(connection: Connection | {transport: Transport, broadcaster_user_id: string}): ChannelGoalProgress {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
 		}
 
 		/**
@@ -1740,11 +1947,14 @@ export namespace EventSub {
 		 */
 		export type ChannelGoalEnd = Subscription<"channel.goal.end", "1", Condition.ChannelGoalEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+		 * @param connection
+		 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
 		 */
-		export function ChannelGoalEnd(transport: Transport, broadcaster_user_id: string): ChannelGoalEnd {
-			return { transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelGoalEnd(connection: Connection | {transport: Transport, broadcaster_user_id: string}): ChannelGoalEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id} };
+			else return { transport: connection.transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
 		}
 
 		/**
@@ -1758,11 +1968,14 @@ export namespace EventSub {
 		 */
 		export type ChannelHypeTrainBegin = Subscription<"channel.hype_train.begin", "1", Condition.ChannelHypeTrainBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train begin notifications for.
 		 */
-		export function ChannelHypeTrainBegin(transport: Transport, broadcaster_user_id: string): ChannelHypeTrainBegin {
-			return { transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelHypeTrainBegin(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelHypeTrainBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1776,11 +1989,14 @@ export namespace EventSub {
 		 */
 		export type ChannelHypeTrainProgress = Subscription<"channel.hype_train.progress", "1", Condition.ChannelHypeTrainProgress, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train progress notifications for.
 		 */
-		export function ChannelHypeTrainProgress(transport: Transport, broadcaster_user_id: string): ChannelHypeTrainProgress {
-			return { transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelHypeTrainProgress(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelHypeTrainProgress {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1790,11 +2006,14 @@ export namespace EventSub {
 		 */
 		export type ChannelHypeTrainEnd = Subscription<"channel.hype_train.end", "1", Condition.ChannelHypeTrainEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train end notifications for.
 		 */
-		export function ChannelHypeTrainEnd(transport: Transport, broadcaster_user_id: string): ChannelHypeTrainEnd {
-			return { transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
+		export function ChannelHypeTrainEnd(connection: Connection | {transport: Transport}, broadcaster_user_id: string): ChannelHypeTrainEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1810,12 +2029,15 @@ export namespace EventSub {
 		 */
 		export type ChannelShieldModeBegin = Subscription<"channel.shield_mode.begin", "1", Condition.ChannelShieldModeBegin, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The ID of the broadcaster whose Shield Mode status was updated.
-		 * @param moderator_user_id The ID of the moderator that updated the Shield Mode’s status. If the broadcaster updated the status, this ID will be the same as broadcaster_user_id.
 		 */
-		export function ChannelShieldModeBegin(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelShieldModeBegin {
-			return { transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelShieldModeBegin(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelShieldModeBegin {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1831,12 +2053,15 @@ export namespace EventSub {
 		 */
 		export type ChannelShieldModeEnd = Subscription<"channel.shield_mode.end", "1", Condition.ChannelShieldModeEnd, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The ID of the broadcaster whose Shield Mode status was updated.
-		 * @param moderator_user_id The ID of the moderator that updated the Shield Mode’s status. If the broadcaster updated the status, this ID will be the same as broadcaster_user_id.
 		 */
-		export function ChannelShieldModeEnd(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelShieldModeEnd {
-			return { transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelShieldModeEnd(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelShieldModeEnd {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1850,12 +2075,15 @@ export namespace EventSub {
 		 */
 		export type ChannelShoutoutCreate = Subscription<"channel.shoutout.create", "1", Condition.ChannelShoutoutCreate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive Shoutout create notifications for.
-		 * @param moderator_user_id The user ID of the moderator that sent the Shoutout. If the broadcaster sent the Shoutout, this ID is the same as the ID in broadcaster_user_id.
 		 */
-		export function ChannelShoutoutCreate(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelShoutoutCreate {
-			return { transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelShoutoutCreate(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelShoutoutCreate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1871,12 +2099,15 @@ export namespace EventSub {
 		 */
 		export type ChannelShoutoutReceive = Subscription<"channel.shoutout.receive", "1", Condition.ChannelShoutoutReceive, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `moderator_user_id` — User ID of the moderator.
 		 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive Shoutout receive notifications for.
-		 * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
 		 */
-		export function ChannelShoutoutReceive(transport: Transport, broadcaster_user_id: string, moderator_user_id: string): ChannelShoutoutReceive {
-			return { transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+		export function ChannelShoutoutReceive(connection: Connection | {transport: Transport, moderator_user_id: string}, broadcaster_user_id: string): ChannelShoutoutReceive {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+			else return { transport: connection.transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
 		}
 
 		/**
@@ -1886,11 +2117,14 @@ export namespace EventSub {
 		 */
 		export type StreamOnline = Subscription<"stream.online", "1", Condition.StreamOnline, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID you want to get stream online notifications for.
 		 */
-		export function StreamOnline(transport: Transport, broadcaster_user_id: string): StreamOnline {
-			return { transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
+		export function StreamOnline(connection: Connection | {transport: Transport}, broadcaster_user_id: string): StreamOnline {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1900,11 +2134,14 @@ export namespace EventSub {
 		 */
 		export type StreamOffline = Subscription<"stream.offline", "1", Condition.StreamOffline, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param broadcaster_user_id The broadcaster user ID you want to get stream offline notifications for.
 		 */
-		export function StreamOffline(transport: Transport, broadcaster_user_id: string): StreamOffline {
-			return { transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
+		export function StreamOffline(connection: Connection | {transport: Transport}, broadcaster_user_id: string): StreamOffline {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
+			else return { transport: connection.transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
 		}
 
 		/**
@@ -1916,11 +2153,14 @@ export namespace EventSub {
 		 */
 		export type UserAuthorizationGrant = Subscription<"user.authorization.grant", "1", Condition.UserAuthorizationGrant, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param client_id Your application’s client id. The provided client_id must match the client id in the application access token.
+		 * @param connection
+		 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `client_id` — Your application’s client id. The provided client_id must match the client id in the application access token.
 		 */
-		export function UserAuthorizationGrant(transport: Transport, client_id: string): UserAuthorizationGrant {
-			return { transport, type: "user.authorization.grant", version: "1", condition: { client_id } };
+		export function UserAuthorizationGrant(connection: Connection | {transport: Transport, client_id: string}): UserAuthorizationGrant {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "user.authorization.grant", version: "1", condition: { client_id: connection.authorization.client_id } };
+			else return { transport: connection.transport, type: "user.authorization.grant", version: "1", condition: { client_id: connection.client_id } };
 		}
 
 		/**
@@ -1932,11 +2172,14 @@ export namespace EventSub {
 		 */
 		export type UserAuthorizationRevoke = Subscription<"user.authorization.revoke", "1", Condition.UserAuthorizationRevoke, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
-		 * @param client_id Your application’s client id. The provided client_id must match the client id in the application access token.
+		 * @param connection
+		 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+		 * - `client_id` — Your application’s client id. The provided client_id must match the client id in the application access token.
 		 */
-		export function UserAuthorizationRevoke(transport: Transport, client_id: string): UserAuthorizationRevoke {
-			return { transport, type: "user.authorization.revoke", version: "1", condition: { client_id } };
+		export function UserAuthorizationRevoke(connection: Connection | {transport: Transport, client_id: string}): UserAuthorizationRevoke {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "user.authorization.revoke", version: "1", condition: { client_id: connection.authorization.client_id } };
+			else return { transport: connection.transport, type: "user.authorization.revoke", version: "1", condition: { client_id: connection.client_id } };
 		}
 
 		/**
@@ -1946,11 +2189,14 @@ export namespace EventSub {
 		 */
 		export type UserUpdate = Subscription<"user.update", "1", Condition.UserUpdate, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param user_id The user ID for the user you want update notifications for.
 		 */
-		export function UserUpdate(transport: Transport, user_id: string): UserUpdate {
-			return { transport, type: "user.update", version: "1", condition: { user_id } };
+		export function UserUpdate(connection: Connection | {transport: Transport}, user_id: string): UserUpdate {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "user.update", version: "1", condition: { user_id } };
+			else return { transport: connection.transport, type: "user.update", version: "1", condition: { user_id } };
 		}
 
 		/**
@@ -1960,11 +2206,14 @@ export namespace EventSub {
 		 */
 		export type UserWhisperMessage = Subscription<"user.whisper.message", "1", Condition.UserWhisperMessage, Transport>;
 		/**
-		 * @param transport The transport details that you want Twitch to use when sending you notifications.
+		 * @param connection
+		 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+		 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
 		 * @param user_id The user_id of the person receiving whispers.
 		 */
-		export function UserWhisperMessage(transport: Transport, user_id: string): UserWhisperMessage {
-			return { transport, type: "user.whisper.message", version: "1", condition: { user_id } };
+		export function UserWhisperMessage(connection: Connection | {transport: Transport}, user_id: string): UserWhisperMessage {
+			if (Connection.is(connection)) return { transport: connection.transport, type: "user.whisper.message", version: "1", condition: { user_id } };
+			else return { transport: connection.transport, type: "user.whisper.message", version: "1", condition: { user_id } };
 		}
 	}
 
@@ -4994,29 +5243,29 @@ export namespace EventSub {
 	}
 }
 
-export type Authorization<S extends Authorization.Scope = Authorization.Scope> = Authorization.App<S> | Authorization.User<S>;
+export type Authorization<S extends Authorization.Scope[] = Authorization.Scope[]> = Authorization.App<S> | Authorization.User<S>;
 export namespace Authorization {
 	/** Specifies data of [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) */
-	export interface App<S extends Scope = Scope> {
+	export interface App<S extends Scope[] = Scope[]> {
 		/** The access token you specified in first argument of `Request.OAuth2Validate` */
 		token: string;
 		/** Client ID which belongs to this access token */
 		client_id: string;
 		/** Authorization scopes which contains this access token */
-		scopes: S[];
+		scopes: S;
 		/** How long, in seconds, the token is valid for */
 		expires_in: number;
 		/** Type of token */
 		type: "app";
 	}
 	/** Specifies data of [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) */
-	export interface User<S extends Scope = Scope> {
+	export interface User<S extends Scope[] = Scope[]> {
 		/** The access token you specified in first argument of `Request.OAuth2Validate` */
 		token: string;
 		/** Client ID which belongs to this access token */
 		client_id: string;
 		/** Authorization scopes which contains this access token */
-		scopes: S[];
+		scopes: S;
 		/** How long, in seconds, the token is valid for */
 		expires_in: number;
 		/** User login associated to owner of token */
@@ -5106,9 +5355,26 @@ export namespace Authorization {
 		| "chat:edit"
 		| "chat:read"
 		| "whispers:read";
+	export type WithScope<Has extends readonly Scope[], Required extends Scope> = Required extends Has[number] ? Has : never;
 
-	export function hasScopes<S extends Scope>(authorization: Authorization, ...scopes: S[]): authorization is Authorization<S> {
+	export function hasScopes<S extends Scope[]>(authorization: Authorization, ...scopes: S): authorization is Authorization<S> {
 		return scopes.every(scope => (authorization.scopes as string[]).includes(scope));
+	}
+
+	/**
+	 * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
+	 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+	 * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
+	 * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+	 * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+	 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+	 */
+	export function authorizeURL(client_id: string, redirect_uri: string, scopes: Scope[], force_verify: boolean = false, state?: string): string {
+		var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+		if (scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join('%20'))}`;
+		if (force_verify) url += `&force_verify=true`;
+		if (state) url += `&state=${state}`;
+		return url;
 	}
 }
 
@@ -6988,7 +7254,7 @@ export namespace ResponseBody {
 		data: string[];
 	}
 	export type SendWhisper = ResponseBody<true, 204>;
-	export type OAuth2Validate<S extends Authorization.Scope> = Authorization<S> & ResponseBody;
+	export type OAuth2Validate<S extends Authorization.Scope[]> = Authorization<S> & ResponseBody;
 	export type OAuth2Revoke = ResponseBody;
 }
 
@@ -7039,7 +7305,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:edit:commercial** scope.
 	 * @param length The length of the commercial to run, in seconds. Twitch tries to serve a commercial that’s the requested length, but it may be shorter or longer. The maximum length you should request is 180 seconds.
 	 */
-	export async function StartCommercial(authorization: Authorization.User<"channel:edit:commercial">, length: number): Promise<ResponseBody.StartCommercial | ResponseBodyError> {
+	export async function StartCommercial<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:edit:commercial">>, length: number): Promise<ResponseBody.StartCommercial | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/commercial", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7053,7 +7319,7 @@ export namespace Request {
 	 * This endpoint returns ad schedule related information, including snooze, when the last ad was run, when the next ad is scheduled, and if the channel is currently in pre-roll free time. Note that a new ad cannot be run until 8 minutes after running a previous ad. [Read More](https://dev.twitch.tv/docs/api/reference/#get-ad-schedule)
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:ads** scope.
 	 */
-	export async function GetAdSchedule(authorization: Authorization.User<"channel:read:ads">): Promise<ResponseBody.GetAdSchedule | ResponseBodyError> {
+	export async function GetAdSchedule<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:ads">>): Promise<ResponseBody.GetAdSchedule | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/ads", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7066,7 +7332,7 @@ export namespace Request {
 	 * If available, pushes back the timestamp of the upcoming automatic mid-roll ad by 5 minutes. This endpoint duplicates the snooze functionality in the creator dashboard’s Ads Manager. [Read More](https://dev.twitch.tv/docs/api/reference/#snooze-next-ad)
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:ads** scope.
 	 */
-	export async function SnoozeNextAd(authorization: Authorization.User<"channel:manage:ads">): Promise<ResponseBody.SnoozeNextAd | ResponseBodyError> {
+	export async function SnoozeNextAd<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:ads">>): Promise<ResponseBody.SnoozeNextAd | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/ads/schedule/snooze", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7084,7 +7350,7 @@ export namespace Request {
 	 * @param first The maximum number of report URLs to return per page in the response. The minimum page size is 1 URL per page and the maximum is 100 URLs per page. The default is 20. **NOTE**: While you may specify a maximum value of 100, the response will contain at most 20 URLs per page.
 	 * @param after The cursor used to get the next page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value. This parameter is ignored if the `extension_id` parameter is set.
 	 */
-	export async function GetExtensionAnalytics(authorization: Authorization.User<"analytics:read:extensions">, extension_id?: string, started_at?: string, ended_at?: string, first?: number, after?: string): Promise<ResponseBody.GetExtensionAnalytics | ResponseBodyError> {
+	export async function GetExtensionAnalytics<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "analytics:read:extensions">>, extension_id?: string, started_at?: string, ended_at?: string, first?: number, after?: string): Promise<ResponseBody.GetExtensionAnalytics | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/analytics/extensions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7101,7 +7367,7 @@ export namespace Request {
 	 * @param ended_at The reporting window’s end date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-22T00:00:00Z). The report is inclusive of the end date. Specify an end date only if you provide a start date. Because it can take up to two days for the data to be available, you must specify an end date that’s earlier than today minus one to two days. If not, the API ignores your end date and uses an end date that is today minus one to two days.
 	 * @param after The cursor used to get the next page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value. This parameter is ignored if `game_id` parameter is set.
 	 */
-	export async function GetGameAnalytics(authorization: Authorization.User<"analytics:read:games">, game_id?: string, started_at?: string, ended_at?: string, first?: number, after?: number): Promise<ResponseBody.GetGameAnalytics | ResponseBodyError> {
+	export async function GetGameAnalytics<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "analytics:read:games">>, game_id?: string, started_at?: string, ended_at?: string, first?: number, after?: number): Promise<ResponseBody.GetGameAnalytics | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/analytics/games", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7124,7 +7390,7 @@ export namespace Request {
 	 * @param started_at The start date, in RFC3339 format, used for determining the aggregation period. Specify this parameter only if you specify the `period` query parameter. The start date is ignored if `period` is `all`. Note that the date is converted to PST before being used, so if you set the start time to `2022-01-01T00:00:00.0Z` and period to month, the actual reporting period is December 2021, not January 2022. If you want the reporting period to be January 2022, you must set the start time to `2022-01-01T08:00:00.0Z` or `2022-01-01T00:00:00.0-08:00`.
 	 * @param user_id An ID that identifies a user that cheered bits in the channel. If `count` is greater than 1, the response may include users ranked above and below the specified user. To get the leaderboard’s top leaders, don’t specify a user ID.
 	 */
-	export async function GetBitsLeaderboard(authorization: Authorization.User<"bits:read">, count?: number, period?: "day" | "week" | "month" | "year" | "all", started_at?: string, user_id?: string): Promise<ResponseBody.GetBitsLeaderboard | ResponseBodyError> {
+	export async function GetBitsLeaderboard<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "bits:read">>, count?: number, period?: "day" | "week" | "month" | "year" | "all", started_at?: string, user_id?: string): Promise<ResponseBody.GetBitsLeaderboard | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/bits/leaderboard", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7155,7 +7421,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value.
 	 */
-	export async function GetExtensionTransactions(authorization: Authorization.App, extension_id: string, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetExtensionTransactions<typeof extension_id> | ResponseBodyError> {
+	export async function GetExtensionTransactions<S extends Authorization.Scope[]>(authorization: Authorization.App, extension_id: string, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetExtensionTransactions<typeof extension_id> | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/extensions/transactions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7183,7 +7449,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:broadcast** scope.
 	 * @param body All fields are optional, but you must specify at least one field
 	 */
-	export async function ModifyChannelInformation(authorization: Authorization.User<"channel:manage:broadcast">, body: RequestBody.ModifyChannelInformation): Promise<ResponseBody.ModifyChannelInformation | ResponseBodyError> {
+	export async function ModifyChannelInformation<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:broadcast">>, body: RequestBody.ModifyChannelInformation): Promise<ResponseBody.ModifyChannelInformation | ResponseBodyError> {
 		try {
 			if (Object.keys(body).length === 0) throw `You must specify at least one field in request body!`;
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels", "PATCH").setHeaders({
@@ -7198,7 +7464,7 @@ export namespace Request {
 	 * Gets the broadcaster’s list editors. [Read More](https://dev.twitch.tv/docs/api/reference/#get-channel-editors)
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:editors** scope.
 	 */
-	export async function GetChannelEditors(authorization: Authorization.User<"channel:read:editors">): Promise<ResponseBody.GetChannelEditors | ResponseBodyError> {
+	export async function GetChannelEditors<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:editors">>): Promise<ResponseBody.GetChannelEditors | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/editors", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7214,7 +7480,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 * @param after The cursor used to get the next page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value.
 	 */
-	export async function GetFollowedChannels(authorization: Authorization.User<"user:read:follows">, broadcaster_id?: string, first?: number, after?: string): Promise<ResponseBody.GetFollowedChannels | ResponseBodyError> {
+	export async function GetFollowedChannels<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:follows">>, broadcaster_id?: string, first?: number, after?: string): Promise<ResponseBody.GetFollowedChannels | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/followed", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7248,7 +7514,7 @@ export namespace Request {
 	 * Creates a Custom Reward in the broadcaster’s channel. The maximum number of custom rewards per channel is 50, which includes both enabled and disabled rewards. [Read More](https://dev.twitch.tv/docs/api/reference/#create-custom-rewards)
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
 	 */
-	export async function CreateCustomReward(authorization: Authorization.User<"channel:manage:redemptions">, body: RequestBody.CreateCustomReward): Promise<ResponseBody.CreateCustomReward | ResponseBodyError> {
+	export async function CreateCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, body: RequestBody.CreateCustomReward): Promise<ResponseBody.CreateCustomReward | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7264,7 +7530,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
 	 * @param id The ID of the custom reward to delete.
 	 */
-	export async function DeleteCustomReward(authorization: Authorization.User<"channel:manage:redemptions">, id: string): Promise<ResponseBody.DeleteCustomReward | ResponseBodyError> {
+	export async function DeleteCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string): Promise<ResponseBody.DeleteCustomReward | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7281,7 +7547,7 @@ export namespace Request {
 	 * @param id A list of IDs to filter the rewards by. You may specify a maximum of 50 IDs. Duplicate IDs are ignored. The response contains only the IDs that were found. If none of the IDs were found, the response is 404 Not Found.
 	 * @param only_manageable_rewards A Boolean value that determines whether the response contains only the custom rewards that the app may manage (the app is identified by the ID in the Client-Id header). Set to `true` to get only the custom rewards that the app may manage. The default is `false`.
 	 */
-	export async function GetCustomRewards(authorization: Authorization.User<"channel:read:redemptions" | "channel:manage:redemptions">, id?: string | string[], only_manageable_rewards?: boolean): Promise<ResponseBody.GetCustomRewards | ResponseBodyError> {
+	export async function GetCustomRewards<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:redemptions" | "channel:manage:redemptions">>, id?: string | string[], only_manageable_rewards?: boolean): Promise<ResponseBody.GetCustomRewards | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7300,7 +7566,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value.
 	 * @param first The maximum number of redemptions to return per page in the response. The minimum page size is 1 redemption per page and the maximum is 50. The default is 20.
 	 */
-	export async function GetCustomRewardRedemptions(authorization: Authorization.User<"channel:read:redemptions" | "channel:manage:redemptions">, reward_id: string, status?: string, id?: string | string[], sort?: string, after?: string, first?: number): Promise<ResponseBody.GetCustomRewardRedemptions | ResponseBodyError> {
+	export async function GetCustomRewardRedemptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:redemptions" | "channel:manage:redemptions">>, reward_id: string, status?: string, id?: string | string[], sort?: string, after?: string, first?: number): Promise<ResponseBody.GetCustomRewardRedemptions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7316,7 +7582,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/api/authentication#user-access-tokens) that includes the **channel:manage:redemptions** scope.
 	 * @param id The ID of the reward to update.
 	 */
-	export async function UpdateCustomReward(authorization: Authorization.User<"channel:manage:redemptions">, id: string, body: RequestBody.UpdateCustomReward): Promise<ResponseBody.UpdateCustomReward | ResponseBodyError> {
+	export async function UpdateCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string, body: RequestBody.UpdateCustomReward): Promise<ResponseBody.UpdateCustomReward | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7332,7 +7598,7 @@ export namespace Request {
 	 * @param reward_id The ID that identifies the reward that’s been redeemed.
 	 * @param status The status to set the redemption to. Setting the status to `CANCELED` refunds the user’s channel points.
 	 */
-	export async function UpdateCustomRewardRedemptionStatus(authorization: Authorization.User<"channel:manage:redemptions">, id: string | string[], reward_id: string, status: "CANCELED" | "FULFILLED"): Promise<ResponseBody.UpdateCustomRewardRedemptionStatus | ResponseBodyError> {
+	export async function UpdateCustomRewardRedemptionStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string | string[], reward_id: string, status: "CANCELED" | "FULFILLED"): Promise<ResponseBody.UpdateCustomRewardRedemptionStatus | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7347,7 +7613,7 @@ export namespace Request {
 	 * To receive events when progress is made towards the campaign’s goal or the broadcaster changes the fundraising goal, subscribe to the [channel.charity_campaign.progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelcharity_campaignprogress) subscription type.
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:charity** scope.
 	 */
-	export async function GetCharityCampaigns(authorization: Authorization.User<"channel:read:charity">): Promise<ResponseBody.GetCharityCampaigns | ResponseBodyError> {
+	export async function GetCharityCampaigns<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:charity">>): Promise<ResponseBody.GetCharityCampaigns | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/charity/campaigns", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7364,7 +7630,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 * @param after The cursor used to get the next page of results. The `Pagination` object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetCharityCampaignDonations(authorization: Authorization.User<"channel:read:charity">, first?: number, after?: string): Promise<ResponseBody.GetCharityCampaignDonations | ResponseBodyError> {
+	export async function GetCharityCampaignDonations<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:charity">>, first?: number, after?: string): Promise<ResponseBody.GetCharityCampaignDonations | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/charity/donations", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7384,7 +7650,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 1,000. The default is 100.
 	 * @param after The cursor used to get the next page of results. The `Pagination` object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetChatters(authorization: Authorization.User<"moderator:read:chatters">, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetChatters | ResponseBodyError> {
+	export async function GetChatters<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:chatters">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetChatters | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/chatters", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7506,7 +7772,7 @@ export namespace Request {
 	 * @param broadcaster_id The User ID of a broadcaster you wish to get follower emotes of. Using this query parameter will guarantee inclusion of the broadcaster’s follower emotes in the response body. **NOTE**: If the owner of token is subscribed to the broadcaster specified, their follower emotes will appear in the response body regardless if this query parameter is used.
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 */
-	export async function GetUserEmotes(authorization: Authorization.User<"user:read:emotes">, broadcaster_id?: string, after?: string) {
+	export async function GetUserEmotes<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:emotes">>, broadcaster_id?: string, after?: string) {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/emotes/user", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7521,7 +7787,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster whose chat settings you want to update.
 	 * @param body All fields are optional. Specify only those fields that you want to update.
 	 */
-	export async function UpdateChatSettings(authorization: Authorization.User<"moderator:manage:chat_settings">, broadcaster_id: string, body: RequestBody.UpdateChatSettings): Promise<ResponseBody.UpdateChatSettings | ResponseBodyError> {
+	export async function UpdateChatSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:chat_settings">>, broadcaster_id: string, body: RequestBody.UpdateChatSettings): Promise<ResponseBody.UpdateChatSettings | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/settings", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7537,7 +7803,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:manage:announcements** scope.
 	 * @param broadcaster_id The ID of the broadcaster that owns the chat room to send the announcement to.
 	 */
-	export async function SendChatAnnouncement(authorization: Authorization.User<"moderator:manage:announcements">, broadcaster_id: string): Promise<ResponseBody.SendChatAnnouncement | ResponseBodyError> {
+	export async function SendChatAnnouncement<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:announcements">>, broadcaster_id: string): Promise<ResponseBody.SendChatAnnouncement | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/announcements", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7558,7 +7824,7 @@ export namespace Request {
 	 * @param from_broadcaster_id The ID of the broadcaster that’s sending the Shoutout.
 	 * @param to_broadcaster_id The ID of the broadcaster that’s receiving the Shoutout.
 	 */
-	export async function SendShoutout(authorization: Authorization.User<"moderator:manage:shoutouts">, from_broadcaster_id: string, to_broadcaster_id: string): Promise<ResponseBody.SendShoutout | ResponseBodyError> {
+	export async function SendShoutout<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:shoutouts">>, from_broadcaster_id: string, to_broadcaster_id: string): Promise<ResponseBody.SendShoutout | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/shoutouts", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7574,7 +7840,7 @@ export namespace Request {
 	 * @param message The message to send. The message is limited to a maximum of 500 characters. Chat messages can also include emoticons. To include emoticons, use the name of the emote. The names are case sensitive. Don’t include colons around the name (e.g., :bleedPurple:). If Twitch recognizes the name, Twitch converts the name to the emote before writing the chat message to the chat room
 	 * @param reply_parent_message_id The ID of the chat message being replied to
 	 */
-	export async function SendChatMessage(authorization: Authorization.User<"user:write:chat">, broadcaster_id: string, message: string, reply_parent_message_id?: string): Promise<ResponseBody.SendChatMessage | ResponseBodyError> {
+	export async function SendChatMessage<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:write:chat">>, broadcaster_id: string, message: string, reply_parent_message_id?: string): Promise<ResponseBody.SendChatMessage | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/messages", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7620,7 +7886,7 @@ export namespace Request {
 	 * 
 	 * Turbo and Prime users may specify a named color or a Hex color code like #9146FF. If you use a Hex color code, remember to URL encode it.
 	 */
-	export async function UpdateUserChatColor(authorization: Authorization.User<"user:manage:chat_color">, color: string): Promise<ResponseBody.UpdateUserChatColor | ResponseBodyError> {
+	export async function UpdateUserChatColor<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:chat_color">>, color: string): Promise<ResponseBody.UpdateUserChatColor | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/color", "PUT").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7641,7 +7907,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster whose stream you want to create a clip from.
 	 * @param has_delay A Boolean value that determines whether the API captures the clip at the moment the viewer requests it or after a delay. If `false` (default), Twitch captures the clip at the moment the viewer requests it (this is the same clip experience as the Twitch UX). If `true`, Twitch adds a delay before capturing the clip (this basically shifts the capture window to the right slightly).
 	 */
-	export async function CreateClip(authorization: Authorization.User<"clips:edit">, broadcaster_id: string, has_delay?: boolean): Promise<ResponseBody.CreateClip | ResponseBodyError> {
+	export async function CreateClip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "clips:edit">>, broadcaster_id: string, has_delay?: boolean): Promise<ResponseBody.CreateClip | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/clips", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7902,7 +8168,7 @@ export namespace Request {
 	 * Instead of polling for the progress of a goal, consider [subscribing](https://dev.twitch.tv/docs/eventsub/manage-subscriptions) to receive notifications when a goal makes progress using the [channel.goal.progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelgoalprogress) subscription type. [Read More](https://dev.twitch.tv/docs/api/goals#requesting-event-notifications)
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:goals** scope.
 	 */
-	export async function GetCreatorGoals(authorization: Authorization.User<"channel:read:goals">): Promise<ResponseBody.GetCreatorGoals | ResponseBodyError> {
+	export async function GetCreatorGoals<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:goals">>): Promise<ResponseBody.GetCreatorGoals | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/goals", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7919,7 +8185,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 1.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetHypeTrainEvents(authorization: Authorization.User<"channel:read:hype_train">, first?: number, after?: string): Promise<ResponseBody.GetHypeTrainEvents | ResponseBodyError> {
+	export async function GetHypeTrainEvents<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:hype_train">>, first?: number, after?: string): Promise<ResponseBody.GetHypeTrainEvents | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/hypetrain/events", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7941,7 +8207,7 @@ export namespace Request {
 	 * The above limits are in addition to the standard [Twitch API rate limits](https://dev.twitch.tv/docs/api/guide#twitch-rate-limits). The rate limit headers in the response represent the Twitch rate limits and not the above limits.
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderation:read** scope.
 	 */
-	export async function CheckAutomodStatus(authorization: Authorization.User<"moderation:read">): Promise<ResponseBody.CheckAutomodStatus | ResponseBodyError> {
+	export async function CheckAutomodStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read">>): Promise<ResponseBody.CheckAutomodStatus | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/enforcements/status", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7956,7 +8222,7 @@ export namespace Request {
 	 * @param msg_id The ID of the message to allow or deny.
 	 * @param action The action to take for the message.
 	 */
-	export async function ManageHeldAutoModMessages(authorization: Authorization.User<"moderator:manage:automod">, msg_id: string, action: "ALLOW" | "DENY"): Promise<ResponseBody.ManageHeldAutoModMessages | ResponseBodyError> {
+	export async function ManageHeldAutoModMessages<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:automod">>, msg_id: string, action: "ALLOW" | "DENY"): Promise<ResponseBody.ManageHeldAutoModMessages | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/message", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7971,7 +8237,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:automod_settings** scope.
 	 * @param broadcaster_id The ID of the broadcaster whose AutoMod settings you want to get.
 	 */
-	export async function GetAutoModSettings(authorization: Authorization.User<"moderator:read:automod_settings">, broadcaster_id: string): Promise<ResponseBody.GetAutoModSettings | ResponseBodyError> {
+	export async function GetAutoModSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:automod_settings">>, broadcaster_id: string): Promise<ResponseBody.GetAutoModSettings | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/settings", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -7997,7 +8263,7 @@ export namespace Request {
 	 * 
 	 * Valid values for all levels are from 0 (no filtering) through 4 (most aggressive filtering). These levels affect how aggressively AutoMod holds back messages for moderators to review before they appear in chat or are denied (not shown).
 	 */
-	export async function UpdateAutoModSettings(authorization: Authorization.User<"moderator:manage:automod">, broadcaster_id: string, body: Omit<ResponseBody.GetAutoModSettings["data"], "broadcaster_id" | "moderator_id">): Promise<ResponseBody.UpdateAutoModSettings | ResponseBodyError> {
+	export async function UpdateAutoModSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:automod">>, broadcaster_id: string, body: Omit<ResponseBody.GetAutoModSettings["data"], "broadcaster_id" | "moderator_id">): Promise<ResponseBody.UpdateAutoModSettings | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/settings", "PUT").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8015,7 +8281,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 * @param before The cursor used to get the previous page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetBannedUsers(authorization: Authorization.User<"moderation:read" | "moderator:manage:banned_users">, user_id?: string | string[], first?: number, after?: string, before?: string): Promise<ResponseBody.GetBannedUsers | ResponseBodyError> {
+	export async function GetBannedUsers<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "moderator:manage:banned_users">>, user_id?: string | string[], first?: number, after?: string, before?: string): Promise<ResponseBody.GetBannedUsers | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/banned", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8038,7 +8304,7 @@ export namespace Request {
 	 * @param duration To ban a user indefinitely, don’t include this field. To put a user in a timeout, include this field and specify the timeout period, in seconds. The minimum timeout is 1 second and the maximum is 1,209,600 seconds (2 weeks). To end a user’s timeout early, set this field to 1, or use the `UnbanUser` function.
 	 * @param reason The reason the you’re banning the user or putting them in a timeout. The text is user defined and is limited to a maximum of 500 characters.
 	 */
-	export async function BanUser(authorization: Authorization.User<"moderator:manage:banned_users">, broadcaster_id: string, user_id: string, duration?: number, reason?: string): Promise<ResponseBody.BanUser | ResponseBodyError> {
+	export async function BanUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:banned_users">>, broadcaster_id: string, user_id: string, duration?: number, reason?: string): Promise<ResponseBody.BanUser | ResponseBodyError> {
 		const data = { user_id, duration, reason };
 		if (!duration) delete data.duration;
 		if (!reason) delete data.reason;
@@ -8060,7 +8326,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster whose chat room the user is banned from chatting in.
 	 * @param user_id The ID of the user to remove the ban or timeout from.
 	 */
-	export async function UnbanUser(authorization: Authorization.User<"moderator:manage:banned_users">, broadcaster_id: string, user_id: string): Promise<ResponseBody.UnbanUser | ResponseBodyError> {
+	export async function UnbanUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:banned_users">>, broadcaster_id: string, user_id: string): Promise<ResponseBody.UnbanUser | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/bans", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8078,7 +8344,7 @@ export namespace Request {
 	 * @param after Cursor used to get next page of results. Pagination object in response contains cursor value.
 	 * @param first The maximum number of items to return per page in response.
 	 */
-	export async function GetUnbanRequests(authorization: Authorization.User<"moderator:read:unban_requests" | "moderator:manage:unban_requests">, broadcaster_id: string, status?: "pending" | "approved" | "denied" | "acknowledged" | "canceled", user_id?: string, after?: string, first?: number): Promise<ResponseBody.GetUnbanRequests | ResponseBodyError> {
+	export async function GetUnbanRequests<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:unban_requests" | "moderator:manage:unban_requests">>, broadcaster_id: string, status?: "pending" | "approved" | "denied" | "acknowledged" | "canceled", user_id?: string, after?: string, first?: number): Promise<ResponseBody.GetUnbanRequests | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/unban_requests", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8095,7 +8361,7 @@ export namespace Request {
 	 * @param status Resolution status.
 	 * @param resolution_text Message supplied by the unban request resolver. The message is limited to a maximum of 500 characters.
 	 */
-	export async function ResolveUnbanRequest(authorization: Authorization.User<"moderator:manage:unban_requests">, broadcaster_id: string, unban_request_id: string, status: "approved" | "denied", resolution_text?: string): Promise<ResponseBody.ResolveUnbanRequest<typeof status> | ResponseBodyError> {
+	export async function ResolveUnbanRequest<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:unban_requests">>, broadcaster_id: string, unban_request_id: string, status: "approved" | "denied", resolution_text?: string): Promise<ResponseBody.ResolveUnbanRequest<typeof status> | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/unban_requests", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8111,7 +8377,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value
 	 */
-	export async function GetBlockedTerms(authorization: Authorization.User<"moderator:read:blocked_terms" | "moderator:manage:blocked_terms">, broadcaster_id: string, first?: string, after?: string): Promise<ResponseBody.GetBlockedTerms | ResponseBodyError> {
+	export async function GetBlockedTerms<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:blocked_terms" | "moderator:manage:blocked_terms">>, broadcaster_id: string, first?: string, after?: string): Promise<ResponseBody.GetBlockedTerms | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8127,7 +8393,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster that owns the list of blocked terms
 	 * @param text The word or phrase to block from being used in the broadcaster’s chat room. The term must contain a minimum of 2 characters and may contain up to a maximum of 500 characters. Terms may include a wildcard character (*). The wildcard character must appear at the beginning or end of a word or set of characters. For example, \*foo or foo\*. If the blocked term already exists, the response contains the existing blocked term
 	 */
-	export async function AddBlockedTerm(authorization: Authorization.User<"moderator:manage:blocked_terms">, broadcaster_id: string, text: string): Promise<ResponseBody.AddBlockedTerm | ResponseBodyError> {
+	export async function AddBlockedTerm<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:blocked_terms">>, broadcaster_id: string, text: string): Promise<ResponseBody.AddBlockedTerm | ResponseBodyError> {
 		try {
 			if (text.length < 2) throw "The length of the term in the text field is too short. The term must contain a minimum of 2 characters.";
 			if (text.length > 500) throw "The length of the term in the text field is too long. The term may contain up to a maximum of 500 characters.";
@@ -8146,7 +8412,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster that owns the list of blocked terms
 	 * @param id The ID of the blocked term to remove from the broadcaster’s list of blocked terms
 	 */
-	export async function RemoveBlockedTerm(authorization: Authorization.User<"moderator:manage:blocked_terms">, broadcaster_id: string, id: string): Promise<ResponseBody.RemoveBlockedTerm | ResponseBodyError> {
+	export async function RemoveBlockedTerm<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:blocked_terms">>, broadcaster_id: string, id: string): Promise<ResponseBody.RemoveBlockedTerm | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8166,7 +8432,7 @@ export namespace Request {
 	 * 
 	 * If not specified, the request removes all messages in the broadcaster’s chat room.
 	 */
-	export async function DeleteChatMessage(authorization: Authorization.User<"moderator:manage:chat_messages">, broadcaster_id: string, message_id?: string): Promise<ResponseBody.DeleteChatMessage | ResponseBodyError> {
+	export async function DeleteChatMessage<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:chat_messages">>, broadcaster_id: string, message_id?: string): Promise<ResponseBody.DeleteChatMessage | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/chat", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8181,7 +8447,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 * @param first The maximum number of items to return per page in the response. Minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 */
-	export async function GetModeratedChannels(authorization: Authorization.User<"user:read:moderated_channels">, after?: string, first?: number): Promise<ResponseBody.GetModeratedChannels | ResponseBodyError> {
+	export async function GetModeratedChannels<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:moderated_channels">>, after?: string, first?: number): Promise<ResponseBody.GetModeratedChannels | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/channels", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8197,7 +8463,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 */
-	export async function GetModerators(authorization: Authorization.User<"moderation:read" | "channel:manage:moderators">, user_id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetModerators | ResponseBodyError> {
+	export async function GetModerators<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "channel:manage:moderators">>, user_id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetModerators | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8213,7 +8479,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:moderators** scope.
 	 * @param user_id The ID of the user to add as a moderator in the broadcaster’s chat room.
 	 */
-	export async function AddChannelModerator(authorization: Authorization.User<"channel:manage:moderators">, user_id: string): Promise<ResponseBody.AddChannelModerator | ResponseBodyError> {
+	export async function AddChannelModerator<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:moderators">>, user_id: string): Promise<ResponseBody.AddChannelModerator | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8229,7 +8495,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:moderators** scope.
 	 * @param user_id The ID of the user to remove as a moderator from the broadcaster’s chat room.
 	 */
-	export async function RemoveChannelModerator(authorization: Authorization.User<"channel:manage:moderators">, user_id: string): Promise<ResponseBody.RemoveChannelModerator | ResponseBodyError> {
+	export async function RemoveChannelModerator<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:moderators">>, user_id: string): Promise<ResponseBody.RemoveChannelModerator | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8245,7 +8511,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 */
-	export async function GetChannelVips(authorization: Authorization.User<"channel:read:vips" | "channel:manage:vips">, user_id?: string, first?: string, after?: string): Promise<ResponseBody.GetChannelVips | ResponseBodyError> {
+	export async function GetChannelVips<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:vips" | "channel:manage:vips">>, user_id?: string, first?: string, after?: string): Promise<ResponseBody.GetChannelVips | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8261,7 +8527,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:vips** scope.
 	 * @param user_id The ID of the user to give VIP status to.
 	 */
-	export async function AddChannelVip(authorization: Authorization.User<"channel:manage:vips">, user_id: string): Promise<ResponseBody.AddChannelVip | ResponseBodyError> {
+	export async function AddChannelVip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:vips">>, user_id: string): Promise<ResponseBody.AddChannelVip | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8280,7 +8546,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster who owns the channel where the user has VIP status.
 	 * @param user_id The ID of the user to remove VIP status from.
 	 */
-	export async function RemoveChannelVip(authorization: Authorization.User<"channel:manage:vips">, broadcaster_id: string, user_id: string): Promise<ResponseBody.RemoveChannelVip | ResponseBodyError> {
+	export async function RemoveChannelVip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:vips">>, broadcaster_id: string, user_id: string): Promise<ResponseBody.RemoveChannelVip | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8297,7 +8563,7 @@ export namespace Request {
 	 * @param broadcaster_id The ID of the broadcaster whose Shield Mode you want to activate or deactivate.
 	 * @param is_active A Boolean value that determines whether to activate Shield Mode. Set to `true` to activate Shield Mode; otherwise, `false` to deactivate Shield Mode.
 	 */
-	export async function UpdateShieldModeStatus(authorization: Authorization.User<"moderator:manage:shield_mode">, broadcaster_id: string, is_active: boolean): Promise<ResponseBody.UpdateShieldModeStatus | ResponseBodyError> {
+	export async function UpdateShieldModeStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:shield_mode">>, broadcaster_id: string, is_active: boolean): Promise<ResponseBody.UpdateShieldModeStatus | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/shield_mode", "PUT").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8314,7 +8580,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **moderator:read:shield_mode** or **moderator:manage:shield_mode** scope.
 	 * @param broadcaster_id The ID of the broadcaster whose Shield Mode activation status you want to get.
 	 */
-	export async function GetShieldModeStatus(authorization: Authorization.User<"moderator:read:shield_mode" | "moderator:manage:shield_mode">, broadcaster_id: string): Promise<ResponseBody.GetShieldModeStatus | ResponseBodyError> {
+	export async function GetShieldModeStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:shield_mode" | "moderator:manage:shield_mode">>, broadcaster_id: string): Promise<ResponseBody.GetShieldModeStatus | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/shield_mode", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8330,7 +8596,7 @@ export namespace Request {
 	 * @param user_id The ID of the twitch user to be warned.
 	 * @param reason A custom reason for the warning. **Max 500 chars.**
 	 */
-	export async function WarnChatUser(authorization: Authorization.User<"moderator:manage:warnings">, broadcaster_id: string, user_id: string, reason: string): Promise<ResponseBody.WarnChatUser | ResponseBodyError> {
+	export async function WarnChatUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:warnings">>, broadcaster_id: string, user_id: string, reason: string): Promise<ResponseBody.WarnChatUser | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/warnings", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8349,7 +8615,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 20 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetPolls(authorization: Authorization.User<"channel:read:polls" | "channel:manage:polls">, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPolls | ResponseBodyError> {
+	export async function GetPolls<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:polls" | "channel:manage:polls">>, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPolls | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8369,7 +8635,7 @@ export namespace Request {
 	 * @param channel_points_voting_enabled A Boolean value that indicates whether viewers may cast additional votes using Channel Points. If `true`, the viewer may cast more than one vote but each additional vote costs the number of Channel Points specified in `channel_points_per_vote`. The default is `false` (viewers may cast only one vote). For information about Channel Points, see [Channel Points Guide](https://help.twitch.tv/s/article/channel-points-guide).
 	 * @param channel_points_per_vote The number of points that the viewer must spend to cast one additional vote. The minimum is 1 and the maximum is 1000000. Set only if `channel_points_voting_enabled` is `true`.
 	 */
-	export async function CreatePoll(authorization: Authorization.User<"channel:manage:polls">, title: string, choices: string[], duration: number, channel_points_voting_enabled?: boolean, channel_points_per_vote?: number): Promise<ResponseBody.CreatePoll | ResponseBodyError> {
+	export async function CreatePoll<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:polls">>, title: string, choices: string[], duration: number, channel_points_voting_enabled?: boolean, channel_points_per_vote?: number): Promise<ResponseBody.CreatePoll | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8385,7 +8651,7 @@ export namespace Request {
 	 * @param id The ID of the poll to update.
 	 * @param status The status to set the poll to.
 	 */
-	export async function EndPoll(authorization: Authorization.User<"channel:manage:polls">, id: string, status: "TERMINATED" | "ARCHIVED"): Promise<ResponseBody.EndPoll<typeof status> | ResponseBodyError> {
+	export async function EndPoll<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:polls">>, id: string, status: "TERMINATED" | "ARCHIVED"): Promise<ResponseBody.EndPoll<typeof status> | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8402,7 +8668,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 25 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetPredictions(authorization: Authorization.User<"channel:read:predictions" | "channel:manage:predictions">, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPredictions | ResponseBodyError> {
+	export async function GetPredictions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:predictions" | "channel:manage:predictions">>, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPredictions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8420,7 +8686,7 @@ export namespace Request {
 	 * @param outcomes The list of possible outcomes that the viewers may choose from. The list must contain a minimum of 2 choices and up to a maximum of 10 choices. The choice is limited to a maximum of 25 characters.
 	 * @param prediction_window The length of time (in seconds) that the prediction will run for. The minimum is 30 seconds and the maximum is 1800 seconds (30 minutes).
 	 */
-	export async function CreatePrediction(authorization: Authorization.User<"channel:manage:predictions">, title: string, outcomes: string[], prediction_window: number): Promise<ResponseBody.CreatePrediction | ResponseBodyError> {
+	export async function CreatePrediction<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:predictions">>, title: string, outcomes: string[], prediction_window: number): Promise<ResponseBody.CreatePrediction | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8444,7 +8710,7 @@ export namespace Request {
 	 * The broadcaster has up to 24 hours after the prediction window closes to resolve the prediction. If not, Twitch sets the status to CANCELED and returns the points.
 	 * @param winning_outcome_id The ID of the winning outcome. You must set this parameter if you set `status` to RESOLVED.
 	 */
-	export async function EndPrediction(authorization: Authorization.User<"channel:manage:predictions">, id: string, status: "RESOLVED" | "CANCELED" | "LOCKED", winning_outcome_id?: string): Promise<ResponseBody.EndPrediction | ResponseBodyError> {
+	export async function EndPrediction<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:predictions">>, id: string, status: "RESOLVED" | "CANCELED" | "LOCKED", winning_outcome_id?: string): Promise<ResponseBody.EndPrediction | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "PATCH").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8467,7 +8733,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:raids** scope.
 	 * @param to_broadcaster_id The ID of the broadcaster to raid.
 	 */
-	export async function StartRaid(authorization: Authorization.User<"channel:manage:raids">, to_broadcaster_id: string): Promise<ResponseBody.StartRaid | ResponseBodyError> {
+	export async function StartRaid<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:raids">>, to_broadcaster_id: string): Promise<ResponseBody.StartRaid | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/raids", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8484,7 +8750,7 @@ export namespace Request {
 	 * **Rate Limit**: The limit is 10 requests within a 10-minute window.
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:raids** scope.
 	 */
-	export async function CancelRaid(authorization: Authorization.User<"channel:manage:raids">): Promise<ResponseBody.CancelRaid | ResponseBodyError> {
+	export async function CancelRaid<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:raids">>): Promise<ResponseBody.CancelRaid | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/raids", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8538,7 +8804,7 @@ export namespace Request {
 	 * Gets the channel’s stream key.
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:read:stream_key** scope.
 	 */
-	export async function GetStreamKey(authorization: Authorization.User<"channel:read:stream_key">): Promise<ResponseBody.GetStreamKey | ResponseBodyError> {
+	export async function GetStreamKey<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:stream_key">>): Promise<ResponseBody.GetStreamKey | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/streams/key", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8574,7 +8840,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 100.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetFollowedStreams(authorization: Authorization.User<"user:read:follows">, first?: number, after?: string): Promise<ResponseBody.GetFollowedStreams | ResponseBodyError> {
+	export async function GetFollowedStreams<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:follows">>, first?: number, after?: string): Promise<ResponseBody.GetFollowedStreams | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/streams/followed", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8591,7 +8857,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 * @param before The cursor used to get the previous page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetBroadcasterSubscriptions(authorization: Authorization.User<"channel:read:subscriptions">, user_id?: string | string[], first?: string, after?: string, before?: string): Promise<ResponseBody.GetBroadcasterSubscriptions | ResponseBodyError> {
+	export async function GetBroadcasterSubscriptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:subscriptions">>, user_id?: string | string[], first?: string, after?: string, before?: string): Promise<ResponseBody.GetBroadcasterSubscriptions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8605,7 +8871,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:read:subscriptions** scope.
 	 * @param broadcaster_id The ID of a partner or affiliate broadcaster.
 	 */
-	export async function CheckUserSubscription(authorization: Authorization.User<"user:read:subscriptions">, broadcaster_id: string): Promise<ResponseBody.CheckUserSubscription | ResponseBodyError> {
+	export async function CheckUserSubscription<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:subscriptions">>, broadcaster_id: string): Promise<ResponseBody.CheckUserSubscription | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions/user", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8673,7 +8939,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:edit** scope.
 	 * @param description The string to update the channel’s description to. The description is limited to a maximum of 300 characters.
 	 */
-	export async function UpdateUserDescription(authorization: Authorization.User<"user:edit">, description: string): Promise<ResponseBody.GetUsers | ResponseBodyError> {
+	export async function UpdateUserDescription<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:edit">>, description: string): Promise<ResponseBody.GetUsers | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/users", "PUT").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8689,7 +8955,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetUserBlockList(authorization: Authorization.User<"user:read:blocked_users">, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetUserBlockList | ResponseBodyError> {
+	export async function GetUserBlockList<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:blocked_users">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetUserBlockList | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8707,7 +8973,7 @@ export namespace Request {
 	 * @param source_context The location where the harassment took place that is causing the broadcaster to block the user.
 	 * @param reason The reason that the broadcaster is blocking the user.
 	 */
-	export async function BlockUser(authorization: Authorization.User<"user:manage:blocked_users">, target_user_id: string, source_context?: "chat" | "whisper", reason?: "harassment" | "spam" | "other"): Promise<ResponseBody.BlockUser | ResponseBodyError> {
+	export async function BlockUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:blocked_users">>, target_user_id: string, source_context?: "chat" | "whisper", reason?: "harassment" | "spam" | "other"): Promise<ResponseBody.BlockUser | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "PUT").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8721,7 +8987,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **user:manage:blocked_users** scope.
 	 * @param target_user_id The ID of the user to remove from the broadcaster’s list of blocked users. The API ignores the request if the broadcaster hasn’t blocked the user.
 	 */
-	export async function UnblockUser(authorization: Authorization.User<"user:manage:blocked_users">, target_user_id: string): Promise<ResponseBody.UnblockUser | ResponseBodyError> {
+	export async function UnblockUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:blocked_users">>, target_user_id: string): Promise<ResponseBody.UnblockUser | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8776,7 +9042,7 @@ export namespace Request {
 	 * @param authorization [User access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes the **channel:manage:videos** scope.
 	 * @param id The list of videos to delete. You can delete a maximum of 5 videos per request. Ignores invalid video IDs. If the user doesn’t have permission to delete one of the videos in the list, none of the videos are deleted.
 	 */
-	export async function DeleteVideos(authorization: Authorization.User<"channel:manage:videos">, id: string | string[]): Promise<ResponseBody.DeleteVideos | ResponseBodyError> {
+	export async function DeleteVideos<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:videos">>, id: string | string[]): Promise<ResponseBody.DeleteVideos | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/videos", "DELETE").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8801,7 +9067,7 @@ export namespace Request {
 	 * 
 	 * Messages that exceed the maximum length are truncated.
 	 */
-	export async function SendWhisper(authorization: Authorization.User<"user:manage:whispers">, to_user_id: string, message: string): Promise<ResponseBody.SendWhisper | ResponseBodyError> {
+	export async function SendWhisper<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:whispers">>, to_user_id: string, message: string): Promise<ResponseBody.SendWhisper | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/whispers", "POST").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8815,28 +9081,23 @@ export namespace Request {
 	 * Validates access token and if its valid, returns data of it. [Read More](https://dev.twitch.tv/docs/authentication/validate-tokens/#how-to-validate-a-token)
 	 * @param authorization Access token data or token itself to validate
 	 */
-	export async function OAuth2Validate<S extends Authorization.Scope>(token_data: string | Authorization<S>) {
-		const token = typeof token_data === "string" ? token_data : token_data.token;
+	export async function OAuth2Validate<T extends string, S extends Authorization.Scope[]>(token_data: T | Authorization<S>): Promise<ResponseBody.OAuth2Validate<S> | ResponseBodyError.OAuth2Validate<T>> {
+		const token = (typeof token_data === "string" ? token_data : token_data.token) as T;
 		if (token.length < 1) return getError("#401 invalid access token");
 		try {
 			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/validate", "GET").setHeaders({
 				"Authorization": `Bearer ${token}`
 			}).fetch();
-			const response: any = await request.json();
-			response.status = request.status;
-			response.token = token;
+			const response: any = await getResponse(request);
 			if (response.status === 200) {
+				response.token = token;
 				if (!response.scopes) response.scopes = [];
 				response.user_login = response.login;
 				delete response.login;
 				response.type = (response.user_id || response.user_login) ? "user" : "app";
 			}
-			return response as ResponseBody.OAuth2Validate<S>;
-		} catch(e) {
-			const err = getError<ResponseBodyError.OAuth2Validate<typeof token>>(e);
-			err.token = token;
-			return err;
-		}
+			return response;
+		} catch(e) { return getError(e) }
 	}
 	/**
 	 * If your app no longer needs an access token, you can revoke it by this method. [Read More](https://dev.twitch.tv/docs/authentication/revoke-tokens/#revoking-access-token)

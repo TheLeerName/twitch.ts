@@ -2,8 +2,9 @@ import fs from 'fs';
 import { Request, EventSub, Authorization } from './index';
 
 const scopes = [
+	"user:read:chat",
 	"user:write:chat",
-] as const;
+] as const satisfies Authorization.Scope[];
 
 const data_save_file = "data.json";
 const data: {subscriptions_id: string[] } = fs.existsSync(data_save_file) ? JSON.parse(fs.readFileSync(data_save_file).toString()) : {subscriptions_id: []};
@@ -37,6 +38,9 @@ async function subscribeToEvents(connection: EventSub.Connection, events: EventS
 
 async function main() {
 	try {
+		// printing to console the authorization link
+		//console.log(Authorization.authorizeURL("<specify_here_your_client_id>", "<specify_here_your_redirect_uri>", scopes));
+
 		const token: string | undefined = process.argv[2];
 		if (!token) throw `You must specify Twitch Access Token in third argument!\n`;
 
@@ -47,7 +51,7 @@ async function main() {
 		console.log(`\ttoken: ${token}`);
 		const authorization = await Request.OAuth2Validate(token);
 		console.log(`\tresponse: ${JSON.stringify(authorization)}`);
-		if (authorization.status !== 200) throw `Token isn't valid!\n`;
+		if (!authorization.ok) throw `Token isn't valid!\n`;
 		if (!Authorization.hasScopes(authorization, ...scopes)) throw `Token has wrong scopes!\n`;
 		if (authorization.type !== "user") throw `Token isn't user access token!\n`;
 		console.log(`Completed!\n`);
@@ -76,7 +80,7 @@ async function main() {
 		connection.onSessionWelcome = async(message, is_reconnected) => {
 			console.log(`Received ${message.metadata.message_type} message\n\tsession: ${JSON.stringify(message.payload.session)}\n`);
 			if (!is_reconnected) await subscribeToEvents(connection, [
-				EventSub.Subscription.ChannelChatMessage(connection.transport, broadcaster.id, connection.authorization.user_id),
+				EventSub.Subscription.ChannelChatMessage(connection, broadcaster.id),
 				// put other EventSub.Subscription.<...> here
 			]);
 			console.log(`Now try to send message !ping in ${broadcaster.display_name} twitch channel`);

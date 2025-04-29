@@ -195,6 +195,12 @@ export var EventSub;
         }
     }
     EventSub.Connection = Connection;
+    (function (Connection) {
+        function is(connection) {
+            return connection.ws != null && connection.authorization != null;
+        }
+        Connection.is = is;
+    })(Connection = EventSub.Connection || (EventSub.Connection = {}));
     let Transport;
     (function (Transport) {
         /**
@@ -213,697 +219,1107 @@ export var EventSub;
     let Subscription;
     (function (Subscription) {
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the broadcaster (channel).
-         * @param moderator_user_id User ID of the moderator.
          */
-        function AutomodMessageHold(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodMessageHold(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.message.hold", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodMessageHold = AutomodMessageHold;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the broadcaster (channel).
-         * @param moderator_user_id User ID of the moderator.
          */
-        function AutomodMessageHoldV2(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodMessageHoldV2(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.message.hold", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodMessageHoldV2 = AutomodMessageHoldV2;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-         * @param moderator_user_id User ID of the moderator.
          */
-        function AutomodMessageUpdate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodMessageUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.message.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodMessageUpdate = AutomodMessageUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-         * @param moderator_user_id User ID of the moderator.
          */
-        function AutomodMessageUpdateV2(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodMessageUpdateV2(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.message.update", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodMessageUpdateV2 = AutomodMessageUpdateV2;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-         * @param moderator_user_id User ID of the moderator.
          */
-        function AutomodSettingsUpdate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodSettingsUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.settings.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodSettingsUpdate = AutomodSettingsUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param broadcaster_user_id User ID of the broadcaster (channel). Maximum: 1.
-         * @param moderator_user_id User ID of the moderator creating the subscription. Maximum: 1.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
+         * @param broadcaster_user_id User ID of the broadcaster (channel).
          */
-        function AutomodTermsUpdate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function AutomodTermsUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "automod.terms.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.AutomodTermsUpdate = AutomodTermsUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The user ID of the channel broadcaster. Maximum: 1.
          */
-        function ChannelBitsUse(transport, broadcaster_user_id) {
-            return { transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
+        function ChannelBitsUse(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.bits.use", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelBitsUse = ChannelBitsUse;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get updates for.
          */
-        function ChannelUpdate(transport, broadcaster_user_id) {
-            return { transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
+        function ChannelUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.update", version: "2", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelUpdate = ChannelUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get follow notifications for.
-         * @param moderator_user_id The ID of the moderator of the channel you want to get follow notifications for. If you have authorization from the broadcaster rather than a moderator, specify the broadcaster’s user ID here.
          */
-        function ChannelFollow(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelFollow(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.follow", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelFollow = ChannelFollow;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_id The ID of the broadcaster that you want to get Channel Ad Break begin notifications for. Maximum: 1
          */
-        function ChannelAdBreakBegin(transport, broadcaster_id) {
-            return { transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
+        function ChannelAdBreakBegin(connection, broadcaster_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
+            else
+                return { transport: connection.transport, type: "channel.ad_break.begin", version: "1", condition: { broadcaster_id } };
         }
         Subscription.ChannelAdBreakBegin = ChannelAdBreakBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat clear events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatClear(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatClear(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.clear", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatClear = ChannelChatClear;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat clear user messages events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatClearUserMessages(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatClearUserMessages(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.clear_user_messages", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatClearUserMessages = ChannelChatClearUserMessages;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id The User ID of the channel to receive chat message events for.
-         * @param user_id The User ID to read chat as.
          */
-        function ChannelChatMessage(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatMessage(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.message", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatMessage = ChannelChatMessage;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat message delete events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatMessageDelete(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatMessageDelete(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.message_delete", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatMessageDelete = ChannelChatMessageDelete;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat notification events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatNotification(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatNotification(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.notification", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatNotification = ChannelChatNotification;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat settings update events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatSettingsUpdate(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatSettingsUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat_settings.update", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatSettingsUpdate = ChannelChatSettingsUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat message events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatUserMessageHold(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatUserMessageHold(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.user_message_hold", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatUserMessageHold = ChannelChatUserMessageHold;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `user_id` — The user ID to read chat as.
          * @param broadcaster_user_id User ID of the channel to receive chat message events for.
-         * @param user_id The user ID to read chat as.
          */
-        function ChannelChatUserMessageUpdate(transport, broadcaster_user_id, user_id) {
-            return { transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id } };
+        function ChannelChatUserMessageUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.chat.user_message_update", version: "1", condition: { broadcaster_user_id, user_id: connection.user_id } };
         }
         Subscription.ChannelChatUserMessageUpdate = ChannelChatUserMessageUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The User ID of the channel to receive shared chat session begin events for.
          */
-        function ChannelSharedChatSessionBegin(transport, broadcaster_user_id) {
-            return { transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSharedChatSessionBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shared_chat.begin", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSharedChatSessionBegin = ChannelSharedChatSessionBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The User ID of the channel to receive shared chat session update events for.
          */
-        function ChannelSharedChatSessionUpdate(transport, broadcaster_user_id) {
-            return { transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSharedChatSessionUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shared_chat.update", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSharedChatSessionUpdate = ChannelSharedChatSessionUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The User ID of the channel to receive shared chat session end events for.
          */
-        function ChannelSharedChatSessionEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSharedChatSessionEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shared_chat.end", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSharedChatSessionEnd = ChannelSharedChatSessionEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscribe notifications for.
          */
-        function ChannelSubscribe(transport, broadcaster_user_id) {
-            return { transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSubscribe(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.subscribe", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSubscribe = ChannelSubscribe;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscription end notifications for.
          */
-        function ChannelSubscriptionEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSubscriptionEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.subscription.end", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSubscriptionEnd = ChannelSubscriptionEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get subscription gift notifications for.
          */
-        function ChannelSubscriptionGift(transport, broadcaster_user_id) {
-            return { transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSubscriptionGift(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.subscription.gift", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSubscriptionGift = ChannelSubscriptionGift;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get resubscription chat message notifications for.
          */
-        function ChannelSubscriptionMessage(transport, broadcaster_user_id) {
-            return { transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
+        function ChannelSubscriptionMessage(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.subscription.message", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelSubscriptionMessage = ChannelSubscriptionMessage;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get cheer notifications for.
          */
-        function ChannelCheer(transport, broadcaster_user_id) {
-            return { transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
+        function ChannelCheer(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.cheer", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelCheer = ChannelCheer;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param condition The condition of this subscription type.
          */
-        function ChannelRaid(transport, condition) {
-            return { transport, type: "channel.raid", version: "1", condition };
+        function ChannelRaid(connection, condition) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.raid", version: "1", condition };
+            else
+                return { transport: connection.transport, type: "channel.raid", version: "1", condition };
         }
         Subscription.ChannelRaid = ChannelRaid;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get ban notifications for.
          */
-        function ChannelBan(transport, broadcaster_user_id) {
-            return { transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
+        function ChannelBan(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.ban", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelBan = ChannelBan;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get unban notifications for.
          */
-        function ChannelUnban(transport, broadcaster_user_id) {
-            return { transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
+        function ChannelUnban(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.unban", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelUnban = ChannelUnban;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param moderator_user_id The ID of the user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The ID of the broadcaster you want to get chat unban request notifications for. Maximum: 1.
          */
-        function ChannelUnbanRequestCreate(transport, moderator_user_id, broadcaster_user_id) {
-            return { transport, type: "channel.unban_request.create", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+        function ChannelUnbanRequestCreate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.unban_request.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.unban_request.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelUnbanRequestCreate = ChannelUnbanRequestCreate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param moderator_user_id The ID of the user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The ID of the broadcaster you want to get unban request resolution notifications for. Maximum: 1.
          */
-        function ChannelUnbanRequestResolve(transport, moderator_user_id, broadcaster_user_id) {
-            return { transport, type: "channel.unban_request.resolve", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+        function ChannelUnbanRequestResolve(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.unban_request.resolve", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.unban_request.resolve", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelUnbanRequestResolve = ChannelUnbanRequestResolve;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The user ID of the broadcaster.
-         * @param moderator_user_id The user ID of the moderator.
          */
-        function ChannelModerate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelModerate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.moderate", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelModerate = ChannelModerate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The user ID of the broadcaster.
-         * @param moderator_user_id The user ID of the moderator.
          */
-        function ChannelModerateV2(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelModerateV2(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.moderate", version: "2", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelModerateV2 = ChannelModerateV2;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get moderator addition notifications for.
          */
-        function ChannelModeratorAdd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
+        function ChannelModeratorAdd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.moderator.add", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelModeratorAdd = ChannelModeratorAdd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to get moderator removal notifications for.
          */
-        function ChannelModeratorRemove(transport, broadcaster_user_id) {
-            return { transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
+        function ChannelModeratorRemove(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.moderator.remove", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelModeratorRemove = ChannelModeratorRemove;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-         * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
          */
-        function ChannelGuestStarSessionBegin(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelGuestStarSessionBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.guest_star_session.begin", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelGuestStarSessionBegin = ChannelGuestStarSessionBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-         * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
          */
-        function ChannelGuestStarSessionEnd(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelGuestStarSessionEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.guest_star_session.end", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelGuestStarSessionEnd = ChannelGuestStarSessionEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-         * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
          */
-        function ChannelGuestStarGuestUpdate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelGuestStarGuestUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.guest_star_guest.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelGuestStarGuestUpdate = ChannelGuestStarGuestUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID of the channel hosting the Guest Star Session.
-         * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
          */
-        function ChannelGuestStarSettingsUpdate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelGuestStarSettingsUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.guest_star_settings.update", version: "beta", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelGuestStarSettingsUpdate = ChannelGuestStarSettingsUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points reward add notifications for.
          */
-        function ChannelPointsAutomaticRewardRedemptionAdd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPointsAutomaticRewardRedemptionAdd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPointsAutomaticRewardRedemptionAdd = ChannelPointsAutomaticRewardRedemptionAdd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points reward add notifications for.
          */
-        function ChannelPointsAutomaticRewardRedemptionAddV2(transport, broadcaster_user_id) {
-            return { transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
+        function ChannelPointsAutomaticRewardRedemptionAddV2(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_automatic_reward_redemption.add", version: "2", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPointsAutomaticRewardRedemptionAddV2 = ChannelPointsAutomaticRewardRedemptionAddV2;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward add notifications for.
          */
-        function ChannelPointsCustomRewardAdd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPointsCustomRewardAdd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.add", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPointsCustomRewardAdd = ChannelPointsCustomRewardAdd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward update notifications for.
          * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
          */
-        function ChannelPointsCustomRewardUpdate(transport, broadcaster_user_id, reward_id) {
-            return { transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+        function ChannelPointsCustomRewardUpdate(connection, broadcaster_user_id, reward_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.update", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPointsCustomRewardUpdate = ChannelPointsCustomRewardUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward remove notifications for.
          * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
          */
-        function ChannelPointsCustomRewardRemove(transport, broadcaster_user_id, reward_id) {
-            return { transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
+        function ChannelPointsCustomRewardRemove(connection, broadcaster_user_id, reward_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward.remove", version: "1", condition: { broadcaster_user_id, reward_id } };
         }
         Subscription.ChannelPointsCustomRewardRemove = ChannelPointsCustomRewardRemove;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward redemption add notifications for.
          * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
          */
-        function ChannelPointsCustomRewardRedemptionAdd(transport, broadcaster_user_id, reward_id) {
-            return { transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+        function ChannelPointsCustomRewardRedemptionAdd(connection, broadcaster_user_id, reward_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
         }
         Subscription.ChannelPointsCustomRewardRedemptionAdd = ChannelPointsCustomRewardRedemptionAdd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward redemption update notifications for.
          * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
          */
-        function ChannelPointsCustomRewardRedemptionUpdate(transport, broadcaster_user_id, reward_id) {
-            return { transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+        function ChannelPointsCustomRewardRedemptionUpdate(connection, broadcaster_user_id, reward_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
+            else
+                return { transport: connection.transport, type: "channel.channel_points_custom_reward_redemption.update", version: "1", condition: { broadcaster_user_id, reward_id } };
         }
         Subscription.ChannelPointsCustomRewardRedemptionUpdate = ChannelPointsCustomRewardRedemptionUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll begin” notifications will be received.
          */
-        function ChannelPollBegin(transport, broadcaster_user_id) {
-            return { transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPollBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.poll.begin", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPollBegin = ChannelPollBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll progress” notifications will be received.
          */
-        function ChannelPollProgress(transport, broadcaster_user_id) {
-            return { transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPollProgress(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.poll.progress", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPollProgress = ChannelPollProgress;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “poll end” notifications will be received.
          */
-        function ChannelPollEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPollEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.poll.end", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPollEnd = ChannelPollEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction begin” notifications will be received.
          */
-        function ChannelPredictionBegin(transport, broadcaster_user_id) {
-            return { transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPredictionBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.prediction.begin", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPredictionBegin = ChannelPredictionBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction progress” notifications will be received.
          */
-        function ChannelPredictionProgress(transport, broadcaster_user_id) {
-            return { transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPredictionProgress(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.prediction.progress", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPredictionProgress = ChannelPredictionProgress;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction lock” notifications will be received.
          */
-        function ChannelPredictionLock(transport, broadcaster_user_id) {
-            return { transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPredictionLock(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.prediction.lock", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPredictionLock = ChannelPredictionLock;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID of the channel for which “prediction end” notifications will be received.
          */
-        function ChannelPredictionEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelPredictionEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.prediction.end", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelPredictionEnd = ChannelPredictionEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param moderator_user_id The ID of a user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the channel to receive chat unban request notifications for.
          */
-        function ChannelSuspiciousUserUpdate(transport, moderator_user_id, broadcaster_user_id) {
-            return { transport, type: "channel.suspicious_user.update", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+        function ChannelSuspiciousUserUpdate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.suspicious_user.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.suspicious_user.update", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelSuspiciousUserUpdate = ChannelSuspiciousUserUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param moderator_user_id The ID of a user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id User ID of the channel to receive chat message events for.
          */
-        function ChannelSuspiciousUserMessage(transport, moderator_user_id, broadcaster_user_id) {
-            return { transport, type: "channel.suspicious_user.message", version: "1", condition: { moderator_user_id, broadcaster_user_id } };
+        function ChannelSuspiciousUserMessage(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.suspicious_user.message", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.suspicious_user.message", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelSuspiciousUserMessage = ChannelSuspiciousUserMessage;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The User ID of the broadcaster (channel) Maximum: 1
          */
-        function ChannelVipAdd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
+        function ChannelVipAdd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.vip.add", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelVipAdd = ChannelVipAdd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The User ID of the broadcaster (channel) Maximum: 1
          */
-        function ChannelVipRemove(transport, broadcaster_user_id) {
-            return { transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
+        function ChannelVipRemove(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.vip.remove", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelVipRemove = ChannelVipRemove;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The User ID of the broadcaster.
-         * @param moderator_user_id The User ID of the moderator.
          */
-        function ChannelWarningAcknowledge(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelWarningAcknowledge(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.warning.acknowledge", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelWarningAcknowledge = ChannelWarningAcknowledge;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The User ID of the broadcaster.
-         * @param moderator_user_id The User ID of the moderator.
          */
-        function ChannelWarningSend(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelWarningSend(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.warning.send", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelWarningSend = ChannelWarningSend;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster whose charity campaign donations you want to receive notifications for.
          */
-        function ChannelCharityCampaignDonate(transport, broadcaster_user_id) {
-            return { transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
+        function ChannelCharityCampaignDonate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.charity_campaign.donate", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelCharityCampaignDonate = ChannelCharityCampaignDonate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster whose charity campaign start events you want to receive notifications for.
          */
-        function ChannelCharityCampaignStart(transport, broadcaster_user_id) {
-            return { transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
+        function ChannelCharityCampaignStart(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.charity_campaign.start", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelCharityCampaignStart = ChannelCharityCampaignStart;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster whose charity campaign progress events you want to receive notifications for.
          */
-        function ChannelCharityCampaignProgress(transport, broadcaster_user_id) {
-            return { transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
+        function ChannelCharityCampaignProgress(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.charity_campaign.progress", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelCharityCampaignProgress = ChannelCharityCampaignProgress;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster whose charity campaign stop events you want to receive notifications for.
          */
-        function ChannelCharityCampaignStop(transport, broadcaster_user_id) {
-            return { transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
+        function ChannelCharityCampaignStop(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.charity_campaign.stop", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelCharityCampaignStop = ChannelCharityCampaignStop;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param client_id Your application’s client id. The provided client_id must match the client ID in the application access token.
+         * @param connection
+         * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `client_id` — Your application’s client id. The provided client_id must match the client ID in the application access token.
          * @param conduit_id Optional. The conduit ID to receive events for. If omitted, events for all of this client’s conduits are sent.
          */
-        function ConduitShardDisabled(transport, client_id, conduit_id) {
-            return { transport, type: "conduit.shard.disabled", version: "1", condition: { client_id, conduit_id } };
+        function ConduitShardDisabled(connection, conduit_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "conduit.shard.disabled", version: "1", condition: { client_id: connection.authorization.client_id, conduit_id } };
+            else
+                return { transport: connection.transport, type: "conduit.shard.disabled", version: "1", condition: { client_id: connection.client_id, conduit_id } };
         }
         Subscription.ConduitShardDisabled = ConduitShardDisabled;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param organization_id The organization ID of the organization that owns the game on the developer portal.
          * @param category_id Optional. The category (or game) ID of the game for which entitlement notifications will be received.
          * @param campaign_id Optional. The campaign ID for a specific campaign for which entitlement notifications will be received.
          */
-        function DropEntitlementGrant(transport, organization_id, category_id, campaign_id) {
-            return { transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
+        function DropEntitlementGrant(connection, organization_id, category_id, campaign_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
+            else
+                return { transport: connection.transport, type: "drop.entitlement.grant", version: "1", condition: { organization_id, category_id, campaign_id } };
         }
         Subscription.DropEntitlementGrant = DropEntitlementGrant;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param extension_client_id The client ID of the extension.
+         * @param connection
+         * If using `Connection` object, `extension_client_id` gets from `authorization.client_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `extension_client_id` — The client ID of the extension.
          */
-        function ExtensionBitsTransactionCreate(transport, extension_client_id) {
-            return { transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id } };
+        function ExtensionBitsTransactionCreate(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id: connection.authorization.client_id } };
+            else
+                return { transport: connection.transport, type: "extension.bits_transaction.create", version: "1", condition: { extension_client_id: connection.extension_client_id } };
         }
         Subscription.ExtensionBitsTransactionCreate = ExtensionBitsTransactionCreate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+         * @param connection
+         * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
          */
-        function ChannelGoalBegin(transport, broadcaster_user_id) {
-            return { transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id } };
+        function ChannelGoalBegin(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.goal.begin", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
         }
         Subscription.ChannelGoalBegin = ChannelGoalBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+         * @param connection
+         * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
          */
-        function ChannelGoalProgress(transport, broadcaster_user_id) {
-            return { transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id } };
+        function ChannelGoalProgress(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.goal.progress", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
         }
         Subscription.ChannelGoalProgress = ChannelGoalProgress;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param broadcaster_user_id The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
+         * @param connection
+         * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `broadcaster_user_id` — The ID of the broadcaster to get notified about. The ID must match the user_id in the OAuth access token.
          */
-        function ChannelGoalEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelGoalEnd(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.goal.end", version: "1", condition: { broadcaster_user_id: connection.broadcaster_user_id } };
         }
         Subscription.ChannelGoalEnd = ChannelGoalEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train begin notifications for.
          */
-        function ChannelHypeTrainBegin(transport, broadcaster_user_id) {
-            return { transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
+        function ChannelHypeTrainBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.hype_train.begin", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelHypeTrainBegin = ChannelHypeTrainBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train progress notifications for.
          */
-        function ChannelHypeTrainProgress(transport, broadcaster_user_id) {
-            return { transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
+        function ChannelHypeTrainProgress(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.hype_train.progress", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelHypeTrainProgress = ChannelHypeTrainProgress;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The ID of the broadcaster that you want to get Hype Train end notifications for.
          */
-        function ChannelHypeTrainEnd(transport, broadcaster_user_id) {
-            return { transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
+        function ChannelHypeTrainEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "channel.hype_train.end", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.ChannelHypeTrainEnd = ChannelHypeTrainEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The ID of the broadcaster whose Shield Mode status was updated.
-         * @param moderator_user_id The ID of the moderator that updated the Shield Mode’s status. If the broadcaster updated the status, this ID will be the same as broadcaster_user_id.
          */
-        function ChannelShieldModeBegin(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelShieldModeBegin(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shield_mode.begin", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelShieldModeBegin = ChannelShieldModeBegin;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The ID of the broadcaster whose Shield Mode status was updated.
-         * @param moderator_user_id The ID of the moderator that updated the Shield Mode’s status. If the broadcaster updated the status, this ID will be the same as broadcaster_user_id.
          */
-        function ChannelShieldModeEnd(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelShieldModeEnd(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shield_mode.end", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelShieldModeEnd = ChannelShieldModeEnd;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive Shoutout create notifications for.
-         * @param moderator_user_id The user ID of the moderator that sent the Shoutout. If the broadcaster sent the Shoutout, this ID is the same as the ID in broadcaster_user_id.
          */
-        function ChannelShoutoutCreate(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelShoutoutCreate(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shoutout.create", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelShoutoutCreate = ChannelShoutoutCreate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `moderator_user_id` — User ID of the moderator.
          * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive Shoutout receive notifications for.
-         * @param moderator_user_id The user ID of the moderator or broadcaster of the specified channel.
          */
-        function ChannelShoutoutReceive(transport, broadcaster_user_id, moderator_user_id) {
-            return { transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id } };
+        function ChannelShoutoutReceive(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.authorization.user_id } };
+            else
+                return { transport: connection.transport, type: "channel.shoutout.receive", version: "1", condition: { broadcaster_user_id, moderator_user_id: connection.moderator_user_id } };
         }
         Subscription.ChannelShoutoutReceive = ChannelShoutoutReceive;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID you want to get stream online notifications for.
          */
-        function StreamOnline(transport, broadcaster_user_id) {
-            return { transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
+        function StreamOnline(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "stream.online", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.StreamOnline = StreamOnline;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param broadcaster_user_id The broadcaster user ID you want to get stream offline notifications for.
          */
-        function StreamOffline(transport, broadcaster_user_id) {
-            return { transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
+        function StreamOffline(connection, broadcaster_user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
+            else
+                return { transport: connection.transport, type: "stream.offline", version: "1", condition: { broadcaster_user_id } };
         }
         Subscription.StreamOffline = StreamOffline;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param client_id Your application’s client id. The provided client_id must match the client id in the application access token.
+         * @param connection
+         * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `client_id` — Your application’s client id. The provided client_id must match the client id in the application access token.
          */
-        function UserAuthorizationGrant(transport, client_id) {
-            return { transport, type: "user.authorization.grant", version: "1", condition: { client_id } };
+        function UserAuthorizationGrant(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "user.authorization.grant", version: "1", condition: { client_id: connection.authorization.client_id } };
+            else
+                return { transport: connection.transport, type: "user.authorization.grant", version: "1", condition: { client_id: connection.client_id } };
         }
         Subscription.UserAuthorizationGrant = UserAuthorizationGrant;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
-         * @param client_id Your application’s client id. The provided client_id must match the client id in the application access token.
+         * @param connection
+         * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+         * - `client_id` — Your application’s client id. The provided client_id must match the client id in the application access token.
          */
-        function UserAuthorizationRevoke(transport, client_id) {
-            return { transport, type: "user.authorization.revoke", version: "1", condition: { client_id } };
+        function UserAuthorizationRevoke(connection) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "user.authorization.revoke", version: "1", condition: { client_id: connection.authorization.client_id } };
+            else
+                return { transport: connection.transport, type: "user.authorization.revoke", version: "1", condition: { client_id: connection.client_id } };
         }
         Subscription.UserAuthorizationRevoke = UserAuthorizationRevoke;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param user_id The user ID for the user you want update notifications for.
          */
-        function UserUpdate(transport, user_id) {
-            return { transport, type: "user.update", version: "1", condition: { user_id } };
+        function UserUpdate(connection, user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "user.update", version: "1", condition: { user_id } };
+            else
+                return { transport: connection.transport, type: "user.update", version: "1", condition: { user_id } };
         }
         Subscription.UserUpdate = UserUpdate;
         /**
-         * @param transport The transport details that you want Twitch to use when sending you notifications.
+         * @param connection
+         * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+         * - `transport` — The transport details that you want Twitch to use when sending you notifications.
          * @param user_id The user_id of the person receiving whispers.
          */
-        function UserWhisperMessage(transport, user_id) {
-            return { transport, type: "user.whisper.message", version: "1", condition: { user_id } };
+        function UserWhisperMessage(connection, user_id) {
+            if (Connection.is(connection))
+                return { transport: connection.transport, type: "user.whisper.message", version: "1", condition: { user_id } };
+            else
+                return { transport: connection.transport, type: "user.whisper.message", version: "1", condition: { user_id } };
         }
         Subscription.UserWhisperMessage = UserWhisperMessage;
     })(Subscription = EventSub.Subscription || (EventSub.Subscription = {}));
@@ -1101,6 +1517,25 @@ export var Authorization;
         return scopes.every(scope => authorization.scopes.includes(scope));
     }
     Authorization.hasScopes = hasScopes;
+    /**
+     * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
+     * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+     * @param redirect_uri Your app’s registered redirect URI. The access token is sent to this URI.
+     * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
+     * @param force_verify Set to `true` to force the user to re-authorize your app’s access to their resources. The default is `false`.
+     * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
+     */
+    function authorizeURL(client_id, redirect_uri, scopes, force_verify = false, state) {
+        var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+        if (scopes.length > 0)
+            url += `&scope=${encodeURI((scopes ?? []).join('%20'))}`;
+        if (force_verify)
+            url += `&force_verify=true`;
+        if (state)
+            url += `&state=${state}`;
+        return url;
+    }
+    Authorization.authorizeURL = authorizeURL;
 })(Authorization || (Authorization = {}));
 function getError(error) {
     var message = `Unknown error`;
@@ -3307,17 +3742,16 @@ export var Request;
      * @param authorization Access token data or token itself to validate
      */
     async function OAuth2Validate(token_data) {
-        const token = typeof token_data === "string" ? token_data : token_data.token;
+        const token = (typeof token_data === "string" ? token_data : token_data.token);
         if (token.length < 1)
             return getError("#401 invalid access token");
         try {
             const request = await new FetchBuilder("https://id.twitch.tv/oauth2/validate", "GET").setHeaders({
                 "Authorization": `Bearer ${token}`
             }).fetch();
-            const response = await request.json();
-            response.status = request.status;
-            response.token = token;
+            const response = await getResponse(request);
             if (response.status === 200) {
+                response.token = token;
                 if (!response.scopes)
                     response.scopes = [];
                 response.user_login = response.login;
@@ -3327,9 +3761,7 @@ export var Request;
             return response;
         }
         catch (e) {
-            const err = getError(e);
-            err.token = token;
-            return err;
+            return getError(e);
         }
     }
     Request.OAuth2Validate = OAuth2Validate;
