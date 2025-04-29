@@ -7263,6 +7263,14 @@ export namespace ResponseBody {
 	export type SendWhisper = ResponseBody<true, 204>;
 	export type OAuth2Validate<S extends Authorization.Scope[]> = Authorization<S> & ResponseBody;
 	export type OAuth2Revoke = ResponseBody;
+	export interface OAuth2Token extends ResponseBody {
+		/** App access token gotten with client credentials grant flow */
+		access_token: string;
+		/** How long, in seconds, the token is valid for */
+		expires_in: number;
+		/** Type of token */
+		token_type: "bearer";
+	}
 }
 
 export interface ResponseBodyError extends ResponseBody<false, 400 | 401 | 404 | 409 | 410 | 422 | 425 | 429> {
@@ -9112,12 +9120,25 @@ export namespace Request {
 	 */
 	export async function OAuth2Revoke(authorization: Authorization): Promise<ResponseBody.OAuth2Revoke | ResponseBodyError> {
 		try {
-			if (authorization.token.length < 1) throw "invalid access token"
+			if (authorization.token.length < 1) throw "invalid access token";
 			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/revoke", "POST").setHeaders({
 				"Content-Type": "application/x-www-form-urlencoded"
 			}).setSearch({ client_id: authorization.client_id, token: authorization.token }).fetch();
 			if (request.ok) return {ok: true, status: 200};
 			else return await getResponse(request);
+		} catch(e) { return getError(e) }
+	}
+	/**
+	 * Gets app access token from [client credentials grant flow](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4)
+	 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+	 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+	 */
+	export async function OAuth2Token(client_id: string, client_secret: string): Promise<ResponseBody.OAuth2Token | ResponseBodyError> {
+		try {
+			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+				"Content-Type": "x-www-form-urlencoded parameters"
+			}).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
+			return await getResponse(request);
 		} catch(e) { return getError(e) }
 	}
 }
