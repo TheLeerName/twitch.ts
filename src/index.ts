@@ -5378,7 +5378,7 @@ export namespace Authorization {
 	 */
 	export function authorizeURL(client_id: string, redirect_uri: string, scopes: Scope[], force_verify: boolean = false, state?: string): string {
 		var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
-		if (scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join('%20'))}`;
+		if (scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
 		if (force_verify) url += `&force_verify=true`;
 		if (state) url += `&state=${state}`;
 		return url;
