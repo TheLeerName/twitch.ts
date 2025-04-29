@@ -16,7 +16,7 @@
 	],
 	"scripts": {
 		"clean": "rimraf dist/",
-		"build": "npm run clean && npx tsc -p tsconfig.json && npx tsc -p tsconfig.browser.json"
+		"build": "npm run clean && npx tsc -p tsconfig.json"
 	},
 	"devDependencies": {
 		"@types/node": "^22.14.0",
