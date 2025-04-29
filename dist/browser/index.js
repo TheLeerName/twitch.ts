@@ -1535,7 +1535,7 @@ export var Authorization;
     function authorizeURL(client_id, redirect_uri, scopes, force_verify = false, state) {
         var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
         if (scopes.length > 0)
-            url += `&scope=${encodeURI((scopes ?? []).join('%20'))}`;
+            url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
         if (force_verify)
             url += `&force_verify=true`;
         if (state)
@@ -3749,7 +3749,7 @@ export var Request;
      * @param authorization Access token data or token itself to validate
      */
     async function OAuth2Validate(token_data) {
-        const token = (typeof token_data === "string" ? token_data : token_data.token);
+        const token = typeof token_data === "string" ? token_data : token_data.token;
         if (token.length < 1)
             return getError("#401 invalid access token");
         try {
