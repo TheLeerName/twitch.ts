@@ -7263,13 +7263,37 @@ export namespace ResponseBody {
 	export type SendWhisper = ResponseBody<true, 204>;
 	export type OAuth2Validate<S extends Authorization.Scope[]> = Authorization<S> & ResponseBody;
 	export type OAuth2Revoke = ResponseBody;
-	export interface OAuth2Token extends ResponseBody {
-		/** App access token gotten with client credentials grant flow */
-		access_token: string;
-		/** How long, in seconds, the token is valid for */
-		expires_in: number;
-		/** Type of token */
-		token_type: "bearer";
+	export namespace OAuth2Token {
+		export interface ClientCredentials extends ResponseBody {
+			/** App access token gotten with client credentials grant flow */
+			access_token: string;
+			/** How long, in seconds, the token is valid for */
+			expires_in: number;
+			/** Type of token */
+			token_type: "bearer";
+		}
+		export interface AuthorizationCode<S extends Authorization.Scope[]> extends ResponseBody {
+			/** User access token gotten with authorization code grant flow */
+			access_token: string;
+			/** How long, in seconds, the token is valid for */
+			expires_in: number;
+			/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
+			refresh_token: string;
+			/** Authorization scopes which contains this access token */
+			scope: S;
+			/** Type of token */
+			token_type: "bearer";
+		}
+		export interface RefreshToken<S extends Authorization.Scope[]> extends ResponseBody {
+			/** User access token gotten with authorization code grant flow */
+			access_token: string;
+			/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
+			refresh_token: string;
+			/** Authorization scopes which contains this access token */
+			scope: S;
+			/** Type of token */
+			token_type: "bearer";
+		}
 	}
 }
 
@@ -9128,17 +9152,48 @@ export namespace Request {
 			else return await getResponse(request);
 		} catch(e) { return getError(e) }
 	}
-	/**
-	 * Gets app access token from [client credentials grant flow](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4)
-	 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
-	 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
-	 */
-	export async function OAuth2Token(client_id: string, client_secret: string): Promise<ResponseBody.OAuth2Token | ResponseBodyError> {
-		try {
-			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
-				"Content-Type": "x-www-form-urlencoded parameters"
-			}).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
-			return await getResponse(request);
-		} catch(e) { return getError(e) }
+	export namespace OAuth2Token {
+		/**
+		 * Gets app access token from [client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
+		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+		 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+		 */
+		export async function ClientCredentials(client_id: string, client_secret: string): Promise<ResponseBody.OAuth2Token.ClientCredentials | ResponseBodyError> {
+			try {
+				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+					"Content-Type": "x-www-form-urlencoded parameters"
+				}).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
+				return await getResponse(request);
+			} catch(e) { return getError(e) }
+		}
+		/**
+		 * Gets user access token and refresh token from [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+		 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+		 * @param redirect_uri Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) redirect URI.
+		 * @param code The code that the `/authorize` response returned in the `code` query parameter.
+		 */
+		export async function AuthorizationCode<S extends Authorization.Scope[]>(client_id: string, client_secret: string, redirect_uri: string, code: string): Promise<ResponseBody.OAuth2Token.AuthorizationCode<S> | ResponseBodyError> {
+			try {
+				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+					"Content-Type": "x-www-form-urlencoded parameters"
+				}).setSearch({ client_id, client_secret, redirect_uri, grant_type: "authorization_code" }).fetch();
+				return await getResponse(request);
+			} catch(e) { return getError(e) }
+		}
+		/**
+		 * Gets user access token from refresh token. [Read More](https://dev.twitch.tv/docs/authentication/refresh-tokens/#how-to-use-a-refresh-token)
+		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
+		 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
+		 * @param refresh_token The refresh token issued to the client.
+		 */
+		export async function RefreshToken<S extends Authorization.Scope[]>(client_id: string, client_secret: string, refresh_token: string): Promise<ResponseBody.OAuth2Token.RefreshToken<S> | ResponseBodyError> {
+			try {
+				const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+					"Content-Type": "x-www-form-urlencoded parameters"
+				}).setSearch({ client_id, client_secret, refresh_token, grant_type: "refresh_token" }).fetch();
+				return await getResponse(request);
+			} catch(e) { return getError(e) }
+		}
 	}
 }
