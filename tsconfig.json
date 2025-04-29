@@ -1,9 +1,8 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
-		"module": "NodeNext",
-		"lib": ["ES2020", "DOM"],
-		"moduleResolution": "nodenext",
+		"target": "ES6",
+		"module": "CommonJS",
+		"moduleResolution": "node",
 		"typeRoots": [
 			"node_modules/@types"
 		],
