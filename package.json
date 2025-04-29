@@ -6,6 +6,7 @@
 	"files": ["dist"],
 	"scripts": {
 		"clean": "rimraf dist/",
+		"prepublish": "npm run build",
 		"build": "npx tsc -p tsconfig.json",
 		"build:browser": "npx tsc -p tsconfig.browser.json"
 	},
