@@ -1517,6 +1517,13 @@ export var Authorization;
         return scopes.every(scope => authorization.scopes.includes(scope));
     }
     Authorization.hasScopes = hasScopes;
+    function fromResponseBodyOAuth2Validate(body) {
+        const body_ = body;
+        delete body_.ok;
+        delete body_.status;
+        return body_;
+    }
+    Authorization.fromResponseBodyOAuth2Validate = fromResponseBodyOAuth2Validate;
     /**
      * Creates a authorize URL for getting user access token via [implicit grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#implicit-grant-flow)
      * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.

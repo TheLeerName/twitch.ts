@@ -49,9 +49,10 @@ async function main() {
 
 		console.log(`Validating token...`);
 		console.log(`\ttoken: ${token}`);
-		const authorization = await Request.OAuth2Validate(token);
-		console.log(`\tresponse: ${JSON.stringify(authorization)}`);
-		if (!authorization.ok) throw `Token isn't valid!\n`;
+		const response = await Request.OAuth2Validate(token);
+		console.log(`\tresponse: ${JSON.stringify(response)}`);
+		if (!response.ok) throw `Token isn't valid!\n`;
+		const authorization = Authorization.fromResponseBodyOAuth2Validate(response);
 		if (!Authorization.hasScopes(authorization, ...scopes)) throw `Token has wrong scopes!\n`;
 		if (authorization.type !== "user") throw `Token isn't user access token!\n`;
 		console.log(`Completed!\n`);
