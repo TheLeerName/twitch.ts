@@ -45,9 +45,6 @@ async function subscribeToEvents(connection: EventSub.Connection, events: EventS
 
 async function main() {
 	try {
-		// printing to console the authorization link
-		//console.log(Authorization.URL.Token("<specify_here_your_client_id>", "<specify_here_your_redirect_uri>", scopes));
-
 		const token: string | undefined = process.argv[2];
 		if (!token) throw `You must specify Twitch Access Token in third argument!\n`;
 
@@ -112,4 +109,7 @@ async function main() {
 		console.error(e);
 	}
 }
+
+// printing to console the authorization link, dont forget to comment line main().catch(console.error); below and run "npm run build"!
+//console.log(Authorization.URL.Token("zhurxr3saodgqkokd0gmymkdjgyyxe", "http://localhost", scopes));
 main().catch(console.error);

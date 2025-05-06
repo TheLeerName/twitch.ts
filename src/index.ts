@@ -8437,7 +8437,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value
 	 */
-	export async function GetBlockedTerms<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:blocked_terms" | "moderator:manage:blocked_terms">>, broadcaster_id: string, first?: string, after?: string): Promise<ResponseBody.GetBlockedTerms | ResponseBodyError> {
+	export async function GetBlockedTerms<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:blocked_terms" | "moderator:manage:blocked_terms">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetBlockedTerms | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8523,7 +8523,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 */
-	export async function GetModerators<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "channel:manage:moderators">>, user_id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetModerators | ResponseBodyError> {
+	export async function GetModerators<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "channel:manage:moderators">>, user_id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetModerators | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8571,7 +8571,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20.
 	 * @param after The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value.
 	 */
-	export async function GetChannelVips<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:vips" | "channel:manage:vips">>, user_id?: string, first?: string, after?: string): Promise<ResponseBody.GetChannelVips | ResponseBodyError> {
+	export async function GetChannelVips<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:vips" | "channel:manage:vips">>, user_id?: string, first?: number, after?: string): Promise<ResponseBody.GetChannelVips | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8675,7 +8675,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 20 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetPolls<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:polls" | "channel:manage:polls">>, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPolls | ResponseBodyError> {
+	export async function GetPolls<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:polls" | "channel:manage:polls">>, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetPolls | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8728,7 +8728,7 @@ export namespace Request {
 	 * @param first The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 25 items per page. The default is 20.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetPredictions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:predictions" | "channel:manage:predictions">>, id?: string | string[], first?: string, after?: string): Promise<ResponseBody.GetPredictions | ResponseBodyError> {
+	export async function GetPredictions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:predictions" | "channel:manage:predictions">>, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetPredictions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -8917,7 +8917,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 * @param before The cursor used to get the previous page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 	 */
-	export async function GetBroadcasterSubscriptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:subscriptions">>, user_id?: string | string[], first?: string, after?: string, before?: string): Promise<ResponseBody.GetBroadcasterSubscriptions | ResponseBodyError> {
+	export async function GetBroadcasterSubscriptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:subscriptions">>, user_id?: string | string[], first?: number, after?: string, before?: string): Promise<ResponseBody.GetBroadcasterSubscriptions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
@@ -9088,7 +9088,7 @@ export namespace Request {
 	 * @param after The cursor used to get the next page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value. Specify this parameter only if you specify the `user_id` query parameter.
 	 * @param before The cursor used to get the previous page of results. The [Pagination](https://dev.twitch.tv/docs/api/guide#pagination) object in the response contains the cursor’s value. Specify this parameter only if you specify the `user_id` query parameter.
 	 */
-	export async function GetVideos(authorization: Authorization, query: {id: string | string[]} | {user_id: string} | {game_id: string}, language?: string, period?: "all" | "day" | "month" | "week", sort?: "time" | "trending" | "views", type?: "all" | "archive" | "highlight" | "upload", first?: string, after?: string, before?: string): Promise<ResponseBody.GetVideos | ResponseBodyError> {
+	export async function GetVideos(authorization: Authorization, query: {id: string | string[]} | {user_id: string} | {game_id: string}, language?: string, period?: "all" | "day" | "month" | "week", sort?: "time" | "trending" | "views", type?: "all" | "archive" | "highlight" | "upload", first?: number, after?: string, before?: string): Promise<ResponseBody.GetVideos | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/videos", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
