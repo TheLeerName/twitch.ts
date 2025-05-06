@@ -5386,6 +5386,8 @@ export namespace Authorization {
 		}
 		/**
 		 * Creates a authorize URL for getting user access token via [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+		 * 
+		 * Authorization code will be expired after **10 minutes**, so be fast to use `Request.OAuth2Token.AuthorizationCode` to get user access token and refresh token!
 		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
 		 * @param redirect_uri Your app’s registered redirect URI. The authorization code is sent to this URI.
 		 * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
@@ -9187,6 +9189,10 @@ export namespace Request {
 		}
 		/**
 		 * Gets user access token and refresh token from [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+		 * 
+		 * User access token expires in **1-4 hours**
+		 * 
+		 * Refresh token expires in **30 days** (only if your app is **Public**)
 		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
 		 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
 		 * @param redirect_uri Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) redirect URI.
@@ -9206,6 +9212,10 @@ export namespace Request {
 		}
 		/**
 		 * Gets user access token from refresh token. [Read More](https://dev.twitch.tv/docs/authentication/refresh-tokens/#how-to-use-a-refresh-token)
+		 * 
+		 * User access token expires in **1-4 hours**
+		 * 
+		 * Refresh token expires in **30 days** (only if your app is **Public**), also this method returns new refresh token, so save it too!
 		 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
 		 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
 		 * @param refresh_token The refresh token issued to the client.
