@@ -8177,14 +8177,15 @@ export namespace Request {
 	 * - `websocket_failed_to_reconnect` - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
 	 * @param type Filter subscriptions by subscription type.
 	 * @param user_id Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+	 * @param subscription_id Returns an array with the subscription matching the ID (as long as it is owned by the client making the request), or an empty array if there is no matching subscription.
 	 * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor's value.
 	 */
-	export async function GetEventSubSubscriptions(authorization: Authorization, status?: EventSub.SubscriptionType, type?: ReturnType<typeof EventSub.Subscription[keyof typeof EventSub.Subscription]>["type"], user_id?: string, after?: string): Promise<ResponseBody.GetEventSubSubscriptions | ResponseBodyError> {
+	export async function GetEventSubSubscriptions(authorization: Authorization, status?: EventSub.SubscriptionType, type?: ReturnType<typeof EventSub.Subscription[keyof typeof EventSub.Subscription]>["type"], user_id?: string, subscription_id?: string, after?: string): Promise<ResponseBody.GetEventSubSubscriptions | ResponseBodyError> {
 		try {
 			const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/subscriptions", "GET").setHeaders({
 				"Client-Id": authorization.client_id,
 				"Authorization": `Bearer ${authorization.token}`
-			}).setSearch({ status, type, user_id, after }).fetch();
+			}).setSearch({ status, type, user_id, subscription_id, after }).fetch();
 			return await getResponse(request);
 		} catch(e) { return getError(e) }
 	}
