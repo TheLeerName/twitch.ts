@@ -1,6 +1,6 @@
 {
 	"name": "twitch.ts",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"main": "./dist/index.js",
 	"types": "./dist/types/index.d.ts",
 	"files": ["dist"],

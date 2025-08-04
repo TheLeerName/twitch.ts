@@ -111,6 +111,8 @@ export namespace EventSub {
 	/**
 	 * Starts WebSocket for subscribing and getting EventSub events
 	 * - Reconnects in `reconnect_ms`, if WebSocket was closed
+	 * - Reconnects immediately, if gets `session_reconnect` message
+	 * - When getting not first `session_welcome` message when `reconnect_url` is `false` or when recreating ws session (if your app is reopened or internet was down), please delete old events via `Request.DeleteEventSubSubscription`, you will need a id of subscription, store it somewhere
 	 * @param reconnect_ms If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
 	 */
 	export function startWebSocket<S extends Authorization.Scope[]>(token_data: Authorization.User<S>, reconnect_ms?: number) {
@@ -128,18 +130,26 @@ export namespace EventSub {
 			await connection.onMessage(message);
 			if (Message.isSessionWelcome(message)) {
 				const is_reconnected = connection.session?.status === "reconnecting";
+				if (connection.ws_old) {
+					// old ws connection must be closed after session_welcome message of new connection
+					connection.ws_old.close();
+					connection.ws_old = undefined;
+				}
 				connection.session = message.payload.session;
 				connection.transport = Transport.WebSocket(message.payload.session.id);
 				connection.onSessionWelcome(message, is_reconnected);
 			}
 			else if (Message.isSessionKeepalive(message)) {
-				connection.keepalive_timeout = setTimeout(() => connection.ws.close(4005, `NetworkTimeout: client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds + 2) * 1000);
+				// if we not getting any message in about 12 seconds, ws connection must be reconnected
+				connection.keepalive_timeout = setTimeout(() => connection.ws.close(4005, `NetworkTimeout: client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds! + 2) * 1000);
 				connection.onSessionKeepalive(message);
 			}
 			else if (Message.isSessionReconnect(message)) {
-				connection.session.status = "reconnecting";
-				connection.ws.onmessage = _ => {};
-				connection.ws.onclose = _ => {};
+				connection.session = message.payload.session;
+				connection.ws_old = connection.ws;
+				connection.ws_old.onmessage = () => {};
+				connection.ws_old.onclose = () => {};
+
 				connection.ws = new WebSocket(message.payload.session.reconnect_url);
 				connection.ws.onmessage = onMessage;
 				connection.ws.onclose = onClose;
@@ -181,10 +191,11 @@ export namespace EventSub {
 
 	export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]> {
 		ws: WebSocket;
+		ws_old: WebSocket | undefined;
 		/** User access token data */
 		authorization: Authorization.User<S>;
 		/** EventSub session, do not use it **before** first `onSessionWelcome()` message */
-		session!: Connection.Session;
+		session!: Session.Any;
 		/** Defines the transport details that you want Twitch to use when sending you event notifications. */
 		transport!: Transport.WebSocket;
 
@@ -207,7 +218,7 @@ export namespace EventSub {
 		/**
 		 * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
 		 * - For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `is_reconnected` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
-		 * @param is_reconnected If its not first `session_welcome` message, if `false`, then you can subscribe to events
+		 * @param is_reconnected **DO NOT** subscribe to events if its `true`!
 		 */
 		async onSessionWelcome(message: Message.SessionWelcome, is_reconnected: boolean) {}
 		/** Calls on getting `session_keepalive` message, these messages indicates that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#keepalive-message) */
@@ -221,14 +232,13 @@ export namespace EventSub {
 
 		/** Closes the connection with code `1000` */
 		protected async close() {
-			await this.onClose(1000, `ClientRefused: Client closed the connection`);
+			await this.onClose(1000, `client closed the connection`);
 			this.ws.onclose = _ => {};
 			this.ws.onmessage = _ => {};
 			this.ws.close();
 		}
 	}
 	export namespace Connection {
-		export type Session = EventSub.Session<"connected" | "reconnecting">;
 		export function is<S extends Authorization.Scope[]>(connection: any): connection is Connection<S> {
 			return connection.ws != null && connection.authorization != null;
 		}
@@ -5072,7 +5082,7 @@ export namespace EventSub {
 	}
 
 	/** An object that contains information about the connection. */
-	export interface Session<Status extends string = "connected", KeepaliveTimeoutSeconds extends number | null = number, ReconnectURL extends string | null = null> {
+	export interface Session<Status extends "connected" | "reconnecting", KeepaliveTimeoutSeconds extends number | null, ReconnectURL extends string | null> {
 		/** An ID that uniquely identifies this WebSocket connection. Use this ID to set the `session_id` field in all [subscription requests](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events). */
 		id: string;
 		/** The connection’s status. */
@@ -5083,6 +5093,14 @@ export namespace EventSub {
 		reconnect_url: ReconnectURL;
 		/** The UTC date and time that the connection was created. */
 		connected_at: string;
+	}
+	export namespace Session {
+		/** An object that contains information about the connection. */
+		export type Any = Connected | Reconnecting;
+		/** An object that contains information about the connection. */
+		export type Connected = Session<"connected", number, null>;
+		/** An object that contains information about the connection. */
+		export type Reconnecting = Session<"reconnecting", null, string>;
 	}
 
 	/** An object that identifies the message. */
@@ -5119,7 +5137,7 @@ export namespace EventSub {
 			/** An object that contains the message. */
 			payload: {
 				/** An object that contains information about the connection. */
-				session: Session;
+				session: Session.Connected;
 			};
 		}
 		/** Defines the message that the EventSub WebSocket server sends your client to indicate that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#keepalive-message) */
@@ -5229,7 +5247,7 @@ export namespace EventSub {
 			/** An object that contains the message. */
 			payload: {
 				/** An object that contains information about the connection. */
-				session: Session<"reconnecting", null, string>;
+				session: Session.Reconnecting;
 			};
 		}
 

@@ -6,7 +6,7 @@ import { Request, EventSub, Authorization } from './index';
 // 
 // Opens WebSocket session of EventSub
 // Subscribes to channel.chat.message event with connecting to specified broadcaster stream chat which prints to terminal chatter name and message text from any sended message using user access token (from authorization code or implicit grant flow)
-// Also has code to process chat commands (try to write !ping to twitch chat after connecting to chat with this script) and send answer to chat
+// Also has code to handle chat commands (try to write !ping to twitch chat after connecting to chat with this script) and send answer to chat
 
 const scopes = [
 	"user:read:chat",
@@ -84,11 +84,13 @@ async function main() {
 		console.log(`\turl: ${connection.ws.url}`);
 		connection.onSessionWelcome = async(message, is_reconnected) => {
 			console.log(`Received ${message.metadata.message_type} message\n\tsession: ${JSON.stringify(message.payload.session)}\n`);
-			if (!is_reconnected) await subscribeToEvents(connection, [
-				EventSub.Subscription.ChannelChatMessage(connection, broadcaster.id),
-				// put other EventSub.Subscription.<...> here
-			]);
-			console.log(`Now try to send message !ping in ${broadcaster.display_name} twitch channel`);
+			if (!is_reconnected) {
+				await subscribeToEvents(connection, [
+					EventSub.Subscription.ChannelChatMessage(connection, broadcaster.id),
+					// put other EventSub.Subscription.<...> here
+				]);
+				console.log(`Now try to send message !ping in ${broadcaster.display_name} twitch channel`);
+			}
 			console.log(`Listening for events...\n`);
 		}
 		connection.onNotification = async(message) => {
@@ -104,6 +106,9 @@ async function main() {
 			}
 			console.log(``);
 		}
+		connection.onSessionReconnect = async(message) => {
+			console.log(`Received ${message.metadata.message_type} message\n\tsession: ${JSON.stringify(message.payload.session)}\n`);
+		};
 		console.log(`Completed!\n`);
 	} catch(e) {
 		console.error(e);
