@@ -119,6 +119,7 @@ export namespace EventSub {
 		if (!reconnect_ms) reconnect_ms = 500;
 
 		const connection = new Connection(new WebSocket(WebSocketURL), token_data);
+		var previous_message_id: string | undefined;
 
 		async function onMessage(e: MessageEvent) {
 			if (connection.keepalive_timeout) {
@@ -127,6 +128,12 @@ export namespace EventSub {
 			}
 
 			const message: Message = JSON.parse(e.data);
+
+			// do not handle same message, twitch can be unsure if you got the message smh
+			if (previous_message_id && message.metadata.message_id === previous_message_id)
+				return;
+			previous_message_id = message.metadata.message_id;
+
 			await connection.onMessage(message);
 			if (Message.isSessionWelcome(message)) {
 				const is_reconnected = connection.session?.status === "reconnecting";
