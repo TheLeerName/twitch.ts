@@ -238,7 +238,7 @@ export namespace EventSub {
 		async onRevocation(message: Message.Revocation) {}
 
 		/** Closes the connection with code `1000` */
-		protected async close() {
+		async close() {
 			await this.onClose(1000, `client closed the connection`);
 			this.ws.onclose = _ => {};
 			this.ws.onmessage = _ => {};
