@@ -106,33 +106,61 @@ export var EventSub;
     /**
      * Starts WebSocket for subscribing and getting EventSub events
      * - Reconnects in `reconnect_ms`, if WebSocket was closed
+     * - Reconnects immediately, if gets `session_reconnect` message
+     * - When getting not first `session_welcome` message when `reconnect_url` is `false` or when recreating ws session (if your app is reopened or internet was down), please delete old events via `Request.DeleteEventSubSubscription`, you will need a id of subscription, store it somewhere
      * @param reconnect_ms If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
      */
     function startWebSocket(token_data, reconnect_ms) {
         if (!reconnect_ms)
             reconnect_ms = 500;
         const connection = new Connection(new WebSocket(EventSub.WebSocketURL), token_data);
+        var previous_message_id;
+        function giveCloseCodeToClient(code = 1000, reason = "client disconnected") {
+            connection.ws.onclose?.({ code, reason });
+            connection.ws.onclose = () => { };
+            connection.ws.close();
+        }
+        function storeFirstConnectedTimestamp(e) {
+            const date = new Date();
+            connection.first_connected_timestamp_iso = date.toISOString();
+            connection.first_connected_timestamp = date.getTime();
+        }
         async function onMessage(e) {
             if (connection.keepalive_timeout) {
                 clearTimeout(connection.keepalive_timeout);
                 delete connection.keepalive_timeout;
             }
             const message = JSON.parse(e.data);
+            // do not handle same message, twitch can be unsure if you got the message smh
+            if (previous_message_id && message.metadata.message_id === previous_message_id)
+                return;
+            previous_message_id = message.metadata.message_id;
             await connection.onMessage(message);
             if (Message.isSessionWelcome(message)) {
+                if (connection.network_timeout) {
+                    clearTimeout(connection.network_timeout);
+                    connection.network_timeout = undefined;
+                }
                 const is_reconnected = connection.session?.status === "reconnecting";
+                if (connection.ws_old) {
+                    // old ws connection must be closed after session_welcome message of new connection
+                    connection.ws_old.close();
+                    connection.ws_old = undefined;
+                }
                 connection.session = message.payload.session;
                 connection.transport = Transport.WebSocket(message.payload.session.id);
                 connection.onSessionWelcome(message, is_reconnected);
             }
             else if (Message.isSessionKeepalive(message)) {
-                connection.keepalive_timeout = setTimeout(() => connection.ws.close(4005, `NetworkTimeout: client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds + 2) * 1000);
+                // if we not getting any message in about 12 seconds, ws connection must be reconnected
+                connection.keepalive_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds + 2) * 1000);
                 connection.onSessionKeepalive(message);
             }
             else if (Message.isSessionReconnect(message)) {
-                connection.session.status = "reconnecting";
-                connection.ws.onmessage = _ => { };
-                connection.ws.onclose = _ => { };
+                connection.session = message.payload.session;
+                connection.ws_old = connection.ws;
+                connection.ws_old.onmessage = () => { };
+                connection.ws_old.onclose = () => { };
                 connection.ws = new WebSocket(message.payload.session.reconnect_url);
                 connection.ws.onmessage = onMessage;
                 connection.ws.onclose = onClose;
@@ -148,11 +176,14 @@ export var EventSub;
         async function onClose(e) {
             setTimeout(() => {
                 connection.ws = new WebSocket(EventSub.WebSocketURL);
+                connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
                 connection.ws.onmessage = onMessage;
                 connection.ws.onclose = onClose;
             }, reconnect_ms);
             connection.onClose(e.code, e.reason);
         }
+        connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
+        connection.ws.onopen = storeFirstConnectedTimestamp;
         connection.ws.onmessage = onMessage;
         connection.ws.onclose = onClose;
         return connection;
@@ -160,6 +191,14 @@ export var EventSub;
     EventSub.startWebSocket = startWebSocket;
     EventSub.WebSocketURL = "wss://eventsub.wss.twitch.tv/ws";
     class Connection {
+        /** Returns connected timestamp of this websocket in ISO format (session_reconnect will reset this) */
+        getConnectedTimestampISO() {
+            return this.session.connected_at;
+        }
+        /** Returns connected timestamp of this websocket (session_reconnect will reset this) */
+        getConnectedTimestamp() {
+            return new Date(this.getConnectedTimestampISO()).getTime();
+        }
         constructor(ws, authorization) {
             this.ws = ws;
             this.authorization = authorization;
@@ -175,7 +214,7 @@ export var EventSub;
         /**
          * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
          * - For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `is_reconnected` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
-         * @param is_reconnected If its not first `session_welcome` message, if `false`, then you can subscribe to events
+         * @param is_reconnected **DO NOT** subscribe to events if its `true`!
          */
         async onSessionWelcome(message, is_reconnected) { }
         /** Calls on getting `session_keepalive` message, these messages indicates that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#keepalive-message) */
@@ -188,7 +227,7 @@ export var EventSub;
         async onRevocation(message) { }
         /** Closes the connection with code `1000` */
         async close() {
-            await this.onClose(1000, `ClientRefused: Client closed the connection`);
+            await this.onClose(1000, `client closed the connection`);
             this.ws.onclose = _ => { };
             this.ws.onmessage = _ => { };
             this.ws.close();
@@ -1547,6 +1586,8 @@ export var Authorization;
         URL.Token = Token;
         /**
          * Creates a authorize URL for getting user access token via [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+         *
+         * Authorization code will be expired after **10 minutes**, so be fast to use `Request.OAuth2Token.AuthorizationCode` to get user access token and refresh token!
          * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
          * @param redirect_uri Your app’s registered redirect URI. The authorization code is sent to this URI.
          * @param scopes A list of scopes. The APIs that you’re calling identify the scopes you must list.
@@ -2598,14 +2639,15 @@ export var Request;
      * - `websocket_failed_to_reconnect` - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
      * @param type Filter subscriptions by subscription type.
      * @param user_id Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+     * @param subscription_id Returns an array with the subscription matching the ID (as long as it is owned by the client making the request), or an empty array if there is no matching subscription.
      * @param after The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor's value.
      */
-    async function GetEventSubSubscriptions(authorization, status, type, user_id, after) {
+    async function GetEventSubSubscriptions(authorization, status, type, user_id, subscription_id, after) {
         try {
             const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/subscriptions", "GET").setHeaders({
                 "Client-Id": authorization.client_id,
                 "Authorization": `Bearer ${authorization.token}`
-            }).setSearch({ status, type, user_id, after }).fetch();
+            }).setSearch({ status, type, user_id, subscription_id, after }).fetch();
             return await getResponse(request);
         }
         catch (e) {
@@ -3836,6 +3878,10 @@ export var Request;
         OAuth2Token.ClientCredentials = ClientCredentials;
         /**
          * Gets user access token and refresh token from [authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#authorization-code-grant-flow)
+         *
+         * User access token expires in **1-4 hours**
+         *
+         * Refresh token expires in **30 days** (only if your app is **Public**)
          * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
          * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
          * @param redirect_uri Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) redirect URI.
@@ -3860,6 +3906,10 @@ export var Request;
         OAuth2Token.AuthorizationCode = AuthorizationCode;
         /**
          * Gets user access token from refresh token. [Read More](https://dev.twitch.tv/docs/authentication/refresh-tokens/#how-to-use-a-refresh-token)
+         *
+         * User access token expires in **1-4 hours**
+         *
+         * Refresh token expires in **30 days** (only if your app is **Public**), also this method returns new refresh token, so save it too!
          * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
          * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
          * @param refresh_token The refresh token issued to the client.

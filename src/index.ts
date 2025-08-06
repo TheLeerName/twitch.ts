@@ -121,6 +121,12 @@ export namespace EventSub {
 		const connection = new Connection(new WebSocket(WebSocketURL), token_data);
 		var previous_message_id: string | undefined;
 
+		function giveCloseCodeToClient(code: number = 1000, reason: string = "client disconnected") {
+			connection.ws.onclose?.({ code, reason } as any);
+			connection.ws.onclose = () => {};
+			connection.ws.close();
+		}
+
 		function storeFirstConnectedTimestamp(e: Event) {
 			const date = new Date();
 			connection.first_connected_timestamp_iso = date.toISOString();
@@ -141,6 +147,10 @@ export namespace EventSub {
 
 			await connection.onMessage(message);
 			if (Message.isSessionWelcome(message)) {
+				if (connection.network_timeout) {
+					clearTimeout(connection.network_timeout);
+					connection.network_timeout = undefined;
+				}
 				const is_reconnected = connection.session?.status === "reconnecting";
 				if (connection.ws_old) {
 					// old ws connection must be closed after session_welcome message of new connection
@@ -153,7 +163,7 @@ export namespace EventSub {
 			}
 			else if (Message.isSessionKeepalive(message)) {
 				// if we not getting any message in about 12 seconds, ws connection must be reconnected
-				connection.keepalive_timeout = setTimeout(() => connection.ws.close(4005, `NetworkTimeout: client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds! + 2) * 1000);
+				connection.keepalive_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds! + 2) * 1000);
 				connection.onSessionKeepalive(message);
 			}
 			else if (Message.isSessionReconnect(message)) {
@@ -178,6 +188,7 @@ export namespace EventSub {
 		async function onClose(e: CloseEvent) {
 			setTimeout(() => {
 				connection.ws = new WebSocket(WebSocketURL);
+				connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
 				connection.ws.onmessage = onMessage;
 				connection.ws.onclose = onClose;
 			}, reconnect_ms);
@@ -185,6 +196,7 @@ export namespace EventSub {
 			connection.onClose(e.code, e.reason);
 		}
 
+		connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
 		connection.ws.onopen = storeFirstConnectedTimestamp;
 		connection.ws.onmessage = onMessage;
 		connection.ws.onclose = onClose;
@@ -227,6 +239,7 @@ export namespace EventSub {
 
 		/** ID of timer which closes connection if WebSocket isn't received any message within `session.keepalive_timeout_seconds`, becomes `undefined` if any message was received */
 		keepalive_timeout?: NodeJS.Timeout | number;
+		network_timeout?: NodeJS.Timeout | number;
 
 		constructor(ws: WebSocket, authorization: Authorization.User<S>) {
 			this.ws = ws;
