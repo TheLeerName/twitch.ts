@@ -121,6 +121,11 @@ export namespace EventSub {
 		const connection = new Connection(new WebSocket(WebSocketURL), token_data);
 		var previous_message_id: string | undefined;
 
+		function storeFirstConnectedTimestamp(e: Event) {
+			const date = new Date();
+			connection.first_connected_timestamp_iso = date.toISOString();
+			connection.first_connected_timestamp = date.getTime();
+		}
 		async function onMessage(e: MessageEvent) {
 			if (connection.keepalive_timeout) {
 				clearTimeout(connection.keepalive_timeout);
@@ -180,6 +185,7 @@ export namespace EventSub {
 			connection.onClose(e.code, e.reason);
 		}
 
+		connection.ws.onopen = storeFirstConnectedTimestamp;
 		connection.ws.onmessage = onMessage;
 		connection.ws.onclose = onClose;
 
@@ -205,6 +211,19 @@ export namespace EventSub {
 		session!: Session.Any;
 		/** Defines the transport details that you want Twitch to use when sending you event notifications. */
 		transport!: Transport.WebSocket;
+
+		/** Returns connected timestamp of this websocket in ISO format (session_reconnect will reset this) */
+		getConnectedTimestampISO(): string {
+			return this.session.connected_at;
+		}
+		/** Returns connected timestamp of this websocket (session_reconnect will reset this) */
+		getConnectedTimestamp(): number {
+			return new Date(this.getConnectedTimestampISO()).getTime();
+		}
+		/** Returns connected timestamp of this entire session in ISO format (session_reconnect will NOT reset this)  */
+		first_connected_timestamp_iso!: string;
+		/** Returns connected timestamp of this entire session in ISO format (session_reconnect will NOT reset this)  */
+		first_connected_timestamp!: number;
 
 		/** ID of timer which closes connection if WebSocket isn't received any message within `session.keepalive_timeout_seconds`, becomes `undefined` if any message was received */
 		keepalive_timeout?: NodeJS.Timeout | number;
