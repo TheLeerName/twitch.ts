@@ -6,7 +6,6 @@ class FetchBuilder {
         this.headers = {};
         this.method = "GET";
         this.body = null;
-        this.abort_controller = null;
         this.timeout = FetchBuilder.global_timeout;
         this.url = url;
         if (method)
@@ -46,11 +45,6 @@ class FetchBuilder {
             this.body = body;
         return this;
     }
-    /** @param abort_controller if not `null`, RequestTimeout will be disabled */
-    setAbortController(abort_controller) {
-        this.abort_controller = abort_controller;
-        return this;
-    }
     /** @param timeout in milliseconds, if `false`, RequestTimeout will be disabled */
     setTimeout(timeout) {
         this.timeout = timeout === false ? 0 : timeout;
@@ -60,7 +54,7 @@ class FetchBuilder {
     static setGlobalTimeout(timeout) {
         this.global_timeout = timeout === false ? 0 : timeout;
     }
-    fetch() {
+    async fetch() {
         var url = this.url;
         var added = false;
         var postfix = "?";
@@ -91,13 +85,24 @@ class FetchBuilder {
         init.headers = this.headers;
         if (this.body)
             init.body = this.body;
-        if (this.abort_controller)
-            init.signal = this.abort_controller.signal;
-        else if (this.timeout > 0) {
+        if (this.timeout > 0) {
             const controller = new AbortController();
             init.signal = controller.signal;
+            var timeout = setTimeout(() => controller.abort({ status: 408, message: "request timeout" }), this.timeout);
+            try {
+                const request = await fetch(url, init);
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = undefined;
+                }
+                return request;
+            }
+            catch (e) {
+                throw e;
+            }
         }
-        return fetch(url, init);
+        else
+            return await fetch(url, init);
     }
 }
 FetchBuilder.global_timeout = 5000;
@@ -1613,6 +1618,8 @@ function getError(error) {
     var status = 400;
     if (error instanceof Error)
         message = `${error.message}`;
+    else if (error.status && error.message)
+        return { ok, status: error.status, message: error.message };
     else if (typeof error === 'string')
         message = `${error}`;
     else

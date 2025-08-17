@@ -7,7 +7,6 @@ class FetchBuilder {
 	method: string = "GET";
 	body: string | null = null;
 
-	abort_controller: AbortController | null = null;
 	timeout: number = FetchBuilder.global_timeout;
 	static global_timeout: number = 5000;
 
@@ -50,12 +49,6 @@ class FetchBuilder {
 		return this;
 	}
 
-	/** @param abort_controller if not `null`, RequestTimeout will be disabled */
-	setAbortController(abort_controller: AbortController | null) {
-		this.abort_controller = abort_controller;
-		return this;
-	}
-
 	/** @param timeout in milliseconds, if `false`, RequestTimeout will be disabled */
 	setTimeout(timeout: number | false) {
 		this.timeout = timeout === false ? 0 : timeout;
@@ -67,7 +60,7 @@ class FetchBuilder {
 		this.global_timeout = timeout === false ? 0 : timeout;
 	}
 
-	fetch() {
+	async fetch() {
 		var url = this.url;
 
 		var added = false;
@@ -96,14 +89,23 @@ class FetchBuilder {
 		init.headers = this.headers;
 		if (this.body) init.body = this.body;
 
-		if (this.abort_controller)
-			init.signal = this.abort_controller.signal;
-		else if (this.timeout > 0) {
+		if (this.timeout > 0) {
 			const controller = new AbortController();
 			init.signal = controller.signal;
-		}
+			var timeout: NodeJS.Timeout | undefined = setTimeout(() => controller.abort({ status: 408, message: "request timeout" }), this.timeout);
 
-		return fetch(url, init);
+			try {
+				const request = await fetch(url, init);
+				if (timeout) {
+					clearTimeout(timeout);
+					timeout = undefined;
+				}
+				return request;
+			}
+			catch(e) { throw e }
+		}
+		else
+			return await fetch(url, init);
 	}
 }
 
@@ -7375,7 +7377,7 @@ export namespace ResponseBody {
 	}
 }
 
-export interface ResponseBodyError extends ResponseBody<false, 400 | 401 | 404 | 409 | 410 | 422 | 425 | 429> {
+export interface ResponseBodyError extends ResponseBody<false, 400 | 401 | 404 | 408 | 409 | 410 | 422 | 425 | 429 | 500> {
 	/** The error message of request. */
 	message: string;
 }
@@ -7392,6 +7394,7 @@ function getError<ResponseBodyError_ = ResponseBodyError>(error: unknown) {
 	var status = 400;
 
 	if (error instanceof Error) message = `${error.message}`;
+	else if ((error as any).status && (error as any).message) return { ok, status: (error as any).status, message: (error as any).message } as ResponseBodyError_;
 	else if (typeof error === 'string') message = `${error}`;
 	else return { ok, status, message } as ResponseBodyError_;
 
