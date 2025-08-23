@@ -5632,12 +5632,12 @@ export namespace ResponseBody {
 				/** The reporting window’s end date. */
 				ended_at: string;
 			};
-			/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
-			pagination?: {
-				/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
-				cursor?: string;
-			}
 		}[];
+		/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+		pagination?: {
+			/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
+			cursor?: string;
+		}
 	}
 	export interface GetGameAnalytics extends ResponseBody {
 		/** A list of reports. The reports are returned in no particular order; however, the data within each report is in ascending order by date (newest first). The report contains one row of data per day of the reporting window; the report contains rows for only those days that the game was used. A report is available only if the game was broadcast for at least 5 hours over the reporting period. The array is empty if there are no reports. */
@@ -6711,12 +6711,12 @@ export namespace ResponseBody {
 			updated_at: string;
 			/** The UTC date and time (in RFC3339 format) that the blocked term is set to expire. After the block expires, users may use the term in the broadcaster’s chat room. This field is `null` if the term was added manually or was permanently blocked by AutoMod. */
 			expires_at: string;
-			/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
-			pagination: {
-				/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
-				cursor?: string;
-			};
 		}[];
+		/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+		pagination?: {
+			/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
+			cursor?: string;
+		};
 	}
 	export interface AddBlockedTerm extends ResponseBody {
 		/** A list that contains the single blocked term that the broadcaster added. */
@@ -6735,11 +6735,6 @@ export namespace ResponseBody {
 			updated_at: string;
 			/** The UTC date and time (in RFC3339 format) that the blocked term is set to expire. After the block expires, users may use the term in the broadcaster’s chat room. This field is `null` if the term was added manually or was permanently blocked by AutoMod. */
 			expires_at: string | null;
-			/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. https://dev.twitch.tv/docs/api/guide#pagination */
-			pagination: {
-				/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
-				cursor?: string;
-			};
 		};
 	}
 	export type RemoveBlockedTerm = ResponseBody<true, 204>;
