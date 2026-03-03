@@ -567,7 +567,7 @@ export namespace Condition {
 /** Defines the transport details that you want Twitch to use when sending you event notifications. */
 export type Transport = Transport.Conduit | Transport.WebHook | Transport.WebSocket;
 export namespace Transport {
-	interface Base<Method extends string = "webhook" | "websocket" | "conduit"> {
+	export interface Base<Method extends string = "webhook" | "websocket" | "conduit"> {
 		/** The transport method. */
 		method: Method;
 	};
@@ -620,7 +620,7 @@ export namespace Transport {
 /** Subscription-related parameters */
 export type Subscription = Subscription.AutomodMessageHold | Subscription.AutomodMessageHoldV2 | Subscription.AutomodMessageUpdate | Subscription.AutomodMessageUpdateV2 | Subscription.AutomodSettingsUpdate | Subscription.AutomodTermsUpdate | Subscription.ChannelAdBreakBegin | Subscription.ChannelBan | Subscription.ChannelBitsUse | Subscription.ChannelCharityCampaignDonate | Subscription.ChannelCharityCampaignProgress | Subscription.ChannelCharityCampaignStart | Subscription.ChannelCharityCampaignStop | Subscription.ChannelChatClear | Subscription.ChannelChatClearUserMessages | Subscription.ChannelChatMessage | Subscription.ChannelChatMessageDelete | Subscription.ChannelChatNotification | Subscription.ChannelChatSettingsUpdate | Subscription.ChannelChatUserMessageHold | Subscription.ChannelChatUserMessageUpdate | Subscription.ChannelCheer | Subscription.ChannelFollow | Subscription.ChannelGoalBegin | Subscription.ChannelGoalEnd | Subscription.ChannelGoalProgress | Subscription.ChannelGuestStarGuestUpdate | Subscription.ChannelGuestStarSessionBegin | Subscription.ChannelGuestStarSessionEnd | Subscription.ChannelGuestStarSettingsUpdate | Subscription.ChannelHypeTrainBegin | Subscription.ChannelHypeTrainEnd | Subscription.ChannelHypeTrainProgress | Subscription.ChannelModerate | Subscription.ChannelModerateV2 | Subscription.ChannelModeratorAdd | Subscription.ChannelModeratorRemove | Subscription.ChannelPointsAutomaticRewardRedemptionAdd | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2 | Subscription.ChannelPointsCustomRewardAdd | Subscription.ChannelPointsCustomRewardRedemptionAdd | Subscription.ChannelPointsCustomRewardRedemptionUpdate | Subscription.ChannelPointsCustomRewardRemove | Subscription.ChannelPointsCustomRewardUpdate | Subscription.ChannelPollBegin | Subscription.ChannelPollEnd | Subscription.ChannelPollProgress | Subscription.ChannelPredictionBegin | Subscription.ChannelPredictionEnd | Subscription.ChannelPredictionLock | Subscription.ChannelPredictionProgress | Subscription.ChannelRaid | Subscription.ChannelSharedChatSessionBegin | Subscription.ChannelSharedChatSessionEnd | Subscription.ChannelSharedChatSessionUpdate | Subscription.ChannelShieldModeBegin | Subscription.ChannelShieldModeEnd | Subscription.ChannelShoutoutCreate | Subscription.ChannelShoutoutReceive | Subscription.ChannelSubscribe | Subscription.ChannelSubscriptionEnd | Subscription.ChannelSubscriptionGift | Subscription.ChannelSubscriptionMessage | Subscription.ChannelSuspiciousUserMessage | Subscription.ChannelSuspiciousUserUpdate | Subscription.ChannelUnban | Subscription.ChannelUnbanRequestCreate | Subscription.ChannelUnbanRequestResolve | Subscription.ChannelUpdate | Subscription.ChannelVipAdd | Subscription.ChannelVipRemove | Subscription.ChannelWarningAcknowledge | Subscription.ChannelWarningSend | Subscription.ConduitShardDisabled | Subscription.DropEntitlementGrant | Subscription.ExtensionBitsTransactionCreate | Subscription.StreamOffline | Subscription.StreamOnline | Subscription.UserAuthorizationGrant | Subscription.UserAuthorizationRevoke | Subscription.UserUpdate | Subscription.UserWhisperMessage;
 export namespace Subscription {
-	type Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> = {
+	export interface Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> {
 		/** The subscription type name. */
 		type: Type;
 		/** The subscription version. */
@@ -629,7 +629,7 @@ export namespace Subscription {
 		condition: Condition_;
 		/** Transport-specific parameters. */
 		transport: Transport_;
-	};
+	}
 	/** 
 	 * The `automod.message.hold` subscription type notifies a user if a message was caught by automod for review. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessagehold)
 	 * 
@@ -5016,7 +5016,7 @@ export namespace Payload {
 /** An object that contains information about the connection. */
 export type Session = Session.Connected | Session.Reconnecting;
 export namespace Session {
-	interface Base<Status extends "connected" | "reconnecting", KeepaliveTimeoutSeconds extends number | null, ReconnectURL extends string | null> {
+	export interface Base<Status extends "connected" | "reconnecting", KeepaliveTimeoutSeconds extends number | null, ReconnectURL extends string | null> {
 		/** An ID that uniquely identifies this WebSocket connection. Use this ID to set the `session_id` field in all [subscription requests](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events). */
 		id: string;
 		/** The connection’s status. */
