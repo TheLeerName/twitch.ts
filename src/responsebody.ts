@@ -799,7 +799,7 @@ export interface GetContentClassificationLabels extends Base {
 // im lazy to make this for methods from Get Drops Entitlements to Update Extension Bits Product
 export interface CreateEventSubSubscription<Subscription_ extends EventSub.Subscription = EventSub.Subscription> extends Base<true, 202> {
 	/** A object that contains the single subscription that you created. */
-	data: {
+	data: Subscription_ & {
 		/** An ID that identifies the subscription. */
 		id: string;
 		/**
@@ -808,16 +808,8 @@ export interface CreateEventSubSubscription<Subscription_ extends EventSub.Subsc
 		 * - `webhook_callback_verification_pending` — The subscription is pending verification of the specified callback URL (see [Responding to a challenge request](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#responding-to-a-challenge-request)).
 		 */
 		status: "enabled" | "webhook_callback_verification_pending";
-		/** The subscription’s type. See [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
-		type: Subscription_["type"];
-		/** The version number that identifies this definition of the subscription’s data. */
-		version: Subscription_["version"];
-		/** The subscription’s parameter values. */
-		condition: Subscription_["condition"];
 		/** The date and time (in RFC3339 format) of when the subscription was created. */
 		created_at: string;
-		/** The transport details used to send the notifications. */
-		transport: EventSub.Transport.WebHook | EventSub.Transport.WebSocket.Connected | EventSub.Transport.Conduit;
 		/** The UTC date and time that the WebSocket connection was established. */
 		connected_at: string;
 		/** The amount that the subscription counts against your limit. [Learn More](https://dev.twitch.tv/docs/eventsub/manage-subscriptions/#subscription-limits) */
@@ -833,7 +825,7 @@ export interface CreateEventSubSubscription<Subscription_ extends EventSub.Subsc
 export type DeleteEventSubSubscription = Base<true, 204>;
 export interface GetEventSubSubscriptions extends Base {
 	/** The list of subscriptions. The list is ordered by the oldest subscription first. The list is empty if the client hasn't created subscriptions or there are no subscriptions that match the specified filter criteria. */
-	data: {
+	data: EventSub.Subscription<EventSub.Transport.WebHook | EventSub.Transport.WebSocket.ConnectedAndDisconnected> & {
 		/** An ID that identifies the subscription. */
 		id: string;
 		/**
@@ -861,16 +853,8 @@ export interface GetEventSubSubscriptions extends Base {
 			'user_removed' | 'version_removed' | 'beta_maintenance' | 'websocket_disconnected' |
 			'websocket_failed_ping_pong' | 'websocket_received_inbound_traffic' | 'websocket_connection_unused' |
 			'websocket_internal_error' | 'websocket_network_timeout' | 'websocket_network_error';
-		/** The subscription's type. */
-		type: string;
-		/** The version number that identifies this definition of the subscription's data. */
-		version: string;
-		/** The subscription's parameter values. This is a string-encoded JSON object whose contents are determined by the subscription type. */
-		condition: Record<string, unknown>;
 		/** The date and time (in RFC3339 format) of when the subscription was created. */
 		created_at: string;
-		/** The transport details used to send the notifications. */
-		transport: EventSub.Transport.WebHook | EventSub.Transport.WebSocket.ConnectedAndDisconnected;
 		/** The amount that the subscription counts against your limit. [Read More](https://dev.twitch.tv/docs/eventsub/manage-subscriptions/#subscription-limits) */
 		cost: number;
 	}[];

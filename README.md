@@ -4,7 +4,7 @@
 - run tests to see features
 
 # Install
-- `npm i github:TheLeerName/twitch.ts#v1.5.3`
+- `npm i github:TheLeerName/twitch.ts#v1.5.4`
 
 # Tests
 > [!NOTE]

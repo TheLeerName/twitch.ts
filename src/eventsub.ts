@@ -618,7 +618,7 @@ export namespace Transport {
 }
 
 /** Subscription-related parameters */
-export type Subscription = Subscription.AutomodMessageHold | Subscription.AutomodMessageHoldV2 | Subscription.AutomodMessageUpdate | Subscription.AutomodMessageUpdateV2 | Subscription.AutomodSettingsUpdate | Subscription.AutomodTermsUpdate | Subscription.ChannelAdBreakBegin | Subscription.ChannelBan | Subscription.ChannelBitsUse | Subscription.ChannelCharityCampaignDonate | Subscription.ChannelCharityCampaignProgress | Subscription.ChannelCharityCampaignStart | Subscription.ChannelCharityCampaignStop | Subscription.ChannelChatClear | Subscription.ChannelChatClearUserMessages | Subscription.ChannelChatMessage | Subscription.ChannelChatMessageDelete | Subscription.ChannelChatNotification | Subscription.ChannelChatSettingsUpdate | Subscription.ChannelChatUserMessageHold | Subscription.ChannelChatUserMessageUpdate | Subscription.ChannelCheer | Subscription.ChannelFollow | Subscription.ChannelGoalBegin | Subscription.ChannelGoalEnd | Subscription.ChannelGoalProgress | Subscription.ChannelGuestStarGuestUpdate | Subscription.ChannelGuestStarSessionBegin | Subscription.ChannelGuestStarSessionEnd | Subscription.ChannelGuestStarSettingsUpdate | Subscription.ChannelHypeTrainBegin | Subscription.ChannelHypeTrainEnd | Subscription.ChannelHypeTrainProgress | Subscription.ChannelModerate | Subscription.ChannelModerateV2 | Subscription.ChannelModeratorAdd | Subscription.ChannelModeratorRemove | Subscription.ChannelPointsAutomaticRewardRedemptionAdd | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2 | Subscription.ChannelPointsCustomRewardAdd | Subscription.ChannelPointsCustomRewardRedemptionAdd | Subscription.ChannelPointsCustomRewardRedemptionUpdate | Subscription.ChannelPointsCustomRewardRemove | Subscription.ChannelPointsCustomRewardUpdate | Subscription.ChannelPollBegin | Subscription.ChannelPollEnd | Subscription.ChannelPollProgress | Subscription.ChannelPredictionBegin | Subscription.ChannelPredictionEnd | Subscription.ChannelPredictionLock | Subscription.ChannelPredictionProgress | Subscription.ChannelRaid | Subscription.ChannelSharedChatSessionBegin | Subscription.ChannelSharedChatSessionEnd | Subscription.ChannelSharedChatSessionUpdate | Subscription.ChannelShieldModeBegin | Subscription.ChannelShieldModeEnd | Subscription.ChannelShoutoutCreate | Subscription.ChannelShoutoutReceive | Subscription.ChannelSubscribe | Subscription.ChannelSubscriptionEnd | Subscription.ChannelSubscriptionGift | Subscription.ChannelSubscriptionMessage | Subscription.ChannelSuspiciousUserMessage | Subscription.ChannelSuspiciousUserUpdate | Subscription.ChannelUnban | Subscription.ChannelUnbanRequestCreate | Subscription.ChannelUnbanRequestResolve | Subscription.ChannelUpdate | Subscription.ChannelVipAdd | Subscription.ChannelVipRemove | Subscription.ChannelWarningAcknowledge | Subscription.ChannelWarningSend | Subscription.ConduitShardDisabled | Subscription.DropEntitlementGrant | Subscription.ExtensionBitsTransactionCreate | Subscription.StreamOffline | Subscription.StreamOnline | Subscription.UserAuthorizationGrant | Subscription.UserAuthorizationRevoke | Subscription.UserUpdate | Subscription.UserWhisperMessage;
+export type Subscription<_Transport extends Transport = Transport> = Subscription.AutomodMessageHold<_Transport> | Subscription.AutomodMessageHoldV2<_Transport> | Subscription.AutomodMessageUpdate<_Transport> | Subscription.AutomodMessageUpdateV2<_Transport> | Subscription.AutomodSettingsUpdate<_Transport> | Subscription.AutomodTermsUpdate<_Transport> | Subscription.ChannelAdBreakBegin<_Transport> | Subscription.ChannelBan<_Transport> | Subscription.ChannelBitsUse<_Transport> | Subscription.ChannelCharityCampaignDonate<_Transport> | Subscription.ChannelCharityCampaignProgress<_Transport> | Subscription.ChannelCharityCampaignStart<_Transport> | Subscription.ChannelCharityCampaignStop<_Transport> | Subscription.ChannelChatClear<_Transport> | Subscription.ChannelChatClearUserMessages<_Transport> | Subscription.ChannelChatMessage<_Transport> | Subscription.ChannelChatMessageDelete<_Transport> | Subscription.ChannelChatNotification<_Transport> | Subscription.ChannelChatSettingsUpdate<_Transport> | Subscription.ChannelChatUserMessageHold<_Transport> | Subscription.ChannelChatUserMessageUpdate<_Transport> | Subscription.ChannelCheer<_Transport> | Subscription.ChannelFollow<_Transport> | Subscription.ChannelGoalBegin<_Transport> | Subscription.ChannelGoalEnd<_Transport> | Subscription.ChannelGoalProgress<_Transport> | Subscription.ChannelGuestStarGuestUpdate<_Transport> | Subscription.ChannelGuestStarSessionBegin<_Transport> | Subscription.ChannelGuestStarSessionEnd<_Transport> | Subscription.ChannelGuestStarSettingsUpdate<_Transport> | Subscription.ChannelHypeTrainBegin<_Transport> | Subscription.ChannelHypeTrainEnd<_Transport> | Subscription.ChannelHypeTrainProgress<_Transport> | Subscription.ChannelModerate<_Transport> | Subscription.ChannelModerateV2<_Transport> | Subscription.ChannelModeratorAdd<_Transport> | Subscription.ChannelModeratorRemove<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2<_Transport> | Subscription.ChannelPointsCustomRewardAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionUpdate<_Transport> | Subscription.ChannelPointsCustomRewardRemove<_Transport> | Subscription.ChannelPointsCustomRewardUpdate<_Transport> | Subscription.ChannelPollBegin<_Transport> | Subscription.ChannelPollEnd<_Transport> | Subscription.ChannelPollProgress<_Transport> | Subscription.ChannelPredictionBegin<_Transport> | Subscription.ChannelPredictionEnd<_Transport> | Subscription.ChannelPredictionLock<_Transport> | Subscription.ChannelPredictionProgress<_Transport> | Subscription.ChannelRaid<_Transport> | Subscription.ChannelSharedChatSessionBegin<_Transport> | Subscription.ChannelSharedChatSessionEnd<_Transport> | Subscription.ChannelSharedChatSessionUpdate<_Transport> | Subscription.ChannelShieldModeBegin<_Transport> | Subscription.ChannelShieldModeEnd<_Transport> | Subscription.ChannelShoutoutCreate<_Transport> | Subscription.ChannelShoutoutReceive<_Transport> | Subscription.ChannelSubscribe<_Transport> | Subscription.ChannelSubscriptionEnd<_Transport> | Subscription.ChannelSubscriptionGift<_Transport> | Subscription.ChannelSubscriptionMessage<_Transport> | Subscription.ChannelSuspiciousUserMessage<_Transport> | Subscription.ChannelSuspiciousUserUpdate<_Transport> | Subscription.ChannelUnban<_Transport> | Subscription.ChannelUnbanRequestCreate<_Transport> | Subscription.ChannelUnbanRequestResolve<_Transport> | Subscription.ChannelUpdate<_Transport> | Subscription.ChannelVipAdd<_Transport> | Subscription.ChannelVipRemove<_Transport> | Subscription.ChannelWarningAcknowledge<_Transport> | Subscription.ChannelWarningSend<_Transport> | Subscription.ConduitShardDisabled<_Transport> | Subscription.DropEntitlementGrant<_Transport> | Subscription.ExtensionBitsTransactionCreate<_Transport> | Subscription.StreamOffline<_Transport> | Subscription.StreamOnline<_Transport> | Subscription.UserAuthorizationGrant<_Transport> | Subscription.UserAuthorizationRevoke<_Transport> | Subscription.UserUpdate<_Transport> | Subscription.UserWhisperMessage;
 export namespace Subscription {
 	export interface Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> {
 		/** The subscription type name. */
@@ -637,7 +637,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	 */
-	export type AutomodMessageHold = Base<"automod.message.hold", "1", Condition.AutomodMessageHold, Transport>;
+	export type AutomodMessageHold<_Transport extends Transport = Transport> = Base<"automod.message.hold", "1", Condition.AutomodMessageHold, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -657,7 +657,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageHoldV2 = Base<"automod.message.hold", "2", Condition.AutomodMessageHold, Transport>;
+	export type AutomodMessageHoldV2<_Transport extends Transport = Transport> = Base<"automod.message.hold", "2", Condition.AutomodMessageHold, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -677,7 +677,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageUpdate = Base<"automod.message.update", "1", Condition.AutomodMessageUpdate, Transport>;
+	export type AutomodMessageUpdate<_Transport extends Transport = Transport> = Base<"automod.message.update", "1", Condition.AutomodMessageUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -697,7 +697,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageUpdateV2 = Base<"automod.message.update", "2", Condition.AutomodMessageUpdate, Transport>;
+	export type AutomodMessageUpdateV2<_Transport extends Transport = Transport> = Base<"automod.message.update", "2", Condition.AutomodMessageUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -717,7 +717,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodSettingsUpdate = Base<"automod.settings.update", "1", Condition.AutomodSettingsUpdate, Transport>;
+	export type AutomodSettingsUpdate<_Transport extends Transport = Transport> = Base<"automod.settings.update", "1", Condition.AutomodSettingsUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -737,7 +737,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodTermsUpdate = Base<"automod.terms.update", "1", Condition.AutomodTermsUpdate, Transport>;
+	export type AutomodTermsUpdate<_Transport extends Transport = Transport> = Base<"automod.terms.update", "1", Condition.AutomodTermsUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -764,7 +764,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user access token that includes the `bits:read` scope.
 	*/
-	export type ChannelBitsUse = Base<"channel.bits.use", "1", Condition.ChannelBitsUse, Transport>;
+	export type ChannelBitsUse<_Transport extends Transport = Transport> = Base<"channel.bits.use", "1", Condition.ChannelBitsUse, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -781,7 +781,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelUpdate = Base<"channel.update", "2", Condition.ChannelUpdate, Transport>;
+	export type ChannelUpdate<_Transport extends Transport = Transport> = Base<"channel.update", "2", Condition.ChannelUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -798,7 +798,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderator:read:followers` scope.
 	 */
-	export type ChannelFollow = Base<"channel.follow", "2", Condition.ChannelFollow, Transport>;
+	export type ChannelFollow<_Transport extends Transport = Transport> = Base<"channel.follow", "2", Condition.ChannelFollow, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -816,7 +816,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:ads` scope.
 	 */
-	export type ChannelAdBreakBegin = Base<"channel.ad_break.begin", "1", Condition.ChannelAdBreakBegin, Transport>;
+	export type ChannelAdBreakBegin<_Transport extends Transport = Transport> = Base<"channel.ad_break.begin", "1", Condition.ChannelAdBreakBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -833,7 +833,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatClear = Base<"channel.chat.clear", "1", Condition.ChannelChatClear, Transport>;
+	export type ChannelChatClear<_Transport extends Transport = Transport> = Base<"channel.chat.clear", "1", Condition.ChannelChatClear, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -851,7 +851,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatClearUserMessages = Base<"channel.chat.clear_user_messages", "1", Condition.ChannelChatClearUserMessages, Transport>;
+	export type ChannelChatClearUserMessages<_Transport extends Transport = Transport> = Base<"channel.chat.clear_user_messages", "1", Condition.ChannelChatClearUserMessages, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -869,7 +869,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatMessage = Base<"channel.chat.message", "1", Condition.ChannelChatMessage, Transport>;
+	export type ChannelChatMessage<_Transport extends Transport = Transport> = Base<"channel.chat.message", "1", Condition.ChannelChatMessage, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -887,7 +887,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatMessageDelete = Base<"channel.chat.message_delete", "1", Condition.ChannelChatMessageDelete, Transport>;
+	export type ChannelChatMessageDelete<_Transport extends Transport = Transport> = Base<"channel.chat.message_delete", "1", Condition.ChannelChatMessageDelete, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -905,7 +905,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatNotification = Base<"channel.chat.notification", "1", Condition.ChannelChatNotification, Transport>;
+	export type ChannelChatNotification<_Transport extends Transport = Transport> = Base<"channel.chat.notification", "1", Condition.ChannelChatNotification, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -923,7 +923,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatSettingsUpdate = Base<"channel.chat_settings.update", "1", Condition.ChannelChatSettingsUpdate, Transport>;
+	export type ChannelChatSettingsUpdate<_Transport extends Transport = Transport> = Base<"channel.chat_settings.update", "1", Condition.ChannelChatSettingsUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -941,7 +941,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
 	 */
-	export type ChannelChatUserMessageHold = Base<"channel.chat.user_message_hold", "1", Condition.ChannelChatUserMessageHold, Transport>;
+	export type ChannelChatUserMessageHold<_Transport extends Transport = Transport> = Base<"channel.chat.user_message_hold", "1", Condition.ChannelChatUserMessageHold, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -959,7 +959,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from the chatting user.
 	 */
-	export type ChannelChatUserMessageUpdate = Base<"channel.chat.user_message_update", "1", Condition.ChannelChatUserMessageUpdate, Transport>;
+	export type ChannelChatUserMessageUpdate<_Transport extends Transport = Transport> = Base<"channel.chat.user_message_update", "1", Condition.ChannelChatUserMessageUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -977,7 +977,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionBegin = Base<"channel.shared_chat.begin", "1", Condition.ChannelSharedChatSessionBegin, Transport>;
+	export type ChannelSharedChatSessionBegin<_Transport extends Transport = Transport> = Base<"channel.shared_chat.begin", "1", Condition.ChannelSharedChatSessionBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -994,7 +994,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionUpdate = Base<"channel.shared_chat.update", "1", Condition.ChannelSharedChatSessionUpdate, Transport>;
+	export type ChannelSharedChatSessionUpdate<_Transport extends Transport = Transport> = Base<"channel.shared_chat.update", "1", Condition.ChannelSharedChatSessionUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1011,7 +1011,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionEnd = Base<"channel.shared_chat.end", "1", Condition.ChannelSharedChatSessionEnd, Transport>;
+	export type ChannelSharedChatSessionEnd<_Transport extends Transport = Transport> = Base<"channel.shared_chat.end", "1", Condition.ChannelSharedChatSessionEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1028,7 +1028,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscribe = Base<"channel.subscribe", "1", Condition.ChannelSubscribe, Transport>;
+	export type ChannelSubscribe<_Transport extends Transport = Transport> = Base<"channel.subscribe", "1", Condition.ChannelSubscribe, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1045,7 +1045,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionEnd = Base<"channel.subscription.end", "1", Condition.ChannelSubscriptionEnd, Transport>;
+	export type ChannelSubscriptionEnd<_Transport extends Transport = Transport> = Base<"channel.subscription.end", "1", Condition.ChannelSubscriptionEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1062,7 +1062,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionGift = Base<"channel.subscription.gift", "1", Condition.ChannelSubscriptionGift, Transport>;
+	export type ChannelSubscriptionGift<_Transport extends Transport = Transport> = Base<"channel.subscription.gift", "1", Condition.ChannelSubscriptionGift, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1079,7 +1079,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionMessage = Base<"channel.subscription.message", "1", Condition.ChannelSubscriptionMessage, Transport>;
+	export type ChannelSubscriptionMessage<_Transport extends Transport = Transport> = Base<"channel.subscription.message", "1", Condition.ChannelSubscriptionMessage, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1096,7 +1096,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `bits:read` scope.
 	 */
-	export type ChannelCheer = Base<"channel.cheer", "1", Condition.ChannelCheer, Transport>;
+	export type ChannelCheer<_Transport extends Transport = Transport> = Base<"channel.cheer", "1", Condition.ChannelCheer, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1113,7 +1113,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelRaid = Base<"channel.raid", "1", Condition.ChannelRaid, Transport>;
+	export type ChannelRaid<_Transport extends Transport = Transport> = Base<"channel.raid", "1", Condition.ChannelRaid, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1130,7 +1130,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:moderate` scope.
 	 */
-	export type ChannelBan = Base<"channel.ban", "1", Condition.ChannelBan, Transport>;
+	export type ChannelBan<_Transport extends Transport = Transport> = Base<"channel.ban", "1", Condition.ChannelBan, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1147,7 +1147,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:moderate` scope.
 	 */
-	export type ChannelUnban = Base<"channel.unban", "1", Condition.ChannelUnban, Transport>;
+	export type ChannelUnban<_Transport extends Transport = Transport> = Base<"channel.unban", "1", Condition.ChannelUnban, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1164,7 +1164,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderator:read:unban_requests` or `moderator:manage:unban_requests` scope.
 	 */
-	export type ChannelUnbanRequestCreate = Base<"channel.unban_request.create", "1", Condition.ChannelUnbanRequestCreate, Transport>;
+	export type ChannelUnbanRequestCreate<_Transport extends Transport = Transport> = Base<"channel.unban_request.create", "1", Condition.ChannelUnbanRequestCreate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1186,7 +1186,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelUnbanRequestResolve = Base<"channel.unban_request.resolve", "1", Condition.ChannelUnbanRequestResolve, Transport>;
+	export type ChannelUnbanRequestResolve<_Transport extends Transport = Transport> = Base<"channel.unban_request.resolve", "1", Condition.ChannelUnbanRequestResolve, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1211,7 +1211,7 @@ export namespace Subscription {
 	 * - `moderator:read:moderators`
 	 * - `moderator:read:vips`
 	 */
-	export type ChannelModerate = Base<"channel.moderate", "1", Condition.ChannelModerate, Transport>;
+	export type ChannelModerate<_Transport extends Transport = Transport> = Base<"channel.moderate", "1", Condition.ChannelModerate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1239,7 +1239,7 @@ export namespace Subscription {
 	 * - `moderator:read:moderators`
 	 * - `moderator:read:vips`
 	 */
-	export type ChannelModerateV2 = Base<"channel.moderate", "2", Condition.ChannelModerate, Transport>;
+	export type ChannelModerateV2<_Transport extends Transport = Transport> = Base<"channel.moderate", "2", Condition.ChannelModerate, _Transport>;
 
 	/**
 	 * @param connection
@@ -1258,7 +1258,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderation:read` scope.
 	 */
-	export type ChannelModeratorAdd = Base<"channel.moderator.add", "1", Condition.ChannelModeratorAdd, Transport>;
+	export type ChannelModeratorAdd<_Transport extends Transport = Transport> = Base<"channel.moderator.add", "1", Condition.ChannelModeratorAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1275,7 +1275,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderation:read` scope.
 	 */
-	export type ChannelModeratorRemove = Base<"channel.moderator.remove", "1", Condition.ChannelModeratorRemove, Transport>;
+	export type ChannelModeratorRemove<_Transport extends Transport = Transport> = Base<"channel.moderator.remove", "1", Condition.ChannelModeratorRemove, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1292,7 +1292,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSessionBegin = Base<"channel.guest_star_session.begin", "beta", Condition.ChannelGuestStarSessionBegin, Transport>;
+	export type ChannelGuestStarSessionBegin<_Transport extends Transport = Transport> = Base<"channel.guest_star_session.begin", "beta", Condition.ChannelGuestStarSessionBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1310,7 +1310,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSessionEnd = Base<"channel.guest_star_session.end", "beta", Condition.ChannelGuestStarSessionEnd, Transport>;
+	export type ChannelGuestStarSessionEnd<_Transport extends Transport = Transport> = Base<"channel.guest_star_session.end", "beta", Condition.ChannelGuestStarSessionEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1328,7 +1328,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarGuestUpdate = Base<"channel.guest_star_guest.update", "beta", Condition.ChannelGuestStarGuestUpdate, Transport>;
+	export type ChannelGuestStarGuestUpdate<_Transport extends Transport = Transport> = Base<"channel.guest_star_guest.update", "beta", Condition.ChannelGuestStarGuestUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1346,7 +1346,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSettingsUpdate = Base<"channel.guest_star_settings.update", "beta", Condition.ChannelGuestStarSettingsUpdate, Transport>;
+	export type ChannelGuestStarSettingsUpdate<_Transport extends Transport = Transport> = Base<"channel.guest_star_settings.update", "beta", Condition.ChannelGuestStarSettingsUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1364,7 +1364,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsAutomaticRewardRedemptionAdd = Base<"channel.channel_points_automatic_reward_redemption.add", "1", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
+	export type ChannelPointsAutomaticRewardRedemptionAdd<_Transport extends Transport = Transport> = Base<"channel.channel_points_automatic_reward_redemption.add", "1", Condition.ChannelPointsAutomaticRewardRedemptionAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1381,7 +1381,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsAutomaticRewardRedemptionAddV2 = Base<"channel.channel_points_automatic_reward_redemption.add", "2", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
+	export type ChannelPointsAutomaticRewardRedemptionAddV2<_Transport extends Transport = Transport> = Base<"channel.channel_points_automatic_reward_redemption.add", "2", Condition.ChannelPointsAutomaticRewardRedemptionAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1398,7 +1398,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardAdd = Base<"channel.channel_points_custom_reward.add", "1", Condition.ChannelPointsCustomRewardAdd, Transport>;
+	export type ChannelPointsCustomRewardAdd<_Transport extends Transport = Transport> = Base<"channel.channel_points_custom_reward.add", "1", Condition.ChannelPointsCustomRewardAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1415,7 +1415,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardUpdate = Base<"channel.channel_points_custom_reward.update", "1", Condition.ChannelPointsCustomRewardUpdate, Transport>;
+	export type ChannelPointsCustomRewardUpdate<_Transport extends Transport = Transport> = Base<"channel.channel_points_custom_reward.update", "1", Condition.ChannelPointsCustomRewardUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1433,7 +1433,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRemove = Base<"channel.channel_points_custom_reward.remove", "1", Condition.ChannelPointsCustomRewardRemove, Transport>;
+	export type ChannelPointsCustomRewardRemove<_Transport extends Transport = Transport> = Base<"channel.channel_points_custom_reward.remove", "1", Condition.ChannelPointsCustomRewardRemove, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1451,7 +1451,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRedemptionAdd = Base<"channel.channel_points_custom_reward_redemption.add", "1", Condition.ChannelPointsCustomRewardRedemptionAdd, Transport>;
+	export type ChannelPointsCustomRewardRedemptionAdd<_Transport extends Transport = Transport> = Base<"channel.channel_points_custom_reward_redemption.add", "1", Condition.ChannelPointsCustomRewardRedemptionAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1469,7 +1469,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRedemptionUpdate = Base<"channel.channel_points_custom_reward_redemption.update", "1", Condition.ChannelPointsCustomRewardRedemptionUpdate, Transport>;
+	export type ChannelPointsCustomRewardRedemptionUpdate<_Transport extends Transport = Transport> = Base<"channel.channel_points_custom_reward_redemption.update", "1", Condition.ChannelPointsCustomRewardRedemptionUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1487,7 +1487,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollBegin = Base<"channel.poll.begin", "1", Condition.ChannelPollBegin, Transport>;
+	export type ChannelPollBegin<_Transport extends Transport = Transport> = Base<"channel.poll.begin", "1", Condition.ChannelPollBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1504,7 +1504,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollProgress = Base<"channel.poll.progress", "1", Condition.ChannelPollProgress, Transport>;
+	export type ChannelPollProgress<_Transport extends Transport = Transport> = Base<"channel.poll.progress", "1", Condition.ChannelPollProgress, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1521,7 +1521,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollEnd = Base<"channel.poll.end", "1", Condition.ChannelPollEnd, Transport>;
+	export type ChannelPollEnd<_Transport extends Transport = Transport> = Base<"channel.poll.end", "1", Condition.ChannelPollEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1538,7 +1538,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionBegin = Base<"channel.prediction.begin", "1", Condition.ChannelPredictionBegin, Transport>;
+	export type ChannelPredictionBegin<_Transport extends Transport = Transport> = Base<"channel.prediction.begin", "1", Condition.ChannelPredictionBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1555,7 +1555,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionProgress = Base<"channel.prediction.progress", "1", Condition.ChannelPredictionProgress, Transport>;
+	export type ChannelPredictionProgress<_Transport extends Transport = Transport> = Base<"channel.prediction.progress", "1", Condition.ChannelPredictionProgress, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1572,7 +1572,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionLock = Base<"channel.prediction.lock", "1", Condition.ChannelPredictionLock, Transport>;
+	export type ChannelPredictionLock<_Transport extends Transport = Transport> = Base<"channel.prediction.lock", "1", Condition.ChannelPredictionLock, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1589,7 +1589,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionEnd = Base<"channel.prediction.end", "1", Condition.ChannelPredictionEnd, Transport>;
+	export type ChannelPredictionEnd<_Transport extends Transport = Transport> = Base<"channel.prediction.end", "1", Condition.ChannelPredictionEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1608,7 +1608,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelSuspiciousUserUpdate = Base<"channel.suspicious_user.update", "1", Condition.ChannelSuspiciousUserUpdate, Transport>;
+	export type ChannelSuspiciousUserUpdate<_Transport extends Transport = Transport> = Base<"channel.suspicious_user.update", "1", Condition.ChannelSuspiciousUserUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1628,7 +1628,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelSuspiciousUserMessage = Base<"channel.suspicious_user.message", "1", Condition.ChannelSuspiciousUserMessage, Transport>;
+	export type ChannelSuspiciousUserMessage<_Transport extends Transport = Transport> = Base<"channel.suspicious_user.message", "1", Condition.ChannelSuspiciousUserMessage, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1646,7 +1646,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
 	 */
-	export type ChannelVipAdd = Base<"channel.vip.add", "1", Condition.ChannelVipAdd, Transport>;
+	export type ChannelVipAdd<_Transport extends Transport = Transport> = Base<"channel.vip.add", "1", Condition.ChannelVipAdd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1663,7 +1663,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
 	 */
-	export type ChannelVipRemove = Base<"channel.vip.remove", "1", Condition.ChannelVipRemove, Transport>;
+	export type ChannelVipRemove<_Transport extends Transport = Transport> = Base<"channel.vip.remove", "1", Condition.ChannelVipRemove, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1680,7 +1680,7 @@ export namespace Subscription {
 	 * 
 	 * Must have the `moderator:read:warnings` or `moderator:manage:warnings` scope.
 	 */
-	export type ChannelWarningAcknowledge = Base<"channel.warning.acknowledge", "1", Condition.ChannelWarningAcknowledge, Transport>;
+	export type ChannelWarningAcknowledge<_Transport extends Transport = Transport> = Base<"channel.warning.acknowledge", "1", Condition.ChannelWarningAcknowledge, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1698,7 +1698,7 @@ export namespace Subscription {
 	 * 
 	 * Must have the `moderator:read:warnings` or `moderator:manage:warnings` scope.
 	 */
-	export type ChannelWarningSend = Base<"channel.warning.send", "1", Condition.ChannelWarningSend, Transport>;
+	export type ChannelWarningSend<_Transport extends Transport = Transport> = Base<"channel.warning.send", "1", Condition.ChannelWarningSend, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1716,7 +1716,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignDonate = Base<"channel.charity_campaign.donate", "1", Condition.ChannelCharityCampaignDonate, Transport>;
+	export type ChannelCharityCampaignDonate<_Transport extends Transport = Transport> = Base<"channel.charity_campaign.donate", "1", Condition.ChannelCharityCampaignDonate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1735,7 +1735,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignStart = Base<"channel.charity_campaign.start", "1", Condition.ChannelCharityCampaignStart, Transport>;
+	export type ChannelCharityCampaignStart<_Transport extends Transport = Transport> = Base<"channel.charity_campaign.start", "1", Condition.ChannelCharityCampaignStart, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1756,7 +1756,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignProgress = Base<"channel.charity_campaign.progress", "1", Condition.ChannelCharityCampaignProgress, Transport>;
+	export type ChannelCharityCampaignProgress<_Transport extends Transport = Transport> = Base<"channel.charity_campaign.progress", "1", Condition.ChannelCharityCampaignProgress, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1773,7 +1773,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignStop = Base<"channel.charity_campaign.stop", "1", Condition.ChannelCharityCampaignStop, Transport>;
+	export type ChannelCharityCampaignStop<_Transport extends Transport = Transport> = Base<"channel.charity_campaign.stop", "1", Condition.ChannelCharityCampaignStop, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1790,7 +1790,7 @@ export namespace Subscription {
 	 * 
 	 * App access token where the client ID matches the client ID in the condition. If `conduit_id` is specified, the client must be the owner of the conduit.
 	 */
-	export type ConduitShardDisabled = Base<"conduit.shard.disabled", "1", Condition.ConduitShardDisabled, Transport>;
+	export type ConduitShardDisabled<_Transport extends Transport = Transport> = Base<"conduit.shard.disabled", "1", Condition.ConduitShardDisabled, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -1810,7 +1810,7 @@ export namespace Subscription {
 	 * 
 	 * App access token required. The client ID associated with the access token must be owned by a user who is part of the specified organization.
 	 */
-	export type DropEntitlementGrant = Base<"drop.entitlement.grant", "1", Condition.DropEntitlementGrant, Transport>;
+	export type DropEntitlementGrant<_Transport extends Transport = Transport> = Base<"drop.entitlement.grant", "1", Condition.DropEntitlementGrant, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1831,7 +1831,7 @@ export namespace Subscription {
 	 * 
 	 * The OAuth token client ID must match the Extension client ID.
 	 */
-	export type ExtensionBitsTransactionCreate = Base<"extension.bits_transaction.create", "1", Condition.ExtensionBitsTransactionCreate, Transport>;
+	export type ExtensionBitsTransactionCreate<_Transport extends Transport = Transport> = Base<"extension.bits_transaction.create", "1", Condition.ExtensionBitsTransactionCreate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `extension_client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -1850,7 +1850,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalBegin = Base<"channel.goal.begin", "1", Condition.ChannelGoalBegin, Transport>;
+	export type ChannelGoalBegin<_Transport extends Transport = Transport> = Base<"channel.goal.begin", "1", Condition.ChannelGoalBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1869,7 +1869,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalProgress = Base<"channel.goal.progress", "1", Condition.ChannelGoalProgress, Transport>;
+	export type ChannelGoalProgress<_Transport extends Transport = Transport> = Base<"channel.goal.progress", "1", Condition.ChannelGoalProgress, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1886,7 +1886,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalEnd = Base<"channel.goal.end", "1", Condition.ChannelGoalEnd, Transport>;
+	export type ChannelGoalEnd<_Transport extends Transport = Transport> = Base<"channel.goal.end", "1", Condition.ChannelGoalEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1907,7 +1907,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainBegin = Base<"channel.hype_train.begin", "1", Condition.ChannelHypeTrainBegin, Transport>;
+	export type ChannelHypeTrainBegin<_Transport extends Transport = Transport> = Base<"channel.hype_train.begin", "1", Condition.ChannelHypeTrainBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1928,7 +1928,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainProgress = Base<"channel.hype_train.progress", "1", Condition.ChannelHypeTrainProgress, Transport>;
+	export type ChannelHypeTrainProgress<_Transport extends Transport = Transport> = Base<"channel.hype_train.progress", "1", Condition.ChannelHypeTrainProgress, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1945,7 +1945,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainEnd = Base<"channel.hype_train.end", "1", Condition.ChannelHypeTrainEnd, Transport>;
+	export type ChannelHypeTrainEnd<_Transport extends Transport = Transport> = Base<"channel.hype_train.end", "1", Condition.ChannelHypeTrainEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1968,7 +1968,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShieldModeBegin = Base<"channel.shield_mode.begin", "1", Condition.ChannelShieldModeBegin, Transport>;
+	export type ChannelShieldModeBegin<_Transport extends Transport = Transport> = Base<"channel.shield_mode.begin", "1", Condition.ChannelShieldModeBegin, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1992,7 +1992,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShieldModeEnd = Base<"channel.shield_mode.end", "1", Condition.ChannelShieldModeEnd, Transport>;
+	export type ChannelShieldModeEnd<_Transport extends Transport = Transport> = Base<"channel.shield_mode.end", "1", Condition.ChannelShieldModeEnd, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2014,7 +2014,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShoutoutCreate = Base<"channel.shoutout.create", "1", Condition.ChannelShoutoutCreate, Transport>;
+	export type ChannelShoutoutCreate<_Transport extends Transport = Transport> = Base<"channel.shoutout.create", "1", Condition.ChannelShoutoutCreate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2038,7 +2038,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShoutoutReceive = Base<"channel.shoutout.receive", "1", Condition.ChannelShoutoutReceive, Transport>;
+	export type ChannelShoutoutReceive<_Transport extends Transport = Transport> = Base<"channel.shoutout.receive", "1", Condition.ChannelShoutoutReceive, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2056,7 +2056,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type StreamOnline = Base<"stream.online", "1", Condition.StreamOnline, Transport>;
+	export type StreamOnline<_Transport extends Transport = Transport> = Base<"stream.online", "1", Condition.StreamOnline, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2073,7 +2073,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type StreamOffline = Base<"stream.offline", "1", Condition.StreamOffline, Transport>;
+	export type StreamOffline<_Transport extends Transport = Transport> = Base<"stream.offline", "1", Condition.StreamOffline, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2092,7 +2092,7 @@ export namespace Subscription {
 	 * 
 	 * Provided `client_id` must match the client id in the application access token.
 	 */
-	export type UserAuthorizationGrant = Base<"user.authorization.grant", "1", Condition.UserAuthorizationGrant, Transport>;
+	export type UserAuthorizationGrant<_Transport extends Transport = Transport> = Base<"user.authorization.grant", "1", Condition.UserAuthorizationGrant, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -2111,7 +2111,7 @@ export namespace Subscription {
 	 * 
 	 * Provided `client_id` must match the client id in the application access token.
 	 */
-	export type UserAuthorizationRevoke = Base<"user.authorization.revoke", "1", Condition.UserAuthorizationRevoke, Transport>;
+	export type UserAuthorizationRevoke<_Transport extends Transport = Transport> = Base<"user.authorization.revoke", "1", Condition.UserAuthorizationRevoke, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -2128,7 +2128,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required. If you have the `user:read:email` scope, the notification will include `email` field.
 	 */
-	export type UserUpdate = Base<"user.update", "1", Condition.UserUpdate, Transport>;
+	export type UserUpdate<_Transport extends Transport = Transport> = Base<"user.update", "1", Condition.UserUpdate, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2145,7 +2145,7 @@ export namespace Subscription {
 	 * 
 	 * Must have oauth scope `user:read:whispers` or `user:manage:whispers`.
 	 */
-	export type UserWhisperMessage = Base<"user.whisper.message", "1", Condition.UserWhisperMessage, Transport>;
+	export type UserWhisperMessage<_Transport extends Transport = Transport> = Base<"user.whisper.message", "1", Condition.UserWhisperMessage, _Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2163,21 +2163,13 @@ export type Payload = Payload.AutomodMessageHold | Payload.AutomodMessageHoldV2 
 export namespace Payload {
 	export interface Base<Subscription_ extends Subscription = Subscription, Status extends string = "enabled"> {
 		/** An object that contains information about your subscription. */
-		subscription: {
+		subscription: Subscription_ & {
 			/** An ID that uniquely identifies this subscription. */
 			id: string;
 			/** The subscription's status. */
 			status: Status;
-			/** The type of event sent in the message. See the `event` field. */
-			type: Subscription_["type"];
-			/** The version number of the subscription type's definition. */
-			version: Subscription_["version"];
 			/** The event's cost. See [Subscription limits](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscription-limits). */
 			cost: number;
-			/** The conditions under which the event fires. For example, if you requested notifications when a broadcaster gets a new follower, this object contains the broadcaster's ID. For information about the condition's data, see the subscription type's description in [Subscription types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types). */
-			condition: Subscription_["condition"];
-			/** An object that contains information about the transport used for notifications. */
-			transport: Subscription_["transport"];
 			/** The UTC date and time that the subscription was created. */
 			created_at: string;
 		};
