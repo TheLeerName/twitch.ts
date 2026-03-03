@@ -1,4 +1,4 @@
-import { Authorization } from ".";
+import { Authorization, Paths } from ".";
 
 /**
  * Starts WebSocket for subscribing and getting EventSub events
@@ -10,7 +10,7 @@ import { Authorization } from ".";
 export function startWebSocket<S extends Authorization.Scope[]>(token_data: Authorization.User<S>, reconnect_ms?: number) {
 	if (!reconnect_ms) reconnect_ms = 500;
 
-	const connection = new Connection(new WebSocket(WebSocketURL), token_data);
+	const connection = new Connection(new WebSocket(Paths.eventSubWS), token_data);
 	var previous_message_id: string | undefined;
 
 	function giveCloseCodeToClient(code: number = 1000, reason: string = "client disconnected") {
@@ -79,7 +79,7 @@ export function startWebSocket<S extends Authorization.Scope[]>(token_data: Auth
 	}
 	async function onClose(e: CloseEvent) {
 		setTimeout(() => {
-			connection.ws = new WebSocket(WebSocketURL);
+			connection.ws = new WebSocket(Paths.eventSubWS);
 			connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
 			connection.ws.onmessage = onMessage;
 			connection.ws.onclose = onClose;
@@ -95,8 +95,6 @@ export function startWebSocket<S extends Authorization.Scope[]>(token_data: Auth
 
 	return connection;
 }
-
-export const WebSocketURL = "wss://wss.twitch.tv/ws";
 
 export type SubscriptionType =
 	'enabled' | 'webhook_callback_verification_pending' | 'webhook_callback_verification_failed' |

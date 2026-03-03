@@ -1,4 +1,4 @@
-import { Authorization } from ".";
+import { Authorization, Paths } from ".";
 import * as RequestBody from "./requestbody";
 import * as ResponseBody from "./responsebody";
 import * as EventSub from "./eventsub";
@@ -14,7 +14,7 @@ import * as EventSub from "./eventsub";
  */
 export async function StartCommercial<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:edit:commercial">>, length: number): Promise<ResponseBody.StartCommercial | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/commercial", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/commercial`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -28,7 +28,7 @@ export async function StartCommercial<S extends Authorization.Scope[]>(authoriza
  */
 export async function GetAdSchedule<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:ads">>): Promise<ResponseBody.GetAdSchedule | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/ads", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/ads`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -41,7 +41,7 @@ export async function GetAdSchedule<S extends Authorization.Scope[]>(authorizati
  */
 export async function SnoozeNextAd<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:ads">>): Promise<ResponseBody.SnoozeNextAd | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/ads/schedule/snooze", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/ads/schedule/snooze`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -59,7 +59,7 @@ export async function SnoozeNextAd<S extends Authorization.Scope[]>(authorizatio
  */
 export async function GetExtensionAnalytics<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "analytics:read:extensions">>, extension_id?: string, started_at?: string, ended_at?: string, first?: number, after?: string): Promise<ResponseBody.GetExtensionAnalytics | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/analytics/extensions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/analytics/extensions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ extension_id, type: "overview_v2", started_at, ended_at, first, after }).fetch();
@@ -76,7 +76,7 @@ export async function GetExtensionAnalytics<S extends Authorization.Scope[]>(aut
  */
 export async function GetGameAnalytics<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "analytics:read:games">>, game_id?: string, started_at?: string, ended_at?: string, first?: number, after?: number): Promise<ResponseBody.GetGameAnalytics | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/analytics/games", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/analytics/games`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ game_id, type: "overview_v2", started_at, ended_at, first, after }).fetch();
@@ -99,7 +99,7 @@ export async function GetGameAnalytics<S extends Authorization.Scope[]>(authoriz
  */
 export async function GetBitsLeaderboard<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "bits:read">>, count?: number, period?: "day" | "week" | "month" | "year" | "all", started_at?: string, user_id?: string): Promise<ResponseBody.GetBitsLeaderboard | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/bits/leaderboard", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/bits/leaderboard`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ count, period, started_at, user_id }).fetch();
@@ -113,7 +113,7 @@ export async function GetBitsLeaderboard<S extends Authorization.Scope[]>(author
  */
 export async function GetCheermotes(authorization: Authorization, broadcaster_id?: string): Promise<ResponseBody.GetBitsLeaderboard | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/bits/cheermotes", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/bits/cheermotes`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -130,7 +130,7 @@ export async function GetCheermotes(authorization: Authorization, broadcaster_id
  */
 export async function GetExtensionTransactions<S extends Authorization.Scope[]>(authorization: Authorization.App, extension_id: string, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetExtensionTransactions<typeof extension_id> | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/extensions/transactions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/extensions/transactions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ extension_id, id, first, after }).fetch();
@@ -144,7 +144,7 @@ export async function GetExtensionTransactions<S extends Authorization.Scope[]>(
  */
 export async function GetChannelInformation(authorization: Authorization, broadcaster_id: string | string[]): Promise<ResponseBody.GetChannelInformation | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -159,7 +159,7 @@ export async function GetChannelInformation(authorization: Authorization, broadc
 export async function ModifyChannelInformation<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:broadcast">>, body: RequestBody.ModifyChannelInformation): Promise<ResponseBody.ModifyChannelInformation | ResponseBody.Error> {
 	try {
 		if (Object.keys(body).length === 0) throw `You must specify at least one field in request body!`;
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -173,7 +173,7 @@ export async function ModifyChannelInformation<S extends Authorization.Scope[]>(
  */
 export async function GetChannelEditors<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:editors">>): Promise<ResponseBody.GetChannelEditors | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/editors", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/editors`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -189,7 +189,7 @@ export async function GetChannelEditors<S extends Authorization.Scope[]>(authori
  */
 export async function GetFollowedChannels<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:follows">>, broadcaster_id?: string, first?: number, after?: string): Promise<ResponseBody.GetFollowedChannels | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/followed", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/followed`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id: authorization.user_id, broadcaster_id, first, after }).fetch();
@@ -210,7 +210,7 @@ export async function GetFollowedChannels<S extends Authorization.Scope[]>(autho
  */
 export async function GetChannelFollowers(authorization: Authorization.User, broadcaster_id: string, user_id?: string, first?: number, after?: string): Promise<ResponseBody.GetChannelFollowers | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/followers", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/followers`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, user_id, first, after }).fetch();
@@ -223,7 +223,7 @@ export async function GetChannelFollowers(authorization: Authorization.User, bro
  */
 export async function CreateCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, body: RequestBody.CreateCustomReward): Promise<ResponseBody.CreateCustomReward | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).setBody(body).fetch();
@@ -239,7 +239,7 @@ export async function CreateCustomReward<S extends Authorization.Scope[]>(author
  */
 export async function DeleteCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string): Promise<ResponseBody.DeleteCustomReward | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, id }).fetch();
@@ -256,7 +256,7 @@ export async function DeleteCustomReward<S extends Authorization.Scope[]>(author
  */
 export async function GetCustomRewards<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:redemptions" | "channel:manage:redemptions">>, id?: string | string[], only_manageable_rewards?: boolean): Promise<ResponseBody.GetCustomRewards | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, id, only_manageable_rewards }).fetch();
@@ -275,7 +275,7 @@ export async function GetCustomRewards<S extends Authorization.Scope[]>(authoriz
  */
 export async function GetCustomRewardRedemptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:redemptions" | "channel:manage:redemptions">>, reward_id: string, status?: string, id?: string | string[], sort?: string, after?: string, first?: number): Promise<ResponseBody.GetCustomRewardRedemptions | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards/redemptions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, reward_id, status, id, sort, after, first }).fetch();
@@ -291,7 +291,7 @@ export async function GetCustomRewardRedemptions<S extends Authorization.Scope[]
  */
 export async function UpdateCustomReward<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string, body: RequestBody.UpdateCustomReward): Promise<ResponseBody.UpdateCustomReward | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, id }).setBody(body).fetch();
@@ -307,7 +307,7 @@ export async function UpdateCustomReward<S extends Authorization.Scope[]>(author
  */
 export async function UpdateCustomRewardRedemptionStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:redemptions">>, id: string | string[], reward_id: string, status: "CANCELED" | "FULFILLED"): Promise<ResponseBody.UpdateCustomRewardRedemptionStatus | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channel_points/custom_rewards/redemptions`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ id, broadcaster_id: authorization.user_id, reward_id }).setBody({ status }).fetch();
@@ -322,7 +322,7 @@ export async function UpdateCustomRewardRedemptionStatus<S extends Authorization
  */
 export async function GetCharityCampaigns<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:charity">>): Promise<ResponseBody.GetCharityCampaigns | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/charity/campaigns", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/charity/campaigns`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -339,7 +339,7 @@ export async function GetCharityCampaigns<S extends Authorization.Scope[]>(autho
  */
 export async function GetCharityCampaignDonations<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:charity">>, first?: number, after?: string): Promise<ResponseBody.GetCharityCampaignDonations | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/charity/donations", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/charity/donations`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, first, after }).fetch();
@@ -359,7 +359,7 @@ export async function GetCharityCampaignDonations<S extends Authorization.Scope[
  */
 export async function GetChatters<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:chatters">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetChatters | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/chatters", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/chatters`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, first, after }).fetch();
@@ -378,7 +378,7 @@ export async function GetChatters<S extends Authorization.Scope[]>(authorization
  */
 export async function GetChannelEmotes(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetChannelEmotes | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/emotes", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/emotes`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -392,7 +392,7 @@ export async function GetChannelEmotes(authorization: Authorization, broadcaster
  */
 export async function GetGlobalEmotes(authorization: Authorization): Promise<ResponseBody.GetGlobalEmotes | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/emotes/global", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/emotes/global`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).fetch();
@@ -408,7 +408,7 @@ export async function GetGlobalEmotes(authorization: Authorization): Promise<Res
  */
 export async function GetEmoteSets(authorization: Authorization, emote_set_id: string | string[]): Promise<ResponseBody.GetEmoteSets | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/emotes/set", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/emotes/set`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ emote_set_id }).fetch();
@@ -422,7 +422,7 @@ export async function GetEmoteSets(authorization: Authorization, emote_set_id: s
  */
 export async function GetChannelChatBadges(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetChannelChatBadges | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/badge", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/badge`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -436,7 +436,7 @@ export async function GetChannelChatBadges(authorization: Authorization, broadca
  */
 export async function GetGlobalChatBadges(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetGlobalChatBadges | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/badges/global", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/badges/global`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -452,7 +452,7 @@ export async function GetGlobalChatBadges(authorization: Authorization, broadcas
  */
 export async function GetChatSettings(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetChatSettings | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/settings", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/settings`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.type === "user" ? authorization.user_id : undefined }).fetch();
@@ -466,7 +466,7 @@ export async function GetChatSettings(authorization: Authorization, broadcaster_
  */
 export async function GetSharedChatSession(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetSharedChatSession | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/shared_chat/session", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/shared_chat/session`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -481,7 +481,7 @@ export async function GetSharedChatSession(authorization: Authorization, broadca
  */
 export async function GetUserEmotes<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:emotes">>, broadcaster_id?: string, after?: string) {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/emotes/user", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/emotes/user`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id: authorization.user_id, broadcaster_id, after }).fetch();
@@ -496,7 +496,7 @@ export async function GetUserEmotes<S extends Authorization.Scope[]>(authorizati
  */
 export async function UpdateChatSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:chat_settings">>, broadcaster_id: string, body: RequestBody.UpdateChatSettings): Promise<ResponseBody.UpdateChatSettings | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/settings", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/settings`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id }).setBody(body).fetch();
@@ -512,7 +512,7 @@ export async function UpdateChatSettings<S extends Authorization.Scope[]>(author
  */
 export async function SendChatAnnouncement<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:announcements">>, broadcaster_id: string): Promise<ResponseBody.SendChatAnnouncement | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/announcements", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/announcements`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id }).fetch();
@@ -533,7 +533,7 @@ export async function SendChatAnnouncement<S extends Authorization.Scope[]>(auth
  */
 export async function SendShoutout<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:shoutouts">>, from_broadcaster_id: string, to_broadcaster_id: string): Promise<ResponseBody.SendShoutout | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/shoutouts", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/shoutouts`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ from_broadcaster_id, to_broadcaster_id, moderator_id: authorization.user_id }).fetch();
@@ -549,7 +549,7 @@ export async function SendShoutout<S extends Authorization.Scope[]>(authorizatio
  */
 export async function SendChatMessage<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:write:chat">>, broadcaster_id: string, message: string, reply_parent_message_id?: string): Promise<ResponseBody.SendChatMessage | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/messages", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/messages`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, sender_id: authorization.user_id, message, reply_parent_message_id }).fetch();
@@ -563,7 +563,7 @@ export async function SendChatMessage<S extends Authorization.Scope[]>(authoriza
  */
 export async function GetUserChatColor(authorization: Authorization, user_id: string): Promise<ResponseBody.GetUserChatColor | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/color", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/color`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id }).fetch();
@@ -595,7 +595,7 @@ export async function GetUserChatColor(authorization: Authorization, user_id: st
  */
 export async function UpdateUserChatColor<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:chat_color">>, color: string): Promise<ResponseBody.UpdateUserChatColor | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/chat/color", "PUT").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/chat/color`, "PUT").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ color }).fetch();
@@ -616,7 +616,7 @@ export async function UpdateUserChatColor<S extends Authorization.Scope[]>(autho
  */
 export async function CreateClip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "clips:edit">>, broadcaster_id: string, has_delay?: boolean): Promise<ResponseBody.CreateClip | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/clips", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/clips`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, has_delay }).fetch();
@@ -643,7 +643,7 @@ export async function CreateClip<S extends Authorization.Scope[]>(authorization:
  */
 export async function GetClips(authorization: Authorization, query: {broadcaster_id: string} | {game_id: string} | {id: string | string[]}, started_at?: string, ended_at?: string, first?: number, before?: string, after?: string, is_featured?: boolean): Promise<ResponseBody.GetClips | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/clips", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/clips`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch(query).setSearch({ started_at, ended_at, first, before, after, is_featured }).fetch();
@@ -656,7 +656,7 @@ export async function GetClips(authorization: Authorization, query: {broadcaster
  */
 export async function GetConduits(authorization: Authorization.App): Promise<ResponseBody.GetConduits | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).fetch();
@@ -670,7 +670,7 @@ export async function GetConduits(authorization: Authorization.App): Promise<Res
  */
 export async function CreateConduit(authorization: Authorization.App, shard_count: number): Promise<ResponseBody.CreateConduit | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -686,7 +686,7 @@ export async function CreateConduit(authorization: Authorization.App, shard_coun
  */
 export async function UpdateConduit(authorization: Authorization.App, id: string, shard_count: string): Promise<ResponseBody.UpdateConduit | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -701,7 +701,7 @@ export async function UpdateConduit(authorization: Authorization.App, id: string
  */
 export async function DeleteConduit(authorization: Authorization.App, id: string): Promise<ResponseBody.DeleteConduit | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -718,7 +718,7 @@ export async function DeleteConduit(authorization: Authorization.App, id: string
  */
 export async function GetConduitShards(authorization: Authorization.App, conduit_id: string, status?: string, after?: string): Promise<ResponseBody.GetConduitShards | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits/shards", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits/shards`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ conduit_id, status, after }).fetch();
@@ -741,7 +741,7 @@ export async function UpdateConduitShards(authorization: Authorization.App, cond
 }[]
 ): Promise<ResponseBody.UpdateConduitShards | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/conduits/shards", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/conduits/shards`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -756,7 +756,7 @@ export async function UpdateConduitShards(authorization: Authorization.App, cond
  */
 export async function GetContentClassificationLabels(authorization: Authorization, locale: "en-US" | "bg-BG" | "cs-CZ" | "da-DK" | "de-DE" | "el-GR" | "en-GB" | "es-ES" | "es-MX" | "fi-FI" | "fr-FR" | "hu-HU" | "it-IT" | "ja-JP" | "ko-KR" | "nl-NL" | "no-NO" | "pl-PL" | "pt-BT" | "pt-PT" | "ro-RO" | "ru-RU" | "sk-SK" | "sv-SE" | "th-TH" | "tr-TR" | "vi-VN" | "zh-CN" | "zh-TW"): Promise<ResponseBody.GetContentClassificationLabels | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/content_classification_labels", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/content_classification_labels`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ locale }).fetch();
@@ -773,7 +773,7 @@ export async function GetContentClassificationLabels(authorization: Authorizatio
  */
 export async function CreateEventSubSubscription<Subscription_ extends EventSub.Subscription>(authorization: Authorization, subscription: Subscription_): Promise<ResponseBody.CreateEventSubSubscription<Subscription_> | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/subscriptions", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/subscriptions`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -790,7 +790,7 @@ export async function CreateEventSubSubscription<Subscription_ extends EventSub.
  */
 export async function DeleteEventSubSubscription(authorization: Authorization, id: string): Promise<ResponseBody.DeleteEventSubSubscription | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/subscriptions", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/subscriptions`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -829,7 +829,7 @@ export async function DeleteEventSubSubscription(authorization: Authorization, i
  */
 export async function GetEventSubSubscriptions(authorization: Authorization, status?: EventSub.SubscriptionType, type?: ReturnType<typeof EventSub.Subscription[keyof typeof EventSub.Subscription]>["type"], user_id?: string, subscription_id?: string, after?: string): Promise<ResponseBody.GetEventSubSubscriptions | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/eventsub/subscriptions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/eventsub/subscriptions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ status, type, user_id, subscription_id, after }).fetch();
@@ -845,7 +845,7 @@ export async function GetEventSubSubscriptions(authorization: Authorization, sta
  */
 export async function GetTopGames(authorization: Authorization, first?: number, after?: string, before?: string): Promise<ResponseBody.GetTopGames | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/games/top", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/games/top`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ first, after, before }).fetch();
@@ -863,7 +863,7 @@ export async function GetTopGames(authorization: Authorization, first?: number, 
  */
 export async function GetGames(authorization: Authorization, name?: string | string[], id?: string | string[], igdb_id?: string | string[]): Promise<ResponseBody.GetGames | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/games", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/games`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ name, id, igdb_id }).fetch();
@@ -878,7 +878,7 @@ export async function GetGames(authorization: Authorization, name?: string | str
  */
 export async function GetCreatorGoals<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:goals">>): Promise<ResponseBody.GetCreatorGoals | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/goals", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/goals`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -895,7 +895,7 @@ export async function GetCreatorGoals<S extends Authorization.Scope[]>(authoriza
  */
 export async function GetHypeTrainEvents<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:hype_train">>, first?: number, after?: string): Promise<ResponseBody.GetHypeTrainEvents | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/hypetrain/events", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/hypetrain/events`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, first, after }).fetch();
@@ -917,7 +917,7 @@ export async function GetHypeTrainEvents<S extends Authorization.Scope[]>(author
  */
 export async function CheckAutomodStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read">>): Promise<ResponseBody.CheckAutomodStatus | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/enforcements/status", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/enforcements/status`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -932,7 +932,7 @@ export async function CheckAutomodStatus<S extends Authorization.Scope[]>(author
  */
 export async function ManageHeldAutoModMessages<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:automod">>, msg_id: string, action: "ALLOW" | "DENY"): Promise<ResponseBody.ManageHeldAutoModMessages | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/message", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/automod/message`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -947,7 +947,7 @@ export async function ManageHeldAutoModMessages<S extends Authorization.Scope[]>
  */
 export async function GetAutoModSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:automod_settings">>, broadcaster_id: string): Promise<ResponseBody.GetAutoModSettings | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/settings", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/automod/settings`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id }).fetch();
@@ -973,7 +973,7 @@ export async function GetAutoModSettings<S extends Authorization.Scope[]>(author
  */
 export async function UpdateAutoModSettings<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:automod">>, broadcaster_id: string, body: Omit<ResponseBody.GetAutoModSettings["data"], "broadcaster_id" | "moderator_id">): Promise<ResponseBody.UpdateAutoModSettings | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/automod/settings", "PUT").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/automod/settings`, "PUT").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -991,7 +991,7 @@ export async function UpdateAutoModSettings<S extends Authorization.Scope[]>(aut
  */
 export async function GetBannedUsers<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "moderator:manage:banned_users">>, user_id?: string | string[], first?: number, after?: string, before?: string): Promise<ResponseBody.GetBannedUsers | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/banned", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/banned`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id, first, after, before }).fetch();
@@ -1018,7 +1018,7 @@ export async function BanUser<S extends Authorization.Scope[]>(authorization: Au
 	if (!reason) delete data.reason;
 
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/bans", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/bans`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1036,7 +1036,7 @@ export async function BanUser<S extends Authorization.Scope[]>(authorization: Au
  */
 export async function UnbanUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:banned_users">>, broadcaster_id: string, user_id: string): Promise<ResponseBody.UnbanUser | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/bans", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/bans`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, user_id }).fetch();
@@ -1054,7 +1054,7 @@ export async function UnbanUser<S extends Authorization.Scope[]>(authorization: 
  */
 export async function GetUnbanRequests<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:unban_requests" | "moderator:manage:unban_requests">>, broadcaster_id: string, status?: "pending" | "approved" | "denied" | "acknowledged" | "canceled", user_id?: string, after?: string, first?: number): Promise<ResponseBody.GetUnbanRequests | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/unban_requests", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/unban_requests`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, status, user_id, after, first }).fetch();
@@ -1071,7 +1071,7 @@ export async function GetUnbanRequests<S extends Authorization.Scope[]>(authoriz
  */
 export async function ResolveUnbanRequest<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:unban_requests">>, broadcaster_id: string, unban_request_id: string, status: "approved" | "denied", resolution_text?: string): Promise<ResponseBody.ResolveUnbanRequest<typeof status> | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/unban_requests", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/unban_requests`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, unban_request_id, status, resolution_text }).fetch();
@@ -1087,7 +1087,7 @@ export async function ResolveUnbanRequest<S extends Authorization.Scope[]>(autho
  */
 export async function GetBlockedTerms<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:blocked_terms" | "moderator:manage:blocked_terms">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetBlockedTerms | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/blocked_terms`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1106,7 +1106,7 @@ export async function AddBlockedTerm<S extends Authorization.Scope[]>(authorizat
 		if (text.length < 2) throw "The length of the term in the text field is too short. The term must contain a minimum of 2 characters.";
 		if (text.length > 500) throw "The length of the term in the text field is too long. The term may contain up to a maximum of 500 characters.";
 
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/blocked_terms`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1122,7 +1122,7 @@ export async function AddBlockedTerm<S extends Authorization.Scope[]>(authorizat
  */
 export async function RemoveBlockedTerm<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:blocked_terms">>, broadcaster_id: string, id: string): Promise<ResponseBody.RemoveBlockedTerm | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/blocked_terms", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/blocked_terms`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, id }).fetch()
@@ -1142,7 +1142,7 @@ export async function RemoveBlockedTerm<S extends Authorization.Scope[]>(authori
  */
 export async function DeleteChatMessage<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:chat_messages">>, broadcaster_id: string, message_id?: string): Promise<ResponseBody.DeleteChatMessage | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/chat", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/chat`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id, message_id }).fetch();
@@ -1157,7 +1157,7 @@ export async function DeleteChatMessage<S extends Authorization.Scope[]>(authori
  */
 export async function GetModeratedChannels<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:moderated_channels">>, after?: string, first?: number): Promise<ResponseBody.GetModeratedChannels | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/channels", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/channels`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id: authorization.user_id, after, first }).fetch();
@@ -1173,7 +1173,7 @@ export async function GetModeratedChannels<S extends Authorization.Scope[]>(auth
  */
 export async function GetModerators<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderation:read" | "channel:manage:moderators">>, user_id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetModerators | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/moderators`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id, first, after }).fetch();
@@ -1189,7 +1189,7 @@ export async function GetModerators<S extends Authorization.Scope[]>(authorizati
  */
 export async function AddChannelModerator<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:moderators">>, user_id: string): Promise<ResponseBody.AddChannelModerator | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/moderators`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id }).fetch();
@@ -1205,7 +1205,7 @@ export async function AddChannelModerator<S extends Authorization.Scope[]>(autho
  */
 export async function RemoveChannelModerator<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:moderators">>, user_id: string): Promise<ResponseBody.RemoveChannelModerator | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/moderators", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/moderators`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id }).fetch();
@@ -1221,7 +1221,7 @@ export async function RemoveChannelModerator<S extends Authorization.Scope[]>(au
  */
 export async function GetChannelVips<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:vips" | "channel:manage:vips">>, user_id?: string, first?: number, after?: string): Promise<ResponseBody.GetChannelVips | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/vips`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id, first, after }).fetch();
@@ -1237,7 +1237,7 @@ export async function GetChannelVips<S extends Authorization.Scope[]>(authorizat
  */
 export async function AddChannelVip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:vips">>, user_id: string): Promise<ResponseBody.AddChannelVip | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/vips`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id }).fetch();
@@ -1256,7 +1256,7 @@ export async function AddChannelVip<S extends Authorization.Scope[]>(authorizati
  */
 export async function RemoveChannelVip<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:vips">>, broadcaster_id: string, user_id: string): Promise<ResponseBody.RemoveChannelVip | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/channels/vips", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/channels/vips`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, user_id }).fetch();
@@ -1273,7 +1273,7 @@ export async function RemoveChannelVip<S extends Authorization.Scope[]>(authoriz
  */
 export async function UpdateShieldModeStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:shield_mode">>, broadcaster_id: string, is_active: boolean): Promise<ResponseBody.UpdateShieldModeStatus | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/shield_mode", "PUT").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/shield_mode`, "PUT").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1290,7 +1290,7 @@ export async function UpdateShieldModeStatus<S extends Authorization.Scope[]>(au
  */
 export async function GetShieldModeStatus<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:read:shield_mode" | "moderator:manage:shield_mode">>, broadcaster_id: string): Promise<ResponseBody.GetShieldModeStatus | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/shield_mode", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/shield_mode`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, moderator_id: authorization.user_id }).fetch();
@@ -1306,7 +1306,7 @@ export async function GetShieldModeStatus<S extends Authorization.Scope[]>(autho
  */
 export async function WarnChatUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "moderator:manage:warnings">>, broadcaster_id: string, user_id: string, reason: string): Promise<ResponseBody.WarnChatUser | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/moderation/warnings", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/moderation/warnings`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1325,7 +1325,7 @@ export async function WarnChatUser<S extends Authorization.Scope[]>(authorizatio
  */
 export async function GetPolls<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:polls" | "channel:manage:polls">>, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetPolls | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/polls`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, id, first, after }).fetch();
@@ -1345,7 +1345,7 @@ export async function GetPolls<S extends Authorization.Scope[]>(authorization: A
  */
 export async function CreatePoll<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:polls">>, title: string, choices: string[], duration: number, channel_points_voting_enabled?: boolean, channel_points_per_vote?: number): Promise<ResponseBody.CreatePoll | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/polls`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1361,7 +1361,7 @@ export async function CreatePoll<S extends Authorization.Scope[]>(authorization:
  */
 export async function EndPoll<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:polls">>, id: string, status: "TERMINATED" | "ARCHIVED"): Promise<ResponseBody.EndPoll<typeof status> | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/polls", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/polls`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1378,7 +1378,7 @@ export async function EndPoll<S extends Authorization.Scope[]>(authorization: Au
  */
 export async function GetPredictions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:predictions" | "channel:manage:predictions">>, id?: string | string[], first?: number, after?: string): Promise<ResponseBody.GetPredictions | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/predictions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, id, first, after }).fetch();
@@ -1396,7 +1396,7 @@ export async function GetPredictions<S extends Authorization.Scope[]>(authorizat
  */
 export async function CreatePrediction<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:predictions">>, title: string, outcomes: string[], prediction_window: number): Promise<ResponseBody.CreatePrediction | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/predictions`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1420,7 +1420,7 @@ export async function CreatePrediction<S extends Authorization.Scope[]>(authoriz
  */
 export async function EndPrediction<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:predictions">>, id: string, status: "RESOLVED" | "CANCELED" | "LOCKED", winning_outcome_id?: string): Promise<ResponseBody.EndPrediction | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/predictions", "PATCH").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/predictions`, "PATCH").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1443,7 +1443,7 @@ export async function EndPrediction<S extends Authorization.Scope[]>(authorizati
  */
 export async function StartRaid<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:raids">>, to_broadcaster_id: string): Promise<ResponseBody.StartRaid | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/raids", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/raids`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ from_broadcaster_id: authorization.user_id, to_broadcaster_id }).fetch();
@@ -1460,7 +1460,7 @@ export async function StartRaid<S extends Authorization.Scope[]>(authorization: 
  */
 export async function CancelRaid<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:raids">>): Promise<ResponseBody.CancelRaid | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/raids", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/raids`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -1478,7 +1478,7 @@ export async function CancelRaid<S extends Authorization.Scope[]>(authorization:
  */
 export async function SearchCategories(authorization: Authorization, query: string, first?: number, after?: string): Promise<ResponseBody.SearchCategories | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/search/categories", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/search/categories`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ query, first, after }).fetch();
@@ -1501,7 +1501,7 @@ export async function SearchCategories(authorization: Authorization, query: stri
  */
 export async function SearchChannels(authorization: Authorization, query: string, live_only?: boolean, first?: number, after?: string): Promise<ResponseBody.SearchChannels | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/search/channels", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/search/channels`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ query, live_only, first, after }).fetch();
@@ -1514,7 +1514,7 @@ export async function SearchChannels(authorization: Authorization, query: string
  */
 export async function GetStreamKey<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:stream_key">>): Promise<ResponseBody.GetStreamKey | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/streams/key", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/streams/key`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id }).fetch();
@@ -1535,7 +1535,7 @@ export async function GetStreamKey<S extends Authorization.Scope[]>(authorizatio
  */
 export async function GetStreams(authorization: Authorization, user_id?: string | string[], user_login?: string | string[], game_id?: string | string[], type?: "all" | "live", language?: string | string[], first?: number, before?: string, after?: string): Promise<ResponseBody.GetStreams | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/streams", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/streams`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id, user_login, game_id, type, language, first, before, after }).fetch();
@@ -1550,7 +1550,7 @@ export async function GetStreams(authorization: Authorization, user_id?: string 
  */
 export async function GetFollowedStreams<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:follows">>, first?: number, after?: string): Promise<ResponseBody.GetFollowedStreams | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/streams/followed", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/streams/followed`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ user_id: authorization.user_id, first, after }).fetch();
@@ -1567,7 +1567,7 @@ export async function GetFollowedStreams<S extends Authorization.Scope[]>(author
  */
 export async function GetBroadcasterSubscriptions<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:read:subscriptions">>, user_id?: string | string[], first?: number, after?: string, before?: string): Promise<ResponseBody.GetBroadcasterSubscriptions | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/subscriptions`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id: authorization.user_id, user_id, first, after, before }).fetch();
@@ -1581,7 +1581,7 @@ export async function GetBroadcasterSubscriptions<S extends Authorization.Scope[
  */
 export async function CheckUserSubscription<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:subscriptions">>, broadcaster_id: string): Promise<ResponseBody.CheckUserSubscription | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions/user", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/subscriptions/user`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, user_id: authorization.user_id }).fetch();
@@ -1595,7 +1595,7 @@ export async function CheckUserSubscription<S extends Authorization.Scope[]>(aut
  */
 export async function GetChannelTeams(authorization: Authorization, broadcaster_id: string): Promise<ResponseBody.GetChannelTeams | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions/user", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/subscriptions/user`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id }).fetch();
@@ -1610,7 +1610,7 @@ export async function GetChannelTeams(authorization: Authorization, broadcaster_
  */
 export async function GetTeams(authorization: Authorization, name?: string, id?: string): Promise<ResponseBody.GetChannelTeams | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/subscriptions/user", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/subscriptions/user`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ name, id }).fetch();
@@ -1633,7 +1633,7 @@ export async function GetUsers(authorization: Authorization, query: {
 }): Promise<ResponseBody.GetUsers | ResponseBody.Error>
 {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/users", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/users`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch(query).fetch();
@@ -1649,7 +1649,7 @@ export async function GetUsers(authorization: Authorization, query: {
  */
 export async function UpdateUserDescription<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:edit">>, description: string): Promise<ResponseBody.GetUsers | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/users", "PUT").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/users`, "PUT").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ description }).fetch();
@@ -1665,7 +1665,7 @@ export async function UpdateUserDescription<S extends Authorization.Scope[]>(aut
  */
 export async function GetUserBlockList<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:read:blocked_users">>, broadcaster_id: string, first?: number, after?: string): Promise<ResponseBody.GetUserBlockList | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/users/blocks`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ broadcaster_id, first, after }).fetch();
@@ -1683,7 +1683,7 @@ export async function GetUserBlockList<S extends Authorization.Scope[]>(authoriz
  */
 export async function BlockUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:blocked_users">>, target_user_id: string, source_context?: "chat" | "whisper", reason?: "harassment" | "spam" | "other"): Promise<ResponseBody.BlockUser | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "PUT").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/users/blocks`, "PUT").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ target_user_id, source_context, reason }).fetch();
@@ -1697,7 +1697,7 @@ export async function BlockUser<S extends Authorization.Scope[]>(authorization: 
  */
 export async function UnblockUser<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:blocked_users">>, target_user_id: string): Promise<ResponseBody.UnblockUser | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/users/blocks", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/users/blocks`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ target_user_id }).fetch();
@@ -1738,7 +1738,7 @@ export async function UnblockUser<S extends Authorization.Scope[]>(authorization
  */
 export async function GetVideos(authorization: Authorization, query: {id: string | string[]} | {user_id: string} | {game_id: string}, language?: string, period?: "all" | "day" | "month" | "week", sort?: "time" | "trending" | "views", type?: "all" | "archive" | "highlight" | "upload", first?: number, after?: string, before?: string): Promise<ResponseBody.GetVideos | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/videos", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/videos`, "GET").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch(query).setSearch({ language, period, sort, type, first, after, before }).fetch();
@@ -1752,7 +1752,7 @@ export async function GetVideos(authorization: Authorization, query: {id: string
  */
 export async function DeleteVideos<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "channel:manage:videos">>, id: string | string[]): Promise<ResponseBody.DeleteVideos | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/videos", "DELETE").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/videos`, "DELETE").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`
 		}).setSearch({ id }).fetch();
@@ -1777,7 +1777,7 @@ export async function DeleteVideos<S extends Authorization.Scope[]>(authorizatio
  */
 export async function SendWhisper<S extends Authorization.Scope[]>(authorization: Authorization.User<Authorization.WithScope<S, "user:manage:whispers">>, to_user_id: string, message: string): Promise<ResponseBody.SendWhisper | ResponseBody.Error> {
 	try {
-		const request = await new FetchBuilder("https://api.twitch.tv/helix/whispers", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.apiHelix}/whispers`, "POST").setHeaders({
 			"Client-Id": authorization.client_id,
 			"Authorization": `Bearer ${authorization.token}`,
 			"Content-Type": "application/json"
@@ -1793,7 +1793,7 @@ export async function OAuth2Validate<S extends Authorization.Scope[]>(token_data
 	const token = typeof token_data === "string" ? token_data : token_data.token;
 	if (token.length < 1) return getError("#401 invalid access token");
 	try {
-		const request = await new FetchBuilder("https://id.twitch.tv/oauth2/validate", "GET").setHeaders({
+		const request = await new FetchBuilder(`${Paths.idOAuth2}/validate`, "GET").setHeaders({
 			"Authorization": `Bearer ${token}`
 		}).fetch();
 		const response: any = await getResponse(request);
@@ -1814,7 +1814,7 @@ export async function OAuth2Validate<S extends Authorization.Scope[]>(token_data
 export async function OAuth2Revoke(authorization: Authorization): Promise<ResponseBody.OAuth2Revoke | ResponseBody.Error> {
 	try {
 		if (authorization.token.length < 1) throw "invalid access token";
-		const request = await new FetchBuilder("https://id.twitch.tv/oauth2/revoke", "POST").setHeaders({
+		const request = await new FetchBuilder(`${Paths.idOAuth2}/revoke`, "POST").setHeaders({
 			"Content-Type": "application/x-www-form-urlencoded"
 		}).setSearch({ client_id: authorization.client_id, token: authorization.token }).fetch();
 		if (request.ok) return {ok: true, status: 200};
@@ -1829,7 +1829,7 @@ export namespace OAuth2Token {
 	 */
 	export async function ClientCredentials(client_id: string, client_secret: string): Promise<ResponseBody.OAuth2Token.ClientCredentials | ResponseBody.Error> {
 		try {
-			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+			const request = await new FetchBuilder(`${Paths.idOAuth2}/token`, "POST").setHeaders({
 				"Content-Type": "x-www-form-urlencoded"
 			}).setSearch({ client_id, client_secret, grant_type: "client_credentials" }).fetch();
 			return await getResponse(request);
@@ -1848,7 +1848,7 @@ export namespace OAuth2Token {
 	 */
 	export async function AuthorizationCode<S extends Authorization.Scope[]>(client_id: string, client_secret: string, redirect_uri: string, code: string): Promise<ResponseBody.OAuth2Token.AuthorizationCode<S> | ResponseBody.Error> {
 		try {
-			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+			const request = await new FetchBuilder(`${Paths.idOAuth2}/token`, "POST").setHeaders({
 				"Content-Type": "x-www-form-urlencoded"
 			}).setSearch({ client_id, client_secret, redirect_uri, code, grant_type: "authorization_code" }).fetch();
 			const response: any = await getResponse(request);
@@ -1870,7 +1870,7 @@ export namespace OAuth2Token {
 	 */
 	export async function RefreshToken<S extends Authorization.Scope[]>(client_id: string, client_secret: string, refresh_token: string): Promise<ResponseBody.OAuth2Token.RefreshToken<S> | ResponseBody.Error> {
 		try {
-			const request = await new FetchBuilder("https://id.twitch.tv/oauth2/token", "POST").setHeaders({
+			const request = await new FetchBuilder(`${Paths.idOAuth2}/token`, "POST").setHeaders({
 				"Content-Type": "x-www-form-urlencoded"
 			}).setSearch({ client_id, client_secret, refresh_token, grant_type: "refresh_token" }).fetch();
 			const response: any = await getResponse(request);

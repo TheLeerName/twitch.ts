@@ -1,5 +1,15 @@
 import * as ResponseBody from "./responsebody";
 
+export const Paths: {
+	apiHelix: string;
+	idOAuth2: string;
+	eventSubWS: string;
+} = {
+	apiHelix: "https://api.twitch.tv/helix",
+	idOAuth2: "https://id.twitch.tv/oauth2",
+	eventSubWS: "wss://wss.twitch.tv/ws"
+};
+
 export type Authorization<S extends Authorization.Scope[] = Authorization.Scope[]> = Authorization.App<S> | Authorization.User<S>;
 export namespace Authorization {
 	/** Specifies data of [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) */
