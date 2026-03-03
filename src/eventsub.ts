@@ -110,7 +110,7 @@ export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]>
 	/** User access token data */
 	authorization: Authorization.User<S>;
 	/** EventSub session, do not use it **before** first `onSessionWelcome()` message */
-	session!: Session.Any;
+	session!: Session;
 	/** Defines the transport details that you want Twitch to use when sending you event notifications. */
 	transport!: Transport.WebSocket;
 
@@ -565,13 +565,14 @@ export namespace Condition {
 }
 
 /** Defines the transport details that you want Twitch to use when sending you event notifications. */
-export interface Transport<Method extends string = "webhook" | "websocket" | "conduit"> {
-	/** The transport method. */
-	method: Method;
-}
+export type Transport = Transport.Conduit | Transport.WebHook | Transport.WebSocket;
 export namespace Transport {
+	interface Base<Method extends string = "webhook" | "websocket" | "conduit"> {
+		/** The transport method. */
+		method: Method;
+	};
 	/** Defines the transport details that you want Twitch to use when sending you event notifications. */
-	export interface WebHook extends Transport<"webhook"> {
+	export interface WebHook extends Base<"webhook"> {
 		/**
 		 * The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443. See [Processing an event](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#processing-an-event).
 		 * 
@@ -588,7 +589,7 @@ export namespace Transport {
 	export function WebHook(callback: string, secret: string): WebHook {return {method: "webhook", callback, secret}}
 
 	/** Defines the transport details that you want Twitch to use when sending you event notifications. */
-	export interface WebSocket extends Transport<"websocket"> {
+	export interface WebSocket extends Base<"websocket"> {
 		/** An ID that identifies the WebSocket to send notifications to. When you connect to EventSub using WebSockets, the server returns the ID in the [Welcome message](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message). */
 		session_id: string;
 	}
@@ -608,7 +609,7 @@ export namespace Transport {
 	}
 
 	/** Defines the transport details that you want Twitch to use when sending you event notifications. */
-	export interface Conduit extends Transport<"conduit"> {
+	export interface Conduit extends Base<"conduit"> {
 		/** An ID that identifies the conduit to send notifications to. When you create a conduit, the server returns the conduit ID. */
 		conduit_id: string;
 	}
@@ -617,17 +618,18 @@ export namespace Transport {
 }
 
 /** Subscription-related parameters */
-export interface Subscription<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> {
-	/** The subscription type name. */
-	type: Type;
-	/** The subscription version. */
-	version: Version_;
-	/** Subscription-specific parameters. */
-	condition: Condition_;
-	/** Transport-specific parameters. */
-	transport: Transport_;
-}
+export type Subscription = Subscription.AutomodMessageHold | Subscription.AutomodMessageHoldV2 | Subscription.AutomodMessageUpdate | Subscription.AutomodMessageUpdateV2 | Subscription.AutomodSettingsUpdate | Subscription.AutomodTermsUpdate | Subscription.ChannelAdBreakBegin | Subscription.ChannelBan | Subscription.ChannelBitsUse | Subscription.ChannelCharityCampaignDonate | Subscription.ChannelCharityCampaignProgress | Subscription.ChannelCharityCampaignStart | Subscription.ChannelCharityCampaignStop | Subscription.ChannelChatClear | Subscription.ChannelChatClearUserMessages | Subscription.ChannelChatMessage | Subscription.ChannelChatMessageDelete | Subscription.ChannelChatNotification | Subscription.ChannelChatSettingsUpdate | Subscription.ChannelChatUserMessageHold | Subscription.ChannelChatUserMessageUpdate | Subscription.ChannelCheer | Subscription.ChannelFollow | Subscription.ChannelGoalBegin | Subscription.ChannelGoalEnd | Subscription.ChannelGoalProgress | Subscription.ChannelGuestStarGuestUpdate | Subscription.ChannelGuestStarSessionBegin | Subscription.ChannelGuestStarSessionEnd | Subscription.ChannelGuestStarSettingsUpdate | Subscription.ChannelHypeTrainBegin | Subscription.ChannelHypeTrainEnd | Subscription.ChannelHypeTrainProgress | Subscription.ChannelModerate | Subscription.ChannelModerateV2 | Subscription.ChannelModeratorAdd | Subscription.ChannelModeratorRemove | Subscription.ChannelPointsAutomaticRewardRedemptionAdd | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2 | Subscription.ChannelPointsCustomRewardAdd | Subscription.ChannelPointsCustomRewardRedemptionAdd | Subscription.ChannelPointsCustomRewardRedemptionUpdate | Subscription.ChannelPointsCustomRewardRemove | Subscription.ChannelPointsCustomRewardUpdate | Subscription.ChannelPollBegin | Subscription.ChannelPollEnd | Subscription.ChannelPollProgress | Subscription.ChannelPredictionBegin | Subscription.ChannelPredictionEnd | Subscription.ChannelPredictionLock | Subscription.ChannelPredictionProgress | Subscription.ChannelRaid | Subscription.ChannelSharedChatSessionBegin | Subscription.ChannelSharedChatSessionEnd | Subscription.ChannelSharedChatSessionUpdate | Subscription.ChannelShieldModeBegin | Subscription.ChannelShieldModeEnd | Subscription.ChannelShoutoutCreate | Subscription.ChannelShoutoutReceive | Subscription.ChannelSubscribe | Subscription.ChannelSubscriptionEnd | Subscription.ChannelSubscriptionGift | Subscription.ChannelSubscriptionMessage | Subscription.ChannelSuspiciousUserMessage | Subscription.ChannelSuspiciousUserUpdate | Subscription.ChannelUnban | Subscription.ChannelUnbanRequestCreate | Subscription.ChannelUnbanRequestResolve | Subscription.ChannelUpdate | Subscription.ChannelVipAdd | Subscription.ChannelVipRemove | Subscription.ChannelWarningAcknowledge | Subscription.ChannelWarningSend | Subscription.ConduitShardDisabled | Subscription.DropEntitlementGrant | Subscription.ExtensionBitsTransactionCreate | Subscription.StreamOffline | Subscription.StreamOnline | Subscription.UserAuthorizationGrant | Subscription.UserAuthorizationRevoke | Subscription.UserUpdate | Subscription.UserWhisperMessage;
 export namespace Subscription {
+	type Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> = {
+		/** The subscription type name. */
+		type: Type;
+		/** The subscription version. */
+		version: Version_;
+		/** Subscription-specific parameters. */
+		condition: Condition_;
+		/** Transport-specific parameters. */
+		transport: Transport_;
+	};
 	/** 
 	 * The `automod.message.hold` subscription type notifies a user if a message was caught by automod for review. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessagehold)
 	 * 
@@ -635,7 +637,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	 */
-	export type AutomodMessageHold = Subscription<"automod.message.hold", "1", Condition.AutomodMessageHold, Transport>;
+	export type AutomodMessageHold = Base<"automod.message.hold", "1", Condition.AutomodMessageHold, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -655,7 +657,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageHoldV2 = Subscription<"automod.message.hold", "2", Condition.AutomodMessageHold, Transport>;
+	export type AutomodMessageHoldV2 = Base<"automod.message.hold", "2", Condition.AutomodMessageHold, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -675,7 +677,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageUpdate = Subscription<"automod.message.update", "1", Condition.AutomodMessageUpdate, Transport>;
+	export type AutomodMessageUpdate = Base<"automod.message.update", "1", Condition.AutomodMessageUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -695,7 +697,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodMessageUpdateV2 = Subscription<"automod.message.update", "2", Condition.AutomodMessageUpdate, Transport>;
+	export type AutomodMessageUpdateV2 = Base<"automod.message.update", "2", Condition.AutomodMessageUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -715,7 +717,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodSettingsUpdate = Subscription<"automod.settings.update", "1", Condition.AutomodSettingsUpdate, Transport>;
+	export type AutomodSettingsUpdate = Base<"automod.settings.update", "1", Condition.AutomodSettingsUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -735,7 +737,7 @@ export namespace Subscription {
 	 * 
 	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
 	*/
-	export type AutomodTermsUpdate = Subscription<"automod.terms.update", "1", Condition.AutomodTermsUpdate, Transport>;
+	export type AutomodTermsUpdate = Base<"automod.terms.update", "1", Condition.AutomodTermsUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -762,7 +764,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user access token that includes the `bits:read` scope.
 	*/
-	export type ChannelBitsUse = Subscription<"channel.bits.use", "1", Condition.ChannelBitsUse, Transport>;
+	export type ChannelBitsUse = Base<"channel.bits.use", "1", Condition.ChannelBitsUse, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -779,7 +781,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelUpdate = Subscription<"channel.update", "2", Condition.ChannelUpdate, Transport>;
+	export type ChannelUpdate = Base<"channel.update", "2", Condition.ChannelUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -796,7 +798,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderator:read:followers` scope.
 	 */
-	export type ChannelFollow = Subscription<"channel.follow", "2", Condition.ChannelFollow, Transport>;
+	export type ChannelFollow = Base<"channel.follow", "2", Condition.ChannelFollow, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -814,7 +816,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:ads` scope.
 	 */
-	export type ChannelAdBreakBegin = Subscription<"channel.ad_break.begin", "1", Condition.ChannelAdBreakBegin, Transport>;
+	export type ChannelAdBreakBegin = Base<"channel.ad_break.begin", "1", Condition.ChannelAdBreakBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -831,7 +833,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatClear = Subscription<"channel.chat.clear", "1", Condition.ChannelChatClear, Transport>;
+	export type ChannelChatClear = Base<"channel.chat.clear", "1", Condition.ChannelChatClear, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -849,7 +851,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatClearUserMessages = Subscription<"channel.chat.clear_user_messages", "1", Condition.ChannelChatClearUserMessages, Transport>;
+	export type ChannelChatClearUserMessages = Base<"channel.chat.clear_user_messages", "1", Condition.ChannelChatClearUserMessages, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -867,7 +869,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatMessage = Subscription<"channel.chat.message", "1", Condition.ChannelChatMessage, Transport>;
+	export type ChannelChatMessage = Base<"channel.chat.message", "1", Condition.ChannelChatMessage, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -885,7 +887,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatMessageDelete = Subscription<"channel.chat.message_delete", "1", Condition.ChannelChatMessageDelete, Transport>;
+	export type ChannelChatMessageDelete = Base<"channel.chat.message_delete", "1", Condition.ChannelChatMessageDelete, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -903,7 +905,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatNotification = Subscription<"channel.chat.notification", "1", Condition.ChannelChatNotification, Transport>;
+	export type ChannelChatNotification = Base<"channel.chat.notification", "1", Condition.ChannelChatNotification, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -921,7 +923,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
 	 */
-	export type ChannelChatSettingsUpdate = Subscription<"channel.chat_settings.update", "1", Condition.ChannelChatSettingsUpdate, Transport>;
+	export type ChannelChatSettingsUpdate = Base<"channel.chat_settings.update", "1", Condition.ChannelChatSettingsUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -939,7 +941,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
 	 */
-	export type ChannelChatUserMessageHold = Subscription<"channel.chat.user_message_hold", "1", Condition.ChannelChatUserMessageHold, Transport>;
+	export type ChannelChatUserMessageHold = Base<"channel.chat.user_message_hold", "1", Condition.ChannelChatUserMessageHold, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -957,7 +959,7 @@ export namespace Subscription {
 	 * 
 	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from the chatting user.
 	 */
-	export type ChannelChatUserMessageUpdate = Subscription<"channel.chat.user_message_update", "1", Condition.ChannelChatUserMessageUpdate, Transport>;
+	export type ChannelChatUserMessageUpdate = Base<"channel.chat.user_message_update", "1", Condition.ChannelChatUserMessageUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -975,7 +977,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionBegin = Subscription<"channel.shared_chat.begin", "1", Condition.ChannelSharedChatSessionBegin, Transport>;
+	export type ChannelSharedChatSessionBegin = Base<"channel.shared_chat.begin", "1", Condition.ChannelSharedChatSessionBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -992,7 +994,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionUpdate = Subscription<"channel.shared_chat.update", "1", Condition.ChannelSharedChatSessionUpdate, Transport>;
+	export type ChannelSharedChatSessionUpdate = Base<"channel.shared_chat.update", "1", Condition.ChannelSharedChatSessionUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1009,7 +1011,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelSharedChatSessionEnd = Subscription<"channel.shared_chat.end", "1", Condition.ChannelSharedChatSessionEnd, Transport>;
+	export type ChannelSharedChatSessionEnd = Base<"channel.shared_chat.end", "1", Condition.ChannelSharedChatSessionEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1026,7 +1028,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscribe = Subscription<"channel.subscribe", "1", Condition.ChannelSubscribe, Transport>;
+	export type ChannelSubscribe = Base<"channel.subscribe", "1", Condition.ChannelSubscribe, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1043,7 +1045,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionEnd = Subscription<"channel.subscription.end", "1", Condition.ChannelSubscriptionEnd, Transport>;
+	export type ChannelSubscriptionEnd = Base<"channel.subscription.end", "1", Condition.ChannelSubscriptionEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1060,7 +1062,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionGift = Subscription<"channel.subscription.gift", "1", Condition.ChannelSubscriptionGift, Transport>;
+	export type ChannelSubscriptionGift = Base<"channel.subscription.gift", "1", Condition.ChannelSubscriptionGift, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1077,7 +1079,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:subscriptions` scope.
 	 */
-	export type ChannelSubscriptionMessage = Subscription<"channel.subscription.message", "1", Condition.ChannelSubscriptionMessage, Transport>;
+	export type ChannelSubscriptionMessage = Base<"channel.subscription.message", "1", Condition.ChannelSubscriptionMessage, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1094,7 +1096,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `bits:read` scope.
 	 */
-	export type ChannelCheer = Subscription<"channel.cheer", "1", Condition.ChannelCheer, Transport>;
+	export type ChannelCheer = Base<"channel.cheer", "1", Condition.ChannelCheer, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1111,7 +1113,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type ChannelRaid = Subscription<"channel.raid", "1", Condition.ChannelRaid, Transport>;
+	export type ChannelRaid = Base<"channel.raid", "1", Condition.ChannelRaid, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1128,7 +1130,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:moderate` scope.
 	 */
-	export type ChannelBan = Subscription<"channel.ban", "1", Condition.ChannelBan, Transport>;
+	export type ChannelBan = Base<"channel.ban", "1", Condition.ChannelBan, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1145,7 +1147,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:moderate` scope.
 	 */
-	export type ChannelUnban = Subscription<"channel.unban", "1", Condition.ChannelUnban, Transport>;
+	export type ChannelUnban = Base<"channel.unban", "1", Condition.ChannelUnban, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1162,7 +1164,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderator:read:unban_requests` or `moderator:manage:unban_requests` scope.
 	 */
-	export type ChannelUnbanRequestCreate = Subscription<"channel.unban_request.create", "1", Condition.ChannelUnbanRequestCreate, Transport>;
+	export type ChannelUnbanRequestCreate = Base<"channel.unban_request.create", "1", Condition.ChannelUnbanRequestCreate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1184,7 +1186,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelUnbanRequestResolve = Subscription<"channel.unban_request.resolve", "1", Condition.ChannelUnbanRequestResolve, Transport>;
+	export type ChannelUnbanRequestResolve = Base<"channel.unban_request.resolve", "1", Condition.ChannelUnbanRequestResolve, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1209,7 +1211,7 @@ export namespace Subscription {
 	 * - `moderator:read:moderators`
 	 * - `moderator:read:vips`
 	 */
-	export type ChannelModerate = Subscription<"channel.moderate", "1", Condition.ChannelModerate, Transport>;
+	export type ChannelModerate = Base<"channel.moderate", "1", Condition.ChannelModerate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1237,7 +1239,7 @@ export namespace Subscription {
 	 * - `moderator:read:moderators`
 	 * - `moderator:read:vips`
 	 */
-	export type ChannelModerateV2 = Subscription<"channel.moderate", "2", Condition.ChannelModerate, Transport>;
+	export type ChannelModerateV2 = Base<"channel.moderate", "2", Condition.ChannelModerate, Transport>;
 
 	/**
 	 * @param connection
@@ -1256,7 +1258,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderation:read` scope.
 	 */
-	export type ChannelModeratorAdd = Subscription<"channel.moderator.add", "1", Condition.ChannelModeratorAdd, Transport>;
+	export type ChannelModeratorAdd = Base<"channel.moderator.add", "1", Condition.ChannelModeratorAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1273,7 +1275,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `moderation:read` scope.
 	 */
-	export type ChannelModeratorRemove = Subscription<"channel.moderator.remove", "1", Condition.ChannelModeratorRemove, Transport>;
+	export type ChannelModeratorRemove = Base<"channel.moderator.remove", "1", Condition.ChannelModeratorRemove, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1290,7 +1292,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSessionBegin = Subscription<"channel.guest_star_session.begin", "beta", Condition.ChannelGuestStarSessionBegin, Transport>;
+	export type ChannelGuestStarSessionBegin = Base<"channel.guest_star_session.begin", "beta", Condition.ChannelGuestStarSessionBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1308,7 +1310,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSessionEnd = Subscription<"channel.guest_star_session.end", "beta", Condition.ChannelGuestStarSessionEnd, Transport>;
+	export type ChannelGuestStarSessionEnd = Base<"channel.guest_star_session.end", "beta", Condition.ChannelGuestStarSessionEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1326,7 +1328,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarGuestUpdate = Subscription<"channel.guest_star_guest.update", "beta", Condition.ChannelGuestStarGuestUpdate, Transport>;
+	export type ChannelGuestStarGuestUpdate = Base<"channel.guest_star_guest.update", "beta", Condition.ChannelGuestStarGuestUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1344,7 +1346,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
 	 */
-	export type ChannelGuestStarSettingsUpdate = Subscription<"channel.guest_star_settings.update", "beta", Condition.ChannelGuestStarSettingsUpdate, Transport>;
+	export type ChannelGuestStarSettingsUpdate = Base<"channel.guest_star_settings.update", "beta", Condition.ChannelGuestStarSettingsUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1362,7 +1364,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsAutomaticRewardRedemptionAdd = Subscription<"channel.channel_points_automatic_reward_redemption.add", "1", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
+	export type ChannelPointsAutomaticRewardRedemptionAdd = Base<"channel.channel_points_automatic_reward_redemption.add", "1", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1379,7 +1381,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsAutomaticRewardRedemptionAddV2 = Subscription<"channel.channel_points_automatic_reward_redemption.add", "2", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
+	export type ChannelPointsAutomaticRewardRedemptionAddV2 = Base<"channel.channel_points_automatic_reward_redemption.add", "2", Condition.ChannelPointsAutomaticRewardRedemptionAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1396,7 +1398,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardAdd = Subscription<"channel.channel_points_custom_reward.add", "1", Condition.ChannelPointsCustomRewardAdd, Transport>;
+	export type ChannelPointsCustomRewardAdd = Base<"channel.channel_points_custom_reward.add", "1", Condition.ChannelPointsCustomRewardAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1413,7 +1415,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardUpdate = Subscription<"channel.channel_points_custom_reward.update", "1", Condition.ChannelPointsCustomRewardUpdate, Transport>;
+	export type ChannelPointsCustomRewardUpdate = Base<"channel.channel_points_custom_reward.update", "1", Condition.ChannelPointsCustomRewardUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1431,7 +1433,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRemove = Subscription<"channel.channel_points_custom_reward.remove", "1", Condition.ChannelPointsCustomRewardRemove, Transport>;
+	export type ChannelPointsCustomRewardRemove = Base<"channel.channel_points_custom_reward.remove", "1", Condition.ChannelPointsCustomRewardRemove, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1449,7 +1451,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRedemptionAdd = Subscription<"channel.channel_points_custom_reward_redemption.add", "1", Condition.ChannelPointsCustomRewardRedemptionAdd, Transport>;
+	export type ChannelPointsCustomRewardRedemptionAdd = Base<"channel.channel_points_custom_reward_redemption.add", "1", Condition.ChannelPointsCustomRewardRedemptionAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1467,7 +1469,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
 	 */
-	export type ChannelPointsCustomRewardRedemptionUpdate = Subscription<"channel.channel_points_custom_reward_redemption.update", "1", Condition.ChannelPointsCustomRewardRedemptionUpdate, Transport>;
+	export type ChannelPointsCustomRewardRedemptionUpdate = Base<"channel.channel_points_custom_reward_redemption.update", "1", Condition.ChannelPointsCustomRewardRedemptionUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1485,7 +1487,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollBegin = Subscription<"channel.poll.begin", "1", Condition.ChannelPollBegin, Transport>;
+	export type ChannelPollBegin = Base<"channel.poll.begin", "1", Condition.ChannelPollBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1502,7 +1504,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollProgress = Subscription<"channel.poll.progress", "1", Condition.ChannelPollProgress, Transport>;
+	export type ChannelPollProgress = Base<"channel.poll.progress", "1", Condition.ChannelPollProgress, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1519,7 +1521,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
 	 */
-	export type ChannelPollEnd = Subscription<"channel.poll.end", "1", Condition.ChannelPollEnd, Transport>;
+	export type ChannelPollEnd = Base<"channel.poll.end", "1", Condition.ChannelPollEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1536,7 +1538,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionBegin = Subscription<"channel.prediction.begin", "1", Condition.ChannelPredictionBegin, Transport>;
+	export type ChannelPredictionBegin = Base<"channel.prediction.begin", "1", Condition.ChannelPredictionBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1553,7 +1555,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionProgress = Subscription<"channel.prediction.progress", "1", Condition.ChannelPredictionProgress, Transport>;
+	export type ChannelPredictionProgress = Base<"channel.prediction.progress", "1", Condition.ChannelPredictionProgress, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1570,7 +1572,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionLock = Subscription<"channel.prediction.lock", "1", Condition.ChannelPredictionLock, Transport>;
+	export type ChannelPredictionLock = Base<"channel.prediction.lock", "1", Condition.ChannelPredictionLock, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1587,7 +1589,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
 	 */
-	export type ChannelPredictionEnd = Subscription<"channel.prediction.end", "1", Condition.ChannelPredictionEnd, Transport>;
+	export type ChannelPredictionEnd = Base<"channel.prediction.end", "1", Condition.ChannelPredictionEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1606,7 +1608,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelSuspiciousUserUpdate = Subscription<"channel.suspicious_user.update", "1", Condition.ChannelSuspiciousUserUpdate, Transport>;
+	export type ChannelSuspiciousUserUpdate = Base<"channel.suspicious_user.update", "1", Condition.ChannelSuspiciousUserUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1626,7 +1628,7 @@ export namespace Subscription {
 	 * 
 	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelSuspiciousUserMessage = Subscription<"channel.suspicious_user.message", "1", Condition.ChannelSuspiciousUserMessage, Transport>;
+	export type ChannelSuspiciousUserMessage = Base<"channel.suspicious_user.message", "1", Condition.ChannelSuspiciousUserMessage, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1644,7 +1646,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
 	 */
-	export type ChannelVipAdd = Subscription<"channel.vip.add", "1", Condition.ChannelVipAdd, Transport>;
+	export type ChannelVipAdd = Base<"channel.vip.add", "1", Condition.ChannelVipAdd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1661,7 +1663,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
 	 */
-	export type ChannelVipRemove = Subscription<"channel.vip.remove", "1", Condition.ChannelVipRemove, Transport>;
+	export type ChannelVipRemove = Base<"channel.vip.remove", "1", Condition.ChannelVipRemove, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1678,7 +1680,7 @@ export namespace Subscription {
 	 * 
 	 * Must have the `moderator:read:warnings` or `moderator:manage:warnings` scope.
 	 */
-	export type ChannelWarningAcknowledge = Subscription<"channel.warning.acknowledge", "1", Condition.ChannelWarningAcknowledge, Transport>;
+	export type ChannelWarningAcknowledge = Base<"channel.warning.acknowledge", "1", Condition.ChannelWarningAcknowledge, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1696,7 +1698,7 @@ export namespace Subscription {
 	 * 
 	 * Must have the `moderator:read:warnings` or `moderator:manage:warnings` scope.
 	 */
-	export type ChannelWarningSend = Subscription<"channel.warning.send", "1", Condition.ChannelWarningSend, Transport>;
+	export type ChannelWarningSend = Base<"channel.warning.send", "1", Condition.ChannelWarningSend, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1714,7 +1716,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignDonate = Subscription<"channel.charity_campaign.donate", "1", Condition.ChannelCharityCampaignDonate, Transport>;
+	export type ChannelCharityCampaignDonate = Base<"channel.charity_campaign.donate", "1", Condition.ChannelCharityCampaignDonate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1733,7 +1735,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignStart = Subscription<"channel.charity_campaign.start", "1", Condition.ChannelCharityCampaignStart, Transport>;
+	export type ChannelCharityCampaignStart = Base<"channel.charity_campaign.start", "1", Condition.ChannelCharityCampaignStart, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1754,7 +1756,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignProgress = Subscription<"channel.charity_campaign.progress", "1", Condition.ChannelCharityCampaignProgress, Transport>;
+	export type ChannelCharityCampaignProgress = Base<"channel.charity_campaign.progress", "1", Condition.ChannelCharityCampaignProgress, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1771,7 +1773,7 @@ export namespace Subscription {
 	 * 
 	 * Requires the **channel:read:charity** scope.
 	 */
-	export type ChannelCharityCampaignStop = Subscription<"channel.charity_campaign.stop", "1", Condition.ChannelCharityCampaignStop, Transport>;
+	export type ChannelCharityCampaignStop = Base<"channel.charity_campaign.stop", "1", Condition.ChannelCharityCampaignStop, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1788,7 +1790,7 @@ export namespace Subscription {
 	 * 
 	 * App access token where the client ID matches the client ID in the condition. If `conduit_id` is specified, the client must be the owner of the conduit.
 	 */
-	export type ConduitShardDisabled = Subscription<"conduit.shard.disabled", "1", Condition.ConduitShardDisabled, Transport>;
+	export type ConduitShardDisabled = Base<"conduit.shard.disabled", "1", Condition.ConduitShardDisabled, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -1808,7 +1810,7 @@ export namespace Subscription {
 	 * 
 	 * App access token required. The client ID associated with the access token must be owned by a user who is part of the specified organization.
 	 */
-	export type DropEntitlementGrant = Subscription<"drop.entitlement.grant", "1", Condition.DropEntitlementGrant, Transport>;
+	export type DropEntitlementGrant = Base<"drop.entitlement.grant", "1", Condition.DropEntitlementGrant, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1829,7 +1831,7 @@ export namespace Subscription {
 	 * 
 	 * The OAuth token client ID must match the Extension client ID.
 	 */
-	export type ExtensionBitsTransactionCreate = Subscription<"extension.bits_transaction.create", "1", Condition.ExtensionBitsTransactionCreate, Transport>;
+	export type ExtensionBitsTransactionCreate = Base<"extension.bits_transaction.create", "1", Condition.ExtensionBitsTransactionCreate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `extension_client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -1848,7 +1850,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalBegin = Subscription<"channel.goal.begin", "1", Condition.ChannelGoalBegin, Transport>;
+	export type ChannelGoalBegin = Base<"channel.goal.begin", "1", Condition.ChannelGoalBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1867,7 +1869,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalProgress = Subscription<"channel.goal.progress", "1", Condition.ChannelGoalProgress, Transport>;
+	export type ChannelGoalProgress = Base<"channel.goal.progress", "1", Condition.ChannelGoalProgress, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1884,7 +1886,7 @@ export namespace Subscription {
 	 * 
 	 * Requires a user OAuth access token with scope set to **channel:read:goals**.
 	 */
-	export type ChannelGoalEnd = Subscription<"channel.goal.end", "1", Condition.ChannelGoalEnd, Transport>;
+	export type ChannelGoalEnd = Base<"channel.goal.end", "1", Condition.ChannelGoalEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `broadcaster_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1905,7 +1907,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainBegin = Subscription<"channel.hype_train.begin", "1", Condition.ChannelHypeTrainBegin, Transport>;
+	export type ChannelHypeTrainBegin = Base<"channel.hype_train.begin", "1", Condition.ChannelHypeTrainBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1926,7 +1928,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainProgress = Subscription<"channel.hype_train.progress", "1", Condition.ChannelHypeTrainProgress, Transport>;
+	export type ChannelHypeTrainProgress = Base<"channel.hype_train.progress", "1", Condition.ChannelHypeTrainProgress, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1943,7 +1945,7 @@ export namespace Subscription {
 	 * 
 	 * Must have `channel:read:hype_train` scope.
 	 */
-	export type ChannelHypeTrainEnd = Subscription<"channel.hype_train.end", "1", Condition.ChannelHypeTrainEnd, Transport>;
+	export type ChannelHypeTrainEnd = Base<"channel.hype_train.end", "1", Condition.ChannelHypeTrainEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1966,7 +1968,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShieldModeBegin = Subscription<"channel.shield_mode.begin", "1", Condition.ChannelShieldModeBegin, Transport>;
+	export type ChannelShieldModeBegin = Base<"channel.shield_mode.begin", "1", Condition.ChannelShieldModeBegin, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -1990,7 +1992,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShieldModeEnd = Subscription<"channel.shield_mode.end", "1", Condition.ChannelShieldModeEnd, Transport>;
+	export type ChannelShieldModeEnd = Base<"channel.shield_mode.end", "1", Condition.ChannelShieldModeEnd, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2012,7 +2014,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShoutoutCreate = Subscription<"channel.shoutout.create", "1", Condition.ChannelShoutoutCreate, Transport>;
+	export type ChannelShoutoutCreate = Base<"channel.shoutout.create", "1", Condition.ChannelShoutoutCreate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2036,7 +2038,7 @@ export namespace Subscription {
 	 * 
 	 * If you use [WebSockets](/docs/eventsub/handling-websocket-events), the ID in `moderator_user_id` must match the user ID in the user access token.
 	 */
-	export type ChannelShoutoutReceive = Subscription<"channel.shoutout.receive", "1", Condition.ChannelShoutoutReceive, Transport>;
+	export type ChannelShoutoutReceive = Base<"channel.shoutout.receive", "1", Condition.ChannelShoutoutReceive, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2054,7 +2056,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type StreamOnline = Subscription<"stream.online", "1", Condition.StreamOnline, Transport>;
+	export type StreamOnline = Base<"stream.online", "1", Condition.StreamOnline, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2071,7 +2073,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required.
 	 */
-	export type StreamOffline = Subscription<"stream.offline", "1", Condition.StreamOffline, Transport>;
+	export type StreamOffline = Base<"stream.offline", "1", Condition.StreamOffline, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2090,7 +2092,7 @@ export namespace Subscription {
 	 * 
 	 * Provided `client_id` must match the client id in the application access token.
 	 */
-	export type UserAuthorizationGrant = Subscription<"user.authorization.grant", "1", Condition.UserAuthorizationGrant, Transport>;
+	export type UserAuthorizationGrant = Base<"user.authorization.grant", "1", Condition.UserAuthorizationGrant, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -2109,7 +2111,7 @@ export namespace Subscription {
 	 * 
 	 * Provided `client_id` must match the client id in the application access token.
 	 */
-	export type UserAuthorizationRevoke = Subscription<"user.authorization.revoke", "1", Condition.UserAuthorizationRevoke, Transport>;
+	export type UserAuthorizationRevoke = Base<"user.authorization.revoke", "1", Condition.UserAuthorizationRevoke, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `client_id` gets from `authorization.client_id`, otherwise use these parameters:
@@ -2126,7 +2128,7 @@ export namespace Subscription {
 	 * 
 	 * No authorization required. If you have the `user:read:email` scope, the notification will include `email` field.
 	 */
-	export type UserUpdate = Subscription<"user.update", "1", Condition.UserUpdate, Transport>;
+	export type UserUpdate = Base<"user.update", "1", Condition.UserUpdate, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2143,7 +2145,7 @@ export namespace Subscription {
 	 * 
 	 * Must have oauth scope `user:read:whispers` or `user:manage:whispers`.
 	 */
-	export type UserWhisperMessage = Subscription<"user.whisper.message", "1", Condition.UserWhisperMessage, Transport>;
+	export type UserWhisperMessage = Base<"user.whisper.message", "1", Condition.UserWhisperMessage, Transport>;
 	/**
 	 * @param connection
 	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
@@ -2157,30 +2159,31 @@ export namespace Subscription {
 }
 
 /** An object that contains the message. */
-export interface Payload<Subscription_ extends Subscription = Subscription, Status extends string = "enabled"> {
-	/** An object that contains information about your subscription. */
-	subscription: {
-		/** An ID that uniquely identifies this subscription. */
-		id: string;
-		/** The subscription's status. */
-		status: Status;
-		/** The type of event sent in the message. See the `event` field. */
-		type: Subscription_["type"];
-		/** The version number of the subscription type's definition. */
-		version: Subscription_["version"];
-		/** The event's cost. See [Subscription limits](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscription-limits). */
-		cost: number;
-		/** The conditions under which the event fires. For example, if you requested notifications when a broadcaster gets a new follower, this object contains the broadcaster's ID. For information about the condition's data, see the subscription type's description in [Subscription types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types). */
-		condition: Subscription_["condition"];
-		/** An object that contains information about the transport used for notifications. */
-		transport: Subscription_["transport"];
-		/** The UTC date and time that the subscription was created. */
-		created_at: string;
-	};
-	/** The data of event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference) */
-	event: any;
-}
+export type Payload = Payload.AutomodMessageHold | Payload.AutomodMessageHoldV2 | Payload.AutomodMessageUpdate | Payload.AutomodMessageUpdateV2 | Payload.AutomodSettingsUpdate | Payload.AutomodTermsUpdate | Payload.ChannelAdBreakBegin | Payload.ChannelBan | Payload.ChannelBitsUse | Payload.ChannelCharityCampaignDonate | Payload.ChannelCharityCampaignProgress | Payload.ChannelCharityCampaignStart | Payload.ChannelCharityCampaignStop | Payload.ChannelChatClear | Payload.ChannelChatClearUserMessages | Payload.ChannelChatMessage | Payload.ChannelChatMessageDelete | Payload.ChannelChatNotification | Payload.ChannelChatSettingsUpdate | Payload.ChannelChatUserMessageHold | Payload.ChannelChatUserMessageUpdate | Payload.ChannelCheer | Payload.ChannelFollow | Payload.ChannelGoalBegin | Payload.ChannelGoalEnd | Payload.ChannelGoalProgress | Payload.ChannelGuestStarGuestUpdate | Payload.ChannelGuestStarSessionBegin | Payload.ChannelGuestStarSessionEnd | Payload.ChannelGuestStarSettingsUpdate | Payload.ChannelHypeTrainBegin | Payload.ChannelHypeTrainEnd | Payload.ChannelHypeTrainProgress | Payload.ChannelModerate | Payload.ChannelModerateV2 | Payload.ChannelModeratorAdd | Payload.ChannelModeratorRemove | Payload.ChannelPointsAutomaticRewardRedemptionAdd | Payload.ChannelPointsAutomaticRewardRedemptionAddV2 | Payload.ChannelPointsCustomRewardAdd | Payload.ChannelPointsCustomRewardRedemptionAdd | Payload.ChannelPointsCustomRewardRedemptionUpdate | Payload.ChannelPointsCustomRewardRemove | Payload.ChannelPointsCustomRewardUpdate | Payload.ChannelPollBegin | Payload.ChannelPollEnd | Payload.ChannelPollProgress | Payload.ChannelPredictionBegin | Payload.ChannelPredictionEnd | Payload.ChannelPredictionLock | Payload.ChannelPredictionProgress | Payload.ChannelRaid | Payload.ChannelSharedChatSessionBegin | Payload.ChannelSharedChatSessionEnd | Payload.ChannelSharedChatSessionUpdate | Payload.ChannelShieldModeBegin | Payload.ChannelShieldModeEnd | Payload.ChannelShoutoutCreate | Payload.ChannelShoutoutReceive | Payload.ChannelSubscribe | Payload.ChannelSubscriptionEnd | Payload.ChannelSubscriptionGift | Payload.ChannelSubscriptionMessage | Payload.ChannelSuspiciousUserMessage | Payload.ChannelSuspiciousUserUpdate | Payload.ChannelUnban | Payload.ChannelUnbanRequestCreate | Payload.ChannelUnbanRequestResolve | Payload.ChannelUpdate | Payload.ChannelVipAdd | Payload.ChannelVipRemove | Payload.ChannelWarningAcknowledge | Payload.ChannelWarningSend | Payload.ConduitShardDisabled | Payload.DropEntitlementGrant | Payload.ExtensionBitsTransactionCreate | Payload.StreamOffline | Payload.StreamOnline | Payload.UserAuthorizationGrant | Payload.UserAuthorizationRevoke | Payload.UserUpdate | Payload.UserWhisperMessage;
 export namespace Payload {
+	export interface Base<Subscription_ extends Subscription = Subscription, Status extends string = "enabled"> {
+		/** An object that contains information about your subscription. */
+		subscription: {
+			/** An ID that uniquely identifies this subscription. */
+			id: string;
+			/** The subscription's status. */
+			status: Status;
+			/** The type of event sent in the message. See the `event` field. */
+			type: Subscription_["type"];
+			/** The version number of the subscription type's definition. */
+			version: Subscription_["version"];
+			/** The event's cost. See [Subscription limits](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscription-limits). */
+			cost: number;
+			/** The conditions under which the event fires. For example, if you requested notifications when a broadcaster gets a new follower, this object contains the broadcaster's ID. For information about the condition's data, see the subscription type's description in [Subscription types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types). */
+			condition: Subscription_["condition"];
+			/** An object that contains information about the transport used for notifications. */
+			transport: Subscription_["transport"];
+			/** The UTC date and time that the subscription was created. */
+			created_at: string;
+		};
+		/** The data of event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference) */
+		event: any;
+	}
 	export namespace AutomodMessage {
 		export type MessageFragment = MessageFragment.Text | MessageFragment.Emote | MessageFragment.Cheermote;
 		export namespace MessageFragment {
@@ -2212,7 +2215,7 @@ export namespace Payload {
 			}
 		}
 	}
-	export interface AutomodMessageHold extends Payload<Subscription.AutomodMessageHold> {
+	export interface AutomodMessageHold extends Base<Subscription.AutomodMessageHold> {
 		/** The data of `automod.message.hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-hold-event) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -2244,7 +2247,7 @@ export namespace Payload {
 			held_at: string;
 		};
 	}
-	export interface AutomodMessageHoldV2 extends Payload<Subscription.AutomodMessageHoldV2> {	
+	export interface AutomodMessageHoldV2 extends Base<Subscription.AutomodMessageHoldV2> {	
 		/** The data of `automod.message.hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-hold-event-v2) */
 		event: AutomodMessageHoldV2.Automod | AutomodMessageHoldV2.BlockedTerm;
 	}
@@ -2316,7 +2319,7 @@ export namespace Payload {
 			};
 		}
 	}
-	export interface AutomodMessageUpdate extends Payload<Subscription.AutomodMessageUpdate> {
+	export interface AutomodMessageUpdate extends Base<Subscription.AutomodMessageUpdate> {
 		/** The data of `automod.message.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-update-event) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -2356,7 +2359,7 @@ export namespace Payload {
 			held_at: string;
 		};
 	}
-	export interface AutomodMessageUpdateV2 extends Payload<Subscription.AutomodMessageUpdateV2> {
+	export interface AutomodMessageUpdateV2 extends Base<Subscription.AutomodMessageUpdateV2> {
 		/** The data of `automod.message.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-update-event-v2) */
 		event: AutomodMessageUpdateV2.Automod | AutomodMessageUpdateV2.BlockedTerm;
 	}
@@ -2436,7 +2439,7 @@ export namespace Payload {
 			};
 		}
 	}
-	export interface AutomodSettingsUpdate extends Payload<Subscription.AutomodSettingsUpdate> {
+	export interface AutomodSettingsUpdate extends Base<Subscription.AutomodSettingsUpdate> {
 		/** The data of `automod.settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-settings-update-event) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -2471,7 +2474,7 @@ export namespace Payload {
 			swearing: number;
 		};
 	}
-	export interface AutomodTermsUpdate extends Payload<Subscription.AutomodTermsUpdate> {
+	export interface AutomodTermsUpdate extends Base<Subscription.AutomodTermsUpdate> {
 		/** The data of `automod.terms.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodtermsupdate) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -2494,7 +2497,7 @@ export namespace Payload {
 			terms: string[];
 		};
 	}
-	export interface ChannelBitsUse extends Payload<Subscription.ChannelBitsUse> {
+	export interface ChannelBitsUse extends Base<Subscription.ChannelBitsUse> {
 		/** The data of `channel.bits.use` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelbitsuse) */
 		event: {
 			/** The User ID of the channel where the Bits were redeemed. */
@@ -2536,7 +2539,7 @@ export namespace Payload {
 			} | null;
 		};
 	}
-	export interface ChannelUpdate extends Payload<Subscription.ChannelUpdate> {
+	export interface ChannelUpdate extends Base<Subscription.ChannelUpdate> {
 		/** The data of `channel.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelupdate) */
 		event: {
 			/** The broadcaster’s user ID. */
@@ -2557,7 +2560,7 @@ export namespace Payload {
 			content_classification_labels: string[];
 		};
 	}
-	export interface ChannelFollow extends Payload<Subscription.ChannelFollow> {
+	export interface ChannelFollow extends Base<Subscription.ChannelFollow> {
 		/** The data of `channel.follow` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow) */
 		event: {
 			/** The user ID for the user now following the specified channel. */
@@ -2576,7 +2579,7 @@ export namespace Payload {
 			followed_at: string;
 		};
 	}
-	export interface ChannelAdBreakBegin extends Payload<Subscription.ChannelAdBreakBegin> {
+	export interface ChannelAdBreakBegin extends Base<Subscription.ChannelAdBreakBegin> {
 		/** The data of `channel.ad_break.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelad_breakbegin) */
 		event: {
 			/** Length in seconds of the mid-roll ad break requested */
@@ -2658,7 +2661,7 @@ export namespace Payload {
 			}
 		}
 	}
-	export interface ChannelChatClear extends Payload<Subscription.ChannelChatClear> {
+	export interface ChannelChatClear extends Base<Subscription.ChannelChatClear> {
 		/** The data of `channel.chat.clear` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear) */
 		event: {
 			/** The broadcaster user ID. */
@@ -2669,7 +2672,7 @@ export namespace Payload {
 			broadcaster_user_login: string;
 		};
 	}
-	export interface ChannelChatClearUserMessages extends Payload<Subscription.ChannelChatClearUserMessages> {
+	export interface ChannelChatClearUserMessages extends Base<Subscription.ChannelChatClearUserMessages> {
 		/** The data of `channel.chat.clear_user_messages` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear_user_messages) */
 		event: {
 			/** The broadcaster user ID. */
@@ -2686,7 +2689,7 @@ export namespace Payload {
 			target_user_login: string;
 		};
 	}
-	export interface ChannelChatMessage extends Payload<Subscription.ChannelChatMessage> {
+	export interface ChannelChatMessage extends Base<Subscription.ChannelChatMessage> {
 		/** The data of `channel.chat.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#channel-chat-message-event) */
 		event: {
 			/** The broadcaster user ID. */
@@ -2758,7 +2761,7 @@ export namespace Payload {
 			is_source_only: boolean | null;
 		};
 	}
-	export interface ChannelChatMessageDelete extends Payload<Subscription.ChannelChatMessageDelete> {
+	export interface ChannelChatMessageDelete extends Base<Subscription.ChannelChatMessageDelete> {
 		/** The data of `channel.chat.message_delete` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage_delete) */
 		event: {
 			/** The broadcaster user ID. */
@@ -2777,7 +2780,7 @@ export namespace Payload {
 			message_id: string;
 		};
 	}
-	export interface ChannelChatNotification extends Payload<Subscription.ChannelChatNotification> {
+	export interface ChannelChatNotification extends Base<Subscription.ChannelChatNotification> {
 		/** The data of `channel.chat.notification` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatnotification) */
 		event:
 			| ChannelChatNotification.Sub | ChannelChatNotification.Resub | ChannelChatNotification.SubGift
@@ -3037,7 +3040,7 @@ export namespace Payload {
 			shared_chat_announcement: Announcement["announcement"];
 		}
 	}
-	export interface ChannelChatSettingsUpdate extends Payload<Subscription.ChannelChatSettingsUpdate> {
+	export interface ChannelChatSettingsUpdate extends Base<Subscription.ChannelChatSettingsUpdate> {
 		/** The data of `channel.chat_settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchat_settingsupdate) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -3062,7 +3065,7 @@ export namespace Payload {
 			unique_chat_mode: boolean;
 		};
 	}
-	export interface ChannelChatUserMessageHold extends Payload<Subscription.ChannelChatUserMessageHold> {
+	export interface ChannelChatUserMessageHold extends Base<Subscription.ChannelChatUserMessageHold> {
 		/** The data of `channel.chat.user_message_hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_hold) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -3107,7 +3110,7 @@ export namespace Payload {
 			};
 		};
 	}
-	export interface ChannelChatUserMessageUpdate extends Payload<Subscription.ChannelChatUserMessageUpdate> {
+	export interface ChannelChatUserMessageUpdate extends Base<Subscription.ChannelChatUserMessageUpdate> {
 		/** The data of `channel.chat.user_message_update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_update) */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
@@ -3153,7 +3156,7 @@ export namespace Payload {
 			};
 		};
 	}
-	export interface ChannelSharedChatSessionBegin extends Payload<Subscription.ChannelSharedChatSessionBegin> {
+	export interface ChannelSharedChatSessionBegin extends Base<Subscription.ChannelSharedChatSessionBegin> {
 		/** The data of `channel.shared_chat.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatbegin) */
 		event: {
 			/** The unique identifier for the shared chat session. */
@@ -3181,7 +3184,7 @@ export namespace Payload {
 			}[];
 		};
 	}
-	export interface ChannelSharedChatSessionUpdate extends Payload<Subscription.ChannelSharedChatSessionUpdate> {
+	export interface ChannelSharedChatSessionUpdate extends Base<Subscription.ChannelSharedChatSessionUpdate> {
 		/** The data of `channel.shared_chat.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatupdate) */
 		event: {
 			/** The unique identifier for the shared chat session. */
@@ -3209,7 +3212,7 @@ export namespace Payload {
 			}[];
 		};
 	}
-	export interface ChannelSharedChatSessionEnd extends Payload<Subscription.ChannelSharedChatSessionEnd> {
+	export interface ChannelSharedChatSessionEnd extends Base<Subscription.ChannelSharedChatSessionEnd> {
 		/** The data of `channel.shared_chat.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatend) */
 		event: {
 			/** The unique identifier for the shared chat session. */
@@ -3228,7 +3231,7 @@ export namespace Payload {
 			host_broadcaster_user_login: string;
 		};
 	}
-	export interface ChannelSubscribe extends Payload<Subscription.ChannelSubscribe> {
+	export interface ChannelSubscribe extends Base<Subscription.ChannelSubscribe> {
 		/** The data of `channel.subscribe` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) */
 		event: {
 			/** The user ID for the user who subscribed to the specified channel. */
@@ -3265,7 +3268,7 @@ export namespace Payload {
 			id: string;
 		}
 	}
-	export interface ChannelSubscriptionEnd extends Payload<Subscription.ChannelSubscriptionEnd> {
+	export interface ChannelSubscriptionEnd extends Base<Subscription.ChannelSubscriptionEnd> {
 		/** The data of `channel.subscription.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionend) */
 		event: {
 			/** The user ID for the user whose subscription ended. */
@@ -3286,7 +3289,7 @@ export namespace Payload {
 			is_gift: boolean;
 		};
 	}
-	export interface ChannelSubscriptionGift extends Payload<Subscription.ChannelSubscriptionGift> {
+	export interface ChannelSubscriptionGift extends Base<Subscription.ChannelSubscriptionGift> {
 		/** The data of `channel.subscription.gift` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptiongift) */
 		event: {
 			/** The user ID of the user who sent the subscription gift. Set to `null` if it was an anonymous subscription gift. */
@@ -3311,7 +3314,7 @@ export namespace Payload {
 			is_anonymous: boolean;
 		};
 	}
-	export interface ChannelSubscriptionMessage extends Payload<Subscription.ChannelSubscriptionMessage> {
+	export interface ChannelSubscriptionMessage extends Base<Subscription.ChannelSubscriptionMessage> {
 		/** The data of `channel.subscription.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionmessage) */
 		event: {
 			/** The user ID of the user who sent a resubscription chat message. */
@@ -3338,7 +3341,7 @@ export namespace Payload {
 			duration_months: number;
 		};
 	}
-	export interface ChannelCheer extends Payload<Subscription.ChannelCheer> {
+	export interface ChannelCheer extends Base<Subscription.ChannelCheer> {
 		/** The data of `channel.cheer` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcheer) */
 		event: {
 			/** Whether the user cheered anonymously or not. */
@@ -3361,7 +3364,7 @@ export namespace Payload {
 			bits: number;
 		};
 	}
-	export interface ChannelRaid extends Payload<Subscription.ChannelRaid> {
+	export interface ChannelRaid extends Base<Subscription.ChannelRaid> {
 		/** The data of `channel.raid` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelraid) */
 		event: {
 			/** The broadcaster ID that created the raid. */
@@ -3380,7 +3383,7 @@ export namespace Payload {
 			viewers: number;
 		};
 	}
-	export interface ChannelBan extends Payload<Subscription.ChannelBan> {
+	export interface ChannelBan extends Base<Subscription.ChannelBan> {
 		/** The data of `channel.ban` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelban) */
 		event: {
 			/** The user ID for the user who was banned on the specified channel. */
@@ -3411,7 +3414,7 @@ export namespace Payload {
 			is_permanent: boolean;
 		};
 	}
-	export interface ChannelUnban extends Payload<Subscription.ChannelUnban> {
+	export interface ChannelUnban extends Base<Subscription.ChannelUnban> {
 		/** The data of `channel.unban` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban) */
 		event: {
 			/** The user id for the user who was unbanned on the specified channel. */
@@ -3434,7 +3437,7 @@ export namespace Payload {
 			moderator_user_name: string;
 		};
 	}
-	export interface ChannelUnbanRequestCreate extends Payload<Subscription.ChannelUnbanRequestCreate> {
+	export interface ChannelUnbanRequestCreate extends Base<Subscription.ChannelUnbanRequestCreate> {
 		/** The data of `channel.unban_request.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestcreate) */
 		event: {
 			/** The ID of the unban request. */
@@ -3457,7 +3460,7 @@ export namespace Payload {
 			created_at: string;
 		};
 	}
-	export interface ChannelUnbanRequestResolve extends Payload<Subscription.ChannelUnbanRequestResolve> {
+	export interface ChannelUnbanRequestResolve extends Base<Subscription.ChannelUnbanRequestResolve> {
 		/** The data of `channel.unban_request.resolve` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestresolve) */
 		event: {
 			/** The ID of the unban request. */
@@ -3486,7 +3489,7 @@ export namespace Payload {
 			status: "approved" | "canceled" | "denied";
 		};
 	}
-	export interface ChannelModerate extends Payload<Subscription.ChannelModerate> {
+	export interface ChannelModerate extends Base<Subscription.ChannelModerate> {
 		/** The data of `channel.moderate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate) */
 		event: 
 			| ChannelModerate.Followers | ChannelModerate.Slow | ChannelModerate.Vip | ChannelModerate.Unvip | ChannelModerate.Mod | ChannelModerate.Unmod
@@ -3721,7 +3724,7 @@ export namespace Payload {
 		}
 		export type Other = Action<"clear" | "emoteonly" | "emoteonlyoff" | "uniquechat" | "uniquechatoff" | "followersoff" | "slowoff" | "subscribers" | "subscribersoff">;
 	}
-	export interface ChannelModerateV2 extends Payload<Subscription.ChannelModerateV2> {
+	export interface ChannelModerateV2 extends Base<Subscription.ChannelModerateV2> {
 		/** The data of `channel.moderate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate) */
 		event: 
 			| ChannelModerate.Followers | ChannelModerate.Slow | ChannelModerate.Vip | ChannelModerate.Unvip | ChannelModerate.Mod | ChannelModerate.Unmod
@@ -3746,7 +3749,7 @@ export namespace Payload {
 			};
 		}
 	}
-	export interface ChannelModeratorAdd extends Payload<Subscription.ChannelModeratorAdd> {
+	export interface ChannelModeratorAdd extends Base<Subscription.ChannelModeratorAdd> {
 		/** The data of `channel.moderator.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatoradd) */
 		event: {
 			/** The requested broadcaster ID. */
@@ -3763,7 +3766,7 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
-	export interface ChannelModeratorRemove extends Payload<Subscription.ChannelModeratorRemove> {
+	export interface ChannelModeratorRemove extends Base<Subscription.ChannelModeratorRemove> {
 		/** The data of `channel.moderator.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatorremove) */
 		event: {
 			/** The requested broadcaster ID. */
@@ -3780,7 +3783,7 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
-	export interface ChannelGuestStarSessionBegin extends Payload<Subscription.ChannelGuestStarSessionBegin> {
+	export interface ChannelGuestStarSessionBegin extends Base<Subscription.ChannelGuestStarSessionBegin> {
 		/** The data of `channel.guest_star_session.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionbegin) */
 		event: {
 			/** The broadcaster user ID. */
@@ -3795,7 +3798,7 @@ export namespace Payload {
 			started_at:	string;
 		};
 	}
-	export interface ChannelGuestStarSessionEnd extends Payload<Subscription.ChannelGuestStarSessionEnd> {
+	export interface ChannelGuestStarSessionEnd extends Base<Subscription.ChannelGuestStarSessionEnd> {
 		/** The data of `channel.guest_star_session.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionend) */
 		event: {
 			/** The non-host broadcaster user ID. */
@@ -3818,7 +3821,7 @@ export namespace Payload {
 			host_user_login: string;
 		};
 	}
-	export interface ChannelGuestStarGuestUpdate extends Payload<Subscription.ChannelGuestStarGuestUpdate> {
+	export interface ChannelGuestStarGuestUpdate extends Base<Subscription.ChannelGuestStarGuestUpdate> {
 		/** The data of `channel.guest_star_session.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionupdate) */
 		event: {
 			/** The non-host broadcaster user ID. */
@@ -3868,7 +3871,7 @@ export namespace Payload {
 			host_volume: number | null;
 		};
 	}
-	export interface ChannelGuestStarSettingsUpdate extends Payload<Subscription.ChannelGuestStarSettingsUpdate> {
+	export interface ChannelGuestStarSettingsUpdate extends Base<Subscription.ChannelGuestStarSettingsUpdate> {
 		/** The data of `channel.guest_star_settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_settingsupdate) */
 		event: {
 			/** User ID of the host channel. */
@@ -3933,7 +3936,7 @@ export namespace Payload {
 			prompt: string;
 		}
 	}
-	export interface ChannelPointsAutomaticRewardRedemptionAdd extends Payload<Subscription.ChannelPointsAutomaticRewardRedemptionAdd> {
+	export interface ChannelPointsAutomaticRewardRedemptionAdd extends Base<Subscription.ChannelPointsAutomaticRewardRedemptionAdd> {
 		/** The data of `channel.channel_points_automatic_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionadd) */
 		event: {
 			/** The ID of the channel where the reward was redeemed. */
@@ -3984,7 +3987,7 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
-	export interface ChannelPointsAutomaticRewardRedemptionAddV2 extends Payload<Subscription.ChannelPointsAutomaticRewardRedemptionAddV2> {
+	export interface ChannelPointsAutomaticRewardRedemptionAddV2 extends Base<Subscription.ChannelPointsAutomaticRewardRedemptionAddV2> {
 		/** The data of `channel.channel_points_automatic_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionaddv2) */
 		event: {
 			/** The ID of the channel where the reward was redeemed. */
@@ -4042,7 +4045,7 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
-	export interface ChannelPointsCustomRewardAdd extends Payload<Subscription.ChannelPointsCustomRewardAdd> {
+	export interface ChannelPointsCustomRewardAdd extends Base<Subscription.ChannelPointsCustomRewardAdd> {
 		/** The data of `channel.channel_points_custom_reward.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardadd) */
 		event: {
 			/** The reward identifier. */
@@ -4087,15 +4090,15 @@ export namespace Payload {
 			redemptions_redeemed_current_stream: number | null;
 		};
 	}
-	export interface ChannelPointsCustomRewardUpdate extends Payload<Subscription.ChannelPointsCustomRewardUpdate> {
+	export interface ChannelPointsCustomRewardUpdate extends Base<Subscription.ChannelPointsCustomRewardUpdate> {
 		/** The data of `channel.channel_points_custom_reward.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardupdate) */
 		event: ChannelPointsCustomRewardAdd["event"];
 	}
-	export interface ChannelPointsCustomRewardRemove extends Payload<Subscription.ChannelPointsCustomRewardRemove> {
+	export interface ChannelPointsCustomRewardRemove extends Base<Subscription.ChannelPointsCustomRewardRemove> {
 		/** The data of `channel.channel_points_custom_reward.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardremove) */
 		event: ChannelPointsCustomRewardAdd["event"];
 	}
-	export interface ChannelPointsCustomRewardRedemptionAdd extends Payload<Subscription.ChannelPointsCustomRewardRedemptionAdd> {
+	export interface ChannelPointsCustomRewardRedemptionAdd extends Base<Subscription.ChannelPointsCustomRewardRedemptionAdd> {
 		/** The data of `channel.channel_points_custom_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionadd) */
 		event: {
 			/** The redemption identifier. */
@@ -4122,7 +4125,7 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
-	export interface ChannelPointsCustomRewardRedemptionUpdate extends Payload<Subscription.ChannelPointsCustomRewardRedemptionUpdate> {
+	export interface ChannelPointsCustomRewardRedemptionUpdate extends Base<Subscription.ChannelPointsCustomRewardRedemptionUpdate> {
 		/** The data of `channel.channel_points_custom_reward_redemption.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionupdate) */
 		event: ChannelPointsCustomRewardRedemptionAdd["event"];
 	}
@@ -4151,7 +4154,7 @@ export namespace Payload {
 			amount_per_vote: number;
 		}
 	}
-	export interface ChannelPollBegin extends Payload<Subscription.ChannelPollBegin> {
+	export interface ChannelPollBegin extends Base<Subscription.ChannelPollBegin> {
 		/** The data of `channel.poll.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollbegin) */
 		event: {
 			/** ID of the poll. */
@@ -4176,7 +4179,7 @@ export namespace Payload {
 			ends_at: string;
 		};
 	}
-	export interface ChannelPollProgress extends Payload<Subscription.ChannelPollProgress> {
+	export interface ChannelPollProgress extends Base<Subscription.ChannelPollProgress> {
 		/** The data of `channel.poll.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollprogress) */
 		event: {
 			/** ID of the poll. */
@@ -4201,7 +4204,7 @@ export namespace Payload {
 			ends_at: string;
 		};
 	}
-	export interface ChannelPollEnd extends Payload<Subscription.ChannelPollEnd> {
+	export interface ChannelPollEnd extends Base<Subscription.ChannelPollEnd> {
 		/** The data of `channel.poll.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollend) */
 		event: {
 			/** ID of the poll. */
@@ -4258,7 +4261,7 @@ export namespace Payload {
 			channel_points_used: number;
 		}
 	}
-	export interface ChannelPredictionBegin extends Payload<Subscription.ChannelPredictionBegin> {
+	export interface ChannelPredictionBegin extends Base<Subscription.ChannelPredictionBegin> {
 		/** The data of `channel.prediction.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionbegin) */
 		event: {
 			/** Channel Points Prediction ID. */
@@ -4279,7 +4282,7 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
-	export interface ChannelPredictionProgress extends Payload<Subscription.ChannelPredictionProgress> {
+	export interface ChannelPredictionProgress extends Base<Subscription.ChannelPredictionProgress> {
 		/** The data of `channel.prediction.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionprogress) */
 		event: {
 			/** Channel Points Prediction ID. */
@@ -4300,7 +4303,7 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
-	export interface ChannelPredictionLock extends Payload<Subscription.ChannelPredictionLock> {
+	export interface ChannelPredictionLock extends Base<Subscription.ChannelPredictionLock> {
 		/** The data of `channel.prediction.lock` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionlock) */
 		event: {
 			/** Channel Points Prediction ID. */
@@ -4321,7 +4324,7 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
-	export interface ChannelPredictionEnd extends Payload<Subscription.ChannelPredictionEnd> {
+	export interface ChannelPredictionEnd extends Base<Subscription.ChannelPredictionEnd> {
 		/** The data of `channel.prediction.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionend) */
 		event: {
 			/** Channel Points Prediction ID. */
@@ -4346,7 +4349,7 @@ export namespace Payload {
 			ended_at: string;
 		};
 	}
-	export interface ChannelSuspiciousUserUpdate extends Payload<Subscription.ChannelSuspiciousUserUpdate> {
+	export interface ChannelSuspiciousUserUpdate extends Base<Subscription.ChannelSuspiciousUserUpdate> {
 		/** The data of `channel.suspicious_user.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_userupdate) */
 		event: {
 			/** The ID of the channel where the treatment for a suspicious user was updated. */
@@ -4371,7 +4374,7 @@ export namespace Payload {
 			low_trust_status: "none" | "active_monitoring" | "restricted";
 		};
 	}
-	export interface ChannelSuspiciousUserMessage extends Payload<Subscription.ChannelSuspiciousUserMessage> {
+	export interface ChannelSuspiciousUserMessage extends Base<Subscription.ChannelSuspiciousUserMessage> {
 		/** The data of `channel.suspicious_user.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_usermessage) */
 		event: {
 			/** The ID of the channel where the treatment for a suspicious user was updated. */
@@ -4405,7 +4408,7 @@ export namespace Payload {
 			};
 		};
 	}
-	export interface ChannelVipAdd extends Payload<Subscription.ChannelVipAdd> {
+	export interface ChannelVipAdd extends Base<Subscription.ChannelVipAdd> {
 		/** The data of `channel.vip.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipadd) */
 		event: {
 			/** The ID of the user who was added as a VIP. */
@@ -4422,7 +4425,7 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
-	export interface ChannelVipRemove extends Payload<Subscription.ChannelVipRemove> {
+	export interface ChannelVipRemove extends Base<Subscription.ChannelVipRemove> {
 		/** The data of `channel.vip.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipremove) */
 		event: {
 			/** The ID of the user who was removed as a VIP. */
@@ -4439,7 +4442,7 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
-	export interface ChannelWarningAcknowledge extends Payload<Subscription.ChannelWarningAcknowledge> {
+	export interface ChannelWarningAcknowledge extends Base<Subscription.ChannelWarningAcknowledge> {
 		/** The data of `channel.warning.acknowledge` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningacknowledge) */
 		event: {
 			/** The user ID of the broadcaster. */
@@ -4456,7 +4459,7 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
-	export interface ChannelWarningSend extends Payload<Subscription.ChannelWarningSend> {
+	export interface ChannelWarningSend extends Base<Subscription.ChannelWarningSend> {
 		/** The data of `channel.warning.send` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningsend) */
 		event: {
 			/** The user ID of the broadcaster. */
@@ -4493,7 +4496,7 @@ export namespace Payload {
 			currency: string;
 		}
 	}
-	export interface ChannelCharityCampaignDonate extends Payload<Subscription.ChannelCharityCampaignDonate> {
+	export interface ChannelCharityCampaignDonate extends Base<Subscription.ChannelCharityCampaignDonate> {
 		/** The data of `channel.charity_campaign.donate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaigndonate) */
 		event: {
 			/** An ID that identifies the donation. The ID is unique across campaigns. */
@@ -4524,7 +4527,7 @@ export namespace Payload {
 			amount: ChannelCharity.Amount;
 		};
 	}
-	export interface ChannelCharityCampaignStart extends Payload<Subscription.ChannelCharityCampaignStart> {
+	export interface ChannelCharityCampaignStart extends Base<Subscription.ChannelCharityCampaignStart> {
 		/** The data of `channel.charity_campaign.start` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstart) */
 		event: {
 			/** An ID that identifies the charity campaign. */
@@ -4551,7 +4554,7 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
-	export interface ChannelCharityCampaignProgress extends Payload<Subscription.ChannelCharityCampaignProgress> {
+	export interface ChannelCharityCampaignProgress extends Base<Subscription.ChannelCharityCampaignProgress> {
 		/** The data of `channel.charity_campaign.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignprogress) */
 		event: {
 			/** An ID that identifies the charity campaign. */
@@ -4576,7 +4579,7 @@ export namespace Payload {
 			target_amount: ChannelCharity.Amount;
 		};
 	}
-	export interface ChannelCharityCampaignStop extends Payload<Subscription.ChannelCharityCampaignStop> {
+	export interface ChannelCharityCampaignStop extends Base<Subscription.ChannelCharityCampaignStop> {
 		/** The data of `channel.charity_campaign.stop` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstop) */
 		event: {
 			/** An ID that identifies the charity campaign. */
@@ -4603,7 +4606,7 @@ export namespace Payload {
 			stopped_at: string;
 		};
 	}
-	export interface ConduitShardDisabled extends Payload<Subscription.ConduitShardDisabled> {
+	export interface ConduitShardDisabled extends Base<Subscription.ConduitShardDisabled> {
 		/** The data of `conduit.shard.disabled` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#conduitsharddisabled) */
 		event: {
 			/** The ID of the conduit. */
@@ -4616,7 +4619,7 @@ export namespace Payload {
 			transport: Subscription.ConduitShardDisabled; // TODO
 		};
 	}
-	export interface DropEntitlementGrant extends Payload<Subscription.DropEntitlementGrant> {
+	export interface DropEntitlementGrant extends Base<Subscription.DropEntitlementGrant> {
 		/** The data of `drop.entitlement.grant` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#dropentitlementgrant) */
 		events: {
 			/** Individual event ID, as assigned by  Use this for de-duplicating messages. */
@@ -4658,7 +4661,7 @@ export namespace Payload {
 			in_development: boolean;
 		};
 	}
-	export interface ExtensionBitsTransactionCreate extends Payload<Subscription.ExtensionBitsTransactionCreate> {
+	export interface ExtensionBitsTransactionCreate extends Base<Subscription.ExtensionBitsTransactionCreate> {
 		/** The data of `extension.bits_transaction.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#extensionbits_transactioncreate) */
 		event: {
 			/** Client ID of the extension. */
@@ -4725,15 +4728,15 @@ export namespace Payload {
 			ended_at: string;
 		}
 	}
-	export interface ChannelGoalBegin extends Payload<Subscription.ChannelGoalBegin> {
+	export interface ChannelGoalBegin extends Base<Subscription.ChannelGoalBegin> {
 		/** The data of `channel.goal.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
 		event: ChannelGoal.Event;
 	}
-	export interface ChannelGoalProgress extends Payload<Subscription.ChannelGoalProgress> {
+	export interface ChannelGoalProgress extends Base<Subscription.ChannelGoalProgress> {
 		/** The data of `channel.goal.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
 		event: ChannelGoal.Event;
 	}
-	export interface ChannelGoalEnd extends Payload<Subscription.ChannelGoalEnd> {
+	export interface ChannelGoalEnd extends Base<Subscription.ChannelGoalEnd> {
 		/** The data of `channel.goal.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
 		event: ChannelGoal.EventEnd;
 	}
@@ -4761,7 +4764,7 @@ export namespace Payload {
 			export type Other = Bits<"other", 500 | 1000 | 2500>;
 		}
 	}
-	export interface ChannelHypeTrainBegin extends Payload<Subscription.ChannelHypeTrainBegin> {
+	export interface ChannelHypeTrainBegin extends Base<Subscription.ChannelHypeTrainBegin> {
 		/** The data of `channel.hype_train.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainbegin) */
 		event: {
 			/** The Hype Train ID. */
@@ -4792,11 +4795,11 @@ export namespace Payload {
 			is_golden_kappa_train: boolean;
 		};
 	}
-	export interface ChannelHypeTrainProgress extends Payload<Subscription.ChannelHypeTrainProgress> {
+	export interface ChannelHypeTrainProgress extends Base<Subscription.ChannelHypeTrainProgress> {
 		/** The data of `channel.hype_train.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainbegin) */
 		event: ChannelHypeTrainBegin["event"];
 	}
-	export interface ChannelHypeTrainEnd extends Payload<Subscription.ChannelHypeTrainEnd> {
+	export interface ChannelHypeTrainEnd extends Base<Subscription.ChannelHypeTrainEnd> {
 		/** The data of `channel.hype_train.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainend) */
 		event: {
 			/** The Hype Train ID. */
@@ -4823,7 +4826,7 @@ export namespace Payload {
 			is_golden_kappa_train: boolean;
 		};
 	}
-	export interface ChannelShieldModeBegin extends Payload<Subscription.ChannelShieldModeBegin> {
+	export interface ChannelShieldModeBegin extends Base<Subscription.ChannelShieldModeBegin> {
 		/** The data of `channel.shield_mode.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modebegin) */
 		event: {
 			/** An ID that identifies the broadcaster whose Shield Mode status was updated. */
@@ -4842,7 +4845,7 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
-	export interface ChannelShieldModeEnd extends Payload<Subscription.ChannelShieldModeEnd> {
+	export interface ChannelShieldModeEnd extends Base<Subscription.ChannelShieldModeEnd> {
 		/** The data of `channel.shield_mode.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modeend) */
 		event: {
 			/** An ID that identifies the broadcaster whose Shield Mode status was updated. */
@@ -4861,7 +4864,7 @@ export namespace Payload {
 			ended_at: string;
 		};
 	}
-	export interface ChannelShoutoutCreate extends Payload<Subscription.ChannelShoutoutCreate> {
+	export interface ChannelShoutoutCreate extends Base<Subscription.ChannelShoutoutCreate> {
 		/** The data of `channel.shoutout.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutcreate) */
 		event: {
 			/** An ID that identifies the broadcaster that sent the Shoutout. */
@@ -4892,7 +4895,7 @@ export namespace Payload {
 			target_cooldown_ends_at: string;
 		};
 	}
-	export interface ChannelShoutoutReceive extends Payload<Subscription.ChannelShoutoutReceive> {
+	export interface ChannelShoutoutReceive extends Base<Subscription.ChannelShoutoutReceive> {
 		/** The data of `channel.shoutout.receive` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutreceive) */
 		event: {
 			/** An ID that identifies the broadcaster that received the Shoutout. */
@@ -4913,7 +4916,7 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
-	export interface StreamOnline extends Payload<Subscription.StreamOnline> {
+	export interface StreamOnline extends Base<Subscription.StreamOnline> {
 		/** The data of `stream.online` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamonline) */
 		event: {
 			/** The ID of the stream. */
@@ -4930,7 +4933,7 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
-	export interface StreamOffline extends Payload<Subscription.StreamOffline> {
+	export interface StreamOffline extends Base<Subscription.StreamOffline> {
 		/** The data of `stream.offline` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamoffline) */
 		event: {
 			/** The broadcaster’s user ID. */
@@ -4941,7 +4944,7 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
-	export interface UserAuthorizationGrant extends Payload<Subscription.UserAuthorizationGrant> {
+	export interface UserAuthorizationGrant extends Base<Subscription.UserAuthorizationGrant> {
 		/** The data of `user.authorization.grant` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationgrant) */
 		event: {
 			/** The client_id of the application that was granted user access. */
@@ -4954,7 +4957,7 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
-	export interface UserAuthorizationRevoke extends Payload<Subscription.UserAuthorizationRevoke> {
+	export interface UserAuthorizationRevoke extends Base<Subscription.UserAuthorizationRevoke> {
 		/** The data of `user.authorization.revoke` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke) */
 		event: {
 			/** The client_id of the application with revoked user access. */
@@ -4967,7 +4970,7 @@ export namespace Payload {
 			user_name: string | null;
 		};
 	}
-	export interface UserUpdate extends Payload<Subscription.UserUpdate> {
+	export interface UserUpdate extends Base<Subscription.UserUpdate> {
 		/** The data of `user.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userupdate) */
 		event: {
 			/** The user’s user ID. */
@@ -4984,7 +4987,7 @@ export namespace Payload {
 			description: string;
 		};
 	}
-	export interface UserWhisperMessage extends Payload<Subscription.UserWhisperMessage> {
+	export interface UserWhisperMessage extends Base<Subscription.UserWhisperMessage> {
 		/** The data of `user.whisper.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userwhispermessage) */
 		event: {
 			/** The ID of the user sending the message. */
@@ -5011,39 +5014,40 @@ export namespace Payload {
 }
 
 /** An object that contains information about the connection. */
-export interface Session<Status extends "connected" | "reconnecting", KeepaliveTimeoutSeconds extends number | null, ReconnectURL extends string | null> {
-	/** An ID that uniquely identifies this WebSocket connection. Use this ID to set the `session_id` field in all [subscription requests](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events). */
-	id: string;
-	/** The connection’s status. */
-	status: Status;
-	/** The maximum number of seconds that you should expect silence before receiving a [keepalive message](https://dev.twitch.tv/docs/eventsub/websocket-reference/#keepalive-message). For a welcome message, this is the number of seconds that you have to [subscribe to an event](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events) after receiving the welcome message. If you don’t subscribe to an event within this window, the socket is disconnected. */
-	keepalive_timeout_seconds: KeepaliveTimeoutSeconds;
-	/** The URL to reconnect to if you get a [Reconnect message](https://dev.twitch.tv/docs/eventsub/websocket-reference/#reconnect-message). */
-	reconnect_url: ReconnectURL;
-	/** The UTC date and time that the connection was created. */
-	connected_at: string;
-}
+export type Session = Session.Connected | Session.Reconnecting;
 export namespace Session {
+	interface Base<Status extends "connected" | "reconnecting", KeepaliveTimeoutSeconds extends number | null, ReconnectURL extends string | null> {
+		/** An ID that uniquely identifies this WebSocket connection. Use this ID to set the `session_id` field in all [subscription requests](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events). */
+		id: string;
+		/** The connection’s status. */
+		status: Status;
+		/** The maximum number of seconds that you should expect silence before receiving a [keepalive message](https://dev.twitch.tv/docs/eventsub/websocket-reference/#keepalive-message). For a welcome message, this is the number of seconds that you have to [subscribe to an event](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscribing-to-events) after receiving the welcome message. If you don’t subscribe to an event within this window, the socket is disconnected. */
+		keepalive_timeout_seconds: KeepaliveTimeoutSeconds;
+		/** The URL to reconnect to if you get a [Reconnect message](https://dev.twitch.tv/docs/eventsub/websocket-reference/#reconnect-message). */
+		reconnect_url: ReconnectURL;
+		/** The UTC date and time that the connection was created. */
+		connected_at: string;
+	}
 	/** An object that contains information about the connection. */
-	export type Any = Connected | Reconnecting;
+	export type Connected = Base<"connected", number, null>;
 	/** An object that contains information about the connection. */
-	export type Connected = Session<"connected", number, null>;
-	/** An object that contains information about the connection. */
-	export type Reconnecting = Session<"reconnecting", null, string>;
+	export type Reconnecting = Base<"reconnecting", null, string>;
 }
 
 /** An object that identifies the message. */
-export interface Metadata<MessageType extends string = string> {
-	/** An ID that uniquely identifies the message. Twitch sends messages at least once, but if Twitch is unsure of whether you received a notification, it’ll resend the message. This means you may receive a notification twice. If Twitch resends the message, the message ID will be the same. */
-	message_id: string;
-	/** The type of message. */
-	message_type: MessageType;
-	/** The UTC date and time that the message was sent. */
-	message_timestamp: string;
-}
+export type Metadata = Metadata.Base | Metadata.Subscription;
 export namespace Metadata {
+	/** An object that identifies the message. */
+	export interface Base<MessageType extends string = string> {
+		/** An ID that uniquely identifies the message. Twitch sends messages at least once, but if Twitch is unsure of whether you received a notification, it’ll resend the message. This means you may receive a notification twice. If Twitch resends the message, the message ID will be the same. */
+		message_id: string;
+		/** The type of message. */
+		message_type: MessageType;
+		/** The UTC date and time that the message was sent. */
+		message_timestamp: string;
+	}
 	/** An object that identifies the subscription message. */
-	export interface Subscription<MessageType extends string = string, SubscriptionType extends string = string, SubscriptionVersion extends Version = Version> extends Metadata<MessageType> {
+	export interface Subscription<MessageType extends string = string, SubscriptionType extends string = string, SubscriptionVersion extends Version = Version> extends Base<MessageType> {
 		/** The type of event sent in the message. */
 		subscription_type: SubscriptionType;
 		/** The version number of the subscription type's definition. This is the same value specified in the subscription request. */
@@ -5062,7 +5066,7 @@ export namespace Message {
 	/** Defines the first message that the EventSub WebSocket server sends after your client connects to the server. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message) */
 	export interface SessionWelcome {
 		/** An object that identifies the message. */
-		metadata: Metadata<"session_welcome">;
+		metadata: Metadata.Base<"session_welcome">;
 		/** An object that contains the message. */
 		payload: {
 			/** An object that contains information about the connection. */
@@ -5072,7 +5076,7 @@ export namespace Message {
 	/** Defines the message that the EventSub WebSocket server sends your client to indicate that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#keepalive-message) */
 	export interface SessionKeepalive {
 		/** An object that identifies the message. */
-		metadata: Metadata<"session_keepalive">;
+		metadata: Metadata.Base<"session_keepalive">;
 		/** An empty object. */
 		payload: {};
 	}
@@ -5124,7 +5128,7 @@ export namespace Message {
 		export function isChannelGuestStarSessionEnd(data: Message.Notification): data is Notification<Payload.ChannelGuestStarSessionEnd> { return data.metadata.subscription_type === "channel.guest_star_session.end" && data.metadata.subscription_version === "beta" }
 		export function isChannelGuestStarGuestUpdate(data: Message.Notification): data is Notification<Payload.ChannelGuestStarGuestUpdate> { return data.metadata.subscription_type === "channel.guest_star_guest.update" && data.metadata.subscription_version === "beta" }
 		export function isChannelGuestStarSettingsUpdate(data: Message.Notification): data is Notification<Payload.ChannelGuestStarSettingsUpdate> { return data.metadata.subscription_type === "channel.guest_star_settings.update" && data.metadata.subscription_version === "beta" }
-		export function isChannelPointsAutomaticRewardRedemptionAdd(data: Message.Notification): data is Notification<Payload.ChannelPointsAutomaticRewardRedemptionAdd> { return data.metadata.subscription_type === "channel.channel_points_automatic_reward_redancement.add" && data.metadata.subscription_version === "1" }
+		export function isChannelPointsAutomaticRewardRedemptionAdd(data: Message.Notification): data is Notification<Payload.ChannelPointsAutomaticRewardRedemptionAdd> { return data.metadata.subscription_type === "channel.channel_points_automatic_reward_redemption.add" && data.metadata.subscription_version === "1" }
 		export function isChannelPointsAutomaticRewardRedemptionAddV2(data: Message.Notification): data is Notification<Payload.ChannelPointsAutomaticRewardRedemptionAddV2> { return data.metadata.subscription_type === "channel.channel_points_automatic_reward_redemption.add" && data.metadata.subscription_version === "2" }
 		export function isChannelPointsCustomRewardAdd(data: Message.Notification): data is Notification<Payload.ChannelPointsCustomRewardAdd> { return data.metadata.subscription_type === "channel.channel_points_custom_reward.add" && data.metadata.subscription_version === "1" }
 		export function isChannelPointsCustomRewardUpdate(data: Message.Notification): data is Notification<Payload.ChannelPointsCustomRewardUpdate> { return data.metadata.subscription_type === "channel.channel_points_custom_reward.update" && data.metadata.subscription_version === "1" }
@@ -5172,7 +5176,7 @@ export namespace Message {
 	/** Defines the message that the EventSub WebSocket server sends if the server must drop the connection. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#reconnect-message) */
 	export interface SessionReconnect {
 		/** An object that identifies the message. */
-		metadata: Metadata<"session_reconnect">;
+		metadata: Metadata.Base<"session_reconnect">;
 		/** An object that contains the message. */
 		payload: {
 			/** An object that contains information about the connection. */
@@ -5185,6 +5189,6 @@ export namespace Message {
 		/** An object that identifies the message. */
 		metadata: Metadata.Subscription<"revocation", string, Version>;
 		/** An object that contains the message. */
-		payload: Payload<Subscription, "authorization_revoked" | "user_removed" | "version_removed">;
+		payload: Payload.Base<Subscription, "authorization_revoked" | "user_removed" | "version_removed">;
 	}
 }
