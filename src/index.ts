@@ -7,7 +7,7 @@ export const Paths: {
 } = {
 	apiHelix: "https://api.twitch.tv/helix",
 	idOAuth2: "https://id.twitch.tv/oauth2",
-	eventSubWS: "wss://wss.twitch.tv/ws"
+	eventSubWS: "wss://eventsub.wss.twitch.tv/ws"
 };
 
 export type Authorization<S extends Authorization.Scope[] = Authorization.Scope[]> = Authorization.App<S> | Authorization.User<S>;
