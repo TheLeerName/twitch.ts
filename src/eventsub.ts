@@ -1,99 +1,15 @@
+import { EventEmitter } from "node:stream";
 import { Authorization, Paths } from ".";
 
 /**
  * Starts WebSocket for subscribing and getting EventSub events
- * - Reconnects in `reconnect_ms`, if WebSocket was closed
+ * - Reconnects in `reconnectMS`, if WebSocket was closed
  * - Reconnects immediately, if gets `session_reconnect` message
- * - When getting not first `session_welcome` message when `reconnect_url` is `false` or when recreating ws session (if your app is reopened or internet was down), please delete old events via `Request.DeleteEventSubSubscription`, you will need a id of subscription, store it somewhere
- * @param reconnect_ms If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
+ * - When getting not first `session_welcome` message when `reconnectURL` is `false` or when recreating ws session (if your app is reopened or internet was down), please delete old events via `Request.DeleteEventSubSubscription`, you will need a id of subscription, store it somewhere
+ * @param reconnectMS If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
  */
-export function startWebSocket<S extends Authorization.Scope[]>(token_data: Authorization.User<S>, reconnect_ms?: number) {
-	if (!reconnect_ms) reconnect_ms = 500;
-
-	const connection = new Connection(new WebSocket(Paths.eventSubWS), token_data);
-	var previous_message_id: string | undefined;
-
-	function giveCloseCodeToClient(code: number = 1000, reason: string = "client disconnected") {
-		connection.ws.onclose?.({ code, reason } as any);
-		connection.ws.onclose = () => {};
-		connection.ws.close();
-	}
-
-	function storeFirstConnectedTimestamp(e: Event) {
-		const date = new Date();
-		connection.first_connected_timestamp_iso = date.toISOString();
-		connection.first_connected_timestamp = date.getTime();
-	}
-	async function onMessage(e: MessageEvent) {
-		if (connection.keepalive_timeout) {
-			clearTimeout(connection.keepalive_timeout);
-			delete connection.keepalive_timeout;
-		}
-
-		const message: Message = JSON.parse(e.data);
-
-		// do not handle same message, twitch can be unsure if you got the message smh
-		if (previous_message_id && message.metadata.message_id === previous_message_id)
-			return;
-		previous_message_id = message.metadata.message_id;
-
-		await connection.onMessage(message);
-		if (Message.isSessionWelcome(message)) {
-			if (connection.network_timeout) {
-				clearTimeout(connection.network_timeout);
-				connection.network_timeout = undefined;
-			}
-			const is_reconnected = connection.session?.status === "reconnecting";
-			if (connection.ws_old) {
-				// old ws connection must be closed after session_welcome message of new connection
-				connection.ws_old.close();
-				connection.ws_old = undefined;
-			}
-			connection.session = message.payload.session;
-			connection.transport = Transport.WebSocket(message.payload.session.id);
-			connection.onSessionWelcome(message, is_reconnected);
-		}
-		else if (Message.isSessionKeepalive(message)) {
-			// if we not getting any message in about 12 seconds, ws connection must be reconnected
-			connection.keepalive_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesn't received any message within ${connection.session.keepalive_timeout_seconds} seconds`), (connection.session.keepalive_timeout_seconds! + 2) * 1000);
-			connection.onSessionKeepalive(message);
-		}
-		else if (Message.isSessionReconnect(message)) {
-			connection.session = message.payload.session;
-			connection.ws_old = connection.ws;
-			connection.ws_old.onmessage = () => {};
-			connection.ws_old.onclose = () => {};
-
-			connection.ws = new WebSocket(message.payload.session.reconnect_url);
-			connection.ws.onmessage = onMessage;
-			connection.ws.onclose = onClose;
-
-			connection.onSessionReconnect(message);
-		}
-		else if (Message.isNotification(message)) {
-			connection.onNotification(message);
-		}
-		else if (Message.isRevocation(message)) {
-			connection.onRevocation(message);
-		}
-	}
-	async function onClose(e: CloseEvent) {
-		setTimeout(() => {
-			connection.ws = new WebSocket(Paths.eventSubWS);
-			connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
-			connection.ws.onmessage = onMessage;
-			connection.ws.onclose = onClose;
-		}, reconnect_ms);
-
-		connection.onClose(e.code, e.reason);
-	}
-
-	connection.network_timeout = setTimeout(() => giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
-	connection.ws.onopen = storeFirstConnectedTimestamp;
-	connection.ws.onmessage = onMessage;
-	connection.ws.onclose = onClose;
-
-	return connection;
+export function startWebSocket<S extends Authorization.Scope[]>(tokenData: Authorization.User<S>, reconnectMS?: number) {
+	return new Connection(tokenData, reconnectMS);
 }
 
 export type SubscriptionType =
@@ -104,9 +20,34 @@ export type SubscriptionType =
 	'websocket_connection_unused' | 'websocket_internal_error' | 'websocket_network_timeout' |
 	'websocket_network_error' | 'websocket_failed_to_reconnect';
 
-export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]> {
+interface ConnectionEvents {
+	/**
+	 * Calls on closing WebSocket
+	 * @param listener.code WebSocket connection close code
+	 * @param listener.reason WebSocket connection close reason
+	 */
+	close: (code: number, reason: string) => void;
+	/** Calls on getting any EventSub message, any specified message callback will be called **after** this callback */
+	message: (message: Message) => void;
+	/**
+	 * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
+	 * - For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `is_reconnected` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
+	 * @param listener.is_reconnected **DO NOT** subscribe to events if its `true`!
+	 */
+	session_welcome: (message: Message.SessionWelcome, isReconnected: boolean) => void;
+	/** Calls on getting `session_keepalive` message, these messages indicates that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#keepalive-message) */
+	session_keepalive: (message: Message.SessionKeepalive) => void;
+	/** Calls on getting `session_reconnect` message, these messages are sent if the edge server that the client is connected to needs to be swapped. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#reconnect-message) */
+	session_reconnect: (message: Message.SessionReconnect) => void;
+	/** Calls on getting `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
+	notification: (message: Message.Notification) => void;
+	/** Calls on getting `revocation` message, these messages are sent if Twitch revokes a subscription. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#revocation-message) */
+	revocation: (message: Message.Revocation) => void;
+}
+
+export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]> extends EventEmitter {
 	ws: WebSocket;
-	ws_old: WebSocket | undefined;
+	wsOld: WebSocket | undefined;
 	/** User access token data */
 	authorization: Authorization.User<S>;
 	/** EventSub session, do not use it **before** first `onSessionWelcome()` message */
@@ -114,54 +55,138 @@ export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]>
 	/** Defines the transport details that you want Twitch to use when sending you event notifications. */
 	transport!: Transport.WebSocket;
 
-	/** Returns connected timestamp of this websocket in ISO format (session_reconnect will reset this) */
+	/** Returns connected timestamp of this websocket in ISO format (`session_reconnect` will reset this) */
 	getConnectedTimestampISO(): string {
 		return this.session.connected_at;
 	}
-	/** Returns connected timestamp of this websocket (session_reconnect will reset this) */
+	/** Returns connected timestamp of this websocket (`session_reconnect` will reset this) */
 	getConnectedTimestamp(): number {
 		return new Date(this.getConnectedTimestampISO()).getTime();
 	}
-	/** Returns connected timestamp of this entire session in ISO format (session_reconnect will NOT reset this)  */
-	first_connected_timestamp_iso!: string;
-	/** Returns connected timestamp of this entire session in ISO format (session_reconnect will NOT reset this)  */
-	first_connected_timestamp!: number;
+	/** Returns connected timestamp of this entire session in ISO format (`session_reconnect` will NOT reset this)  */
+	firstConnectedTimestampISO!: string;
+	/** Returns connected timestamp of this entire session in ISO format (`session_reconnect` will NOT reset this)  */
+	firstConnectedTimestamp!: number;
+
+	/** If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500` */
+	reconnectMS: number = 500
 
 	/** ID of timer which closes connection if WebSocket isn't received any message within `session.keepalive_timeout_seconds`, becomes `undefined` if any message was received */
-	keepalive_timeout?: NodeJS.Timeout | number;
-	network_timeout?: NodeJS.Timeout | number;
+	keepaliveTimeout?: NodeJS.Timeout | number;
+	networkTimeout?: NodeJS.Timeout | number;
 
-	constructor(ws: WebSocket, authorization: Authorization.User<S>) {
-		this.ws = ws;
-		this.authorization = authorization;
+	private prevMessageIDs: Record<string, string> = {};
+
+	/**
+	 * Starts WebSocket for subscribing and getting EventSub events
+	 * - Reconnects in `reconnectMS`, if WebSocket was closed
+	 * - Reconnects immediately, if gets `session_reconnect` message
+	 * - When getting not first `session_welcome` message when `reconnectURL` is `false` or when recreating ws session (if your app is reopened or internet was down), please delete old events via `Request.DeleteEventSubSubscription`, you will need a id of subscription, store it somewhere
+	 * @param reconnectMS If less then `1`, WebSocket will be not reconnected after `onClose()`, default value is `500`
+	 */
+	constructor(tokenData: Authorization.User<S>, reconnectMS?: number) {
+		super();
+		this.authorization = tokenData;
+		if (reconnectMS) this.reconnectMS = reconnectMS;
+
+		this.ws = new WebSocket(Paths.eventSubWS);
+		this.networkTimeout = setTimeout(() => this.giveCloseCodeToClient(4005, `client didnt received session_welcome message within 10 seconds`), 10000);
+		this.ws.onopen = this.storeFirstConnectedTimestamp;
+
+		this.ws.onmessage = this.onMessage;
+		this.ws.onclose = this.onClose;
+	}
+	private onMessage = (e: MessageEvent) => {
+		if (this.keepaliveTimeout) {
+			clearTimeout(this.keepaliveTimeout);
+			delete this.keepaliveTimeout;
+		}
+
+		const message: Message = JSON.parse(e.data);
+
+		// do not handle same message, twitch can be unsure if you got the message smh
+		if (this.prevMessageIDs[message.metadata.message_type] === message.metadata.message_id)
+			return;
+		this.prevMessageIDs[message.metadata.message_type] = message.metadata.message_id;
+
+		this.emit("message", message);
+		if (Message.isSessionWelcome(message)) {
+			if (this.networkTimeout) {
+				clearTimeout(this.networkTimeout);
+				this.networkTimeout = undefined;
+			}
+			const isReconnected = this.session?.status === "reconnecting";
+			if (this.wsOld) {
+				// old ws connection must be closed after session_welcome message of new connection
+				this.wsOld.close();
+				this.wsOld = undefined;
+			}
+			this.session = message.payload.session;
+			this.transport = Transport.WebSocket(message.payload.session.id);
+			this.emit("session_welcome", message, isReconnected);
+		}
+		else if (Message.isSessionKeepalive(message)) {
+			// if we not getting any message in about 11 seconds, ws connection must be reconnected
+			this.keepaliveTimeout = setTimeout(() => this.giveCloseCodeToClient(4005, `client doesn't received any message within ${this.session.keepalive_timeout_seconds} seconds`), (this.session.keepalive_timeout_seconds! + 2) * 1000);
+			this.emit("session_keepalive", message);
+		}
+		else if (Message.isSessionReconnect(message)) {
+			this.session = message.payload.session;
+			this.wsOld = this.ws;
+			this.wsOld.onmessage = () => {};
+			this.wsOld.onclose = () => {};
+
+			this.ws = new WebSocket(message.payload.session.reconnect_url);
+			this.ws.onmessage = this.onMessage;
+			this.ws.onclose = this.onClose;
+
+			this.emit("session_reconnect", message);
+		}
+		else if (Message.isNotification(message)) {
+			this.emit("notification", message);
+		}
+		else if (Message.isRevocation(message))
+			this.emit("revocation", message);
+	}
+	private onClose = (e: CloseEvent) => {
+		setTimeout(() => {
+			this.ws = new WebSocket(Paths.eventSubWS);
+			this.networkTimeout = setTimeout(() => this.giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
+			this.ws.onmessage = this.onMessage;
+			this.ws.onclose = this.onClose;
+		}, this.reconnectMS);
+
+		this.emit("close", e.code, e.reason);
 	}
 
-	/**
-	 * Calls on closing WebSocket
-	 * @param code WebSocket connection close code
-	 * @param reason WebSocket connection close reason
-	 */
-	async onClose(code: number, reason: string) {}
-	/** Calls on getting any EventSub message, any specified message callback will be called **after** this callback */
-	async onMessage(message: Message) {}
-	/**
-	 * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
-	 * - For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `is_reconnected` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
-	 * @param is_reconnected **DO NOT** subscribe to events if its `true`!
-	 */
-	async onSessionWelcome(message: Message.SessionWelcome, is_reconnected: boolean) {}
-	/** Calls on getting `session_keepalive` message, these messages indicates that the WebSocket connection is healthy. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#keepalive-message) */
-	async onSessionKeepalive(message: Message.SessionKeepalive) {}
-	/** Calls on getting `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
-	async onNotification(message: Message.Notification) {}
-	/** Calls on getting `session_reconnect` message, these messages are sent if the edge server that the client is connected to needs to be swapped. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#reconnect-message) */
-	async onSessionReconnect(message: Message.SessionReconnect) {}
-	/** Calls on getting `revocation` message, these messages are sent if Twitch revokes a subscription. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#revocation-message) */
-	async onRevocation(message: Message.Revocation) {}
+	private storeFirstConnectedTimestamp(e: Event) {
+		const date = new Date();
+		this.firstConnectedTimestampISO = date.toISOString();
+		this.firstConnectedTimestamp = date.getTime();
+	}
+
+	private giveCloseCodeToClient(code: number = 1000, reason: string = "client disconnected") {
+		this.ws.onclose?.({ code, reason } as any);
+		this.ws.onclose = () => {};
+		this.ws.close();
+	}
+
+	override once<EventName extends keyof ConnectionEvents>(eventName: EventName, listener: ConnectionEvents[EventName]) {
+		return super.once(eventName, listener);
+	}
+	override on<EventName extends keyof ConnectionEvents>(eventName: EventName, listener: ConnectionEvents[EventName]) {
+		return super.on(eventName, listener);
+	}
+	override off<EventName extends keyof ConnectionEvents>(eventName: EventName, listener: ConnectionEvents[EventName]) {
+		return super.off(eventName, listener);
+	}
+	override emit<EventName extends keyof ConnectionEvents>(eventName: EventName, ...args: Parameters<ConnectionEvents[EventName]>) {
+		return super.emit(eventName, ...args);
+	}
 
 	/** Closes the connection with code `1000` */
 	async close() {
-		await this.onClose(1000, `client closed the connection`);
+		this.emit("close", 1000, `client closed the connection`);
 		this.ws.onclose = _ => {};
 		this.ws.onmessage = _ => {};
 		this.ws.close();
@@ -171,6 +196,7 @@ export namespace Connection {
 	export function is<S extends Authorization.Scope[]>(connection: any): connection is Connection<S> {
 		return connection.ws != null && connection.authorization != null;
 	}
+	export type EventName = "close" | "message" | "session_welcome" | "session_keepalive" | "notification" | "session_reconnect" | "revocation";
 }
 
 /** Definition of the subscription. */
@@ -620,6 +646,43 @@ export namespace Transport {
 /** Subscription-related parameters */
 export type Subscription<_Transport extends Transport = Transport> = Subscription.AutomodMessageHold<_Transport> | Subscription.AutomodMessageHoldV2<_Transport> | Subscription.AutomodMessageUpdate<_Transport> | Subscription.AutomodMessageUpdateV2<_Transport> | Subscription.AutomodSettingsUpdate<_Transport> | Subscription.AutomodTermsUpdate<_Transport> | Subscription.ChannelAdBreakBegin<_Transport> | Subscription.ChannelBan<_Transport> | Subscription.ChannelBitsUse<_Transport> | Subscription.ChannelCharityCampaignDonate<_Transport> | Subscription.ChannelCharityCampaignProgress<_Transport> | Subscription.ChannelCharityCampaignStart<_Transport> | Subscription.ChannelCharityCampaignStop<_Transport> | Subscription.ChannelChatClear<_Transport> | Subscription.ChannelChatClearUserMessages<_Transport> | Subscription.ChannelChatMessage<_Transport> | Subscription.ChannelChatMessageDelete<_Transport> | Subscription.ChannelChatNotification<_Transport> | Subscription.ChannelChatSettingsUpdate<_Transport> | Subscription.ChannelChatUserMessageHold<_Transport> | Subscription.ChannelChatUserMessageUpdate<_Transport> | Subscription.ChannelCheer<_Transport> | Subscription.ChannelFollow<_Transport> | Subscription.ChannelGoalBegin<_Transport> | Subscription.ChannelGoalEnd<_Transport> | Subscription.ChannelGoalProgress<_Transport> | Subscription.ChannelGuestStarGuestUpdate<_Transport> | Subscription.ChannelGuestStarSessionBegin<_Transport> | Subscription.ChannelGuestStarSessionEnd<_Transport> | Subscription.ChannelGuestStarSettingsUpdate<_Transport> | Subscription.ChannelHypeTrainBegin<_Transport> | Subscription.ChannelHypeTrainEnd<_Transport> | Subscription.ChannelHypeTrainProgress<_Transport> | Subscription.ChannelModerate<_Transport> | Subscription.ChannelModerateV2<_Transport> | Subscription.ChannelModeratorAdd<_Transport> | Subscription.ChannelModeratorRemove<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2<_Transport> | Subscription.ChannelPointsCustomRewardAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionUpdate<_Transport> | Subscription.ChannelPointsCustomRewardRemove<_Transport> | Subscription.ChannelPointsCustomRewardUpdate<_Transport> | Subscription.ChannelPollBegin<_Transport> | Subscription.ChannelPollEnd<_Transport> | Subscription.ChannelPollProgress<_Transport> | Subscription.ChannelPredictionBegin<_Transport> | Subscription.ChannelPredictionEnd<_Transport> | Subscription.ChannelPredictionLock<_Transport> | Subscription.ChannelPredictionProgress<_Transport> | Subscription.ChannelRaid<_Transport> | Subscription.ChannelSharedChatSessionBegin<_Transport> | Subscription.ChannelSharedChatSessionEnd<_Transport> | Subscription.ChannelSharedChatSessionUpdate<_Transport> | Subscription.ChannelShieldModeBegin<_Transport> | Subscription.ChannelShieldModeEnd<_Transport> | Subscription.ChannelShoutoutCreate<_Transport> | Subscription.ChannelShoutoutReceive<_Transport> | Subscription.ChannelSubscribe<_Transport> | Subscription.ChannelSubscriptionEnd<_Transport> | Subscription.ChannelSubscriptionGift<_Transport> | Subscription.ChannelSubscriptionMessage<_Transport> | Subscription.ChannelSuspiciousUserMessage<_Transport> | Subscription.ChannelSuspiciousUserUpdate<_Transport> | Subscription.ChannelUnban<_Transport> | Subscription.ChannelUnbanRequestCreate<_Transport> | Subscription.ChannelUnbanRequestResolve<_Transport> | Subscription.ChannelUpdate<_Transport> | Subscription.ChannelVipAdd<_Transport> | Subscription.ChannelVipRemove<_Transport> | Subscription.ChannelWarningAcknowledge<_Transport> | Subscription.ChannelWarningSend<_Transport> | Subscription.ConduitShardDisabled<_Transport> | Subscription.DropEntitlementGrant<_Transport> | Subscription.ExtensionBitsTransactionCreate<_Transport> | Subscription.StreamOffline<_Transport> | Subscription.StreamOnline<_Transport> | Subscription.UserAuthorizationGrant<_Transport> | Subscription.UserAuthorizationRevoke<_Transport> | Subscription.UserUpdate<_Transport> | Subscription.UserWhisperMessage;
 export namespace Subscription {
+	/**
+	 * Type|Description
+	 * -|-
+	 * `enabled`|The subscription is enabled.
+	 * `webhook_callback_verification_pending`|The subscription is pending verification of the specified callback URL.
+	 * `webhook_callback_verification_failed`|The specified callback URL failed verification.
+	 * `notification_failures_exceeded`|The notification delivery failure rate was too high.
+	 * `authorization_revoked`|The authorization was revoked for one or more users specified in the Condition object.
+	 * `moderator_removed`|The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
+	 * `user_removed`|One of the users specified in the Condition object was removed.
+	 * `version_removed`|The subscription to subscription type and version is no longer supported.
+	 * `beta_maintenance`|The subscription to the beta subscription type was removed due to maintenance.
+	 * `websocket_disconnected`|The client closed the connection.
+	 * `websocket_failed_ping_pong`|The client failed to respond to a ping message.
+	 * `websocket_received_inbound_traffic`|The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+	 * `websocket_connection_unused`|The client failed to subscribe to events within the required time.
+	 * `websocket_internal_error`|The Twitch WebSocket server experienced an unexpected error.
+	 * `websocket_network_timeout`|The Twitch WebSocket server timed out writing the message to the client.
+	 * `websocket_network_error`|The Twitch WebSocket server experienced a network error writing the message to the client.
+	 */
+	export type Status = 
+		"enabled" | 
+		"webhook_callback_verification_pending" | 
+		"webhook_callback_verification_failed" | 
+		"notification_failures_exceeded" | 
+		"authorization_revoked" | 
+		"moderator_removed" | 
+		"user_removed" | 
+		"version_removed" | 
+		"beta_maintenance" | 
+		"websocket_disconnected" |
+		"websocket_failed_ping_pong" |
+		"websocket_received_inbound_traffic" | 
+		"websocket_connection_unused" |
+		"websocket_internal_error" | 
+		"websocket_network_timeout" | 
+		"websocket_network_error";
 	export interface Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> {
 		/** The subscription type name. */
 		type: Type;
@@ -2161,12 +2224,31 @@ export namespace Subscription {
 /** An object that contains the message. */
 export type Payload = Payload.AutomodMessageHold | Payload.AutomodMessageHoldV2 | Payload.AutomodMessageUpdate | Payload.AutomodMessageUpdateV2 | Payload.AutomodSettingsUpdate | Payload.AutomodTermsUpdate | Payload.ChannelAdBreakBegin | Payload.ChannelBan | Payload.ChannelBitsUse | Payload.ChannelCharityCampaignDonate | Payload.ChannelCharityCampaignProgress | Payload.ChannelCharityCampaignStart | Payload.ChannelCharityCampaignStop | Payload.ChannelChatClear | Payload.ChannelChatClearUserMessages | Payload.ChannelChatMessage | Payload.ChannelChatMessageDelete | Payload.ChannelChatNotification | Payload.ChannelChatSettingsUpdate | Payload.ChannelChatUserMessageHold | Payload.ChannelChatUserMessageUpdate | Payload.ChannelCheer | Payload.ChannelFollow | Payload.ChannelGoalBegin | Payload.ChannelGoalEnd | Payload.ChannelGoalProgress | Payload.ChannelGuestStarGuestUpdate | Payload.ChannelGuestStarSessionBegin | Payload.ChannelGuestStarSessionEnd | Payload.ChannelGuestStarSettingsUpdate | Payload.ChannelHypeTrainBegin | Payload.ChannelHypeTrainEnd | Payload.ChannelHypeTrainProgress | Payload.ChannelModerate | Payload.ChannelModerateV2 | Payload.ChannelModeratorAdd | Payload.ChannelModeratorRemove | Payload.ChannelPointsAutomaticRewardRedemptionAdd | Payload.ChannelPointsAutomaticRewardRedemptionAddV2 | Payload.ChannelPointsCustomRewardAdd | Payload.ChannelPointsCustomRewardRedemptionAdd | Payload.ChannelPointsCustomRewardRedemptionUpdate | Payload.ChannelPointsCustomRewardRemove | Payload.ChannelPointsCustomRewardUpdate | Payload.ChannelPollBegin | Payload.ChannelPollEnd | Payload.ChannelPollProgress | Payload.ChannelPredictionBegin | Payload.ChannelPredictionEnd | Payload.ChannelPredictionLock | Payload.ChannelPredictionProgress | Payload.ChannelRaid | Payload.ChannelSharedChatSessionBegin | Payload.ChannelSharedChatSessionEnd | Payload.ChannelSharedChatSessionUpdate | Payload.ChannelShieldModeBegin | Payload.ChannelShieldModeEnd | Payload.ChannelShoutoutCreate | Payload.ChannelShoutoutReceive | Payload.ChannelSubscribe | Payload.ChannelSubscriptionEnd | Payload.ChannelSubscriptionGift | Payload.ChannelSubscriptionMessage | Payload.ChannelSuspiciousUserMessage | Payload.ChannelSuspiciousUserUpdate | Payload.ChannelUnban | Payload.ChannelUnbanRequestCreate | Payload.ChannelUnbanRequestResolve | Payload.ChannelUpdate | Payload.ChannelVipAdd | Payload.ChannelVipRemove | Payload.ChannelWarningAcknowledge | Payload.ChannelWarningSend | Payload.ConduitShardDisabled | Payload.DropEntitlementGrant | Payload.ExtensionBitsTransactionCreate | Payload.StreamOffline | Payload.StreamOnline | Payload.UserAuthorizationGrant | Payload.UserAuthorizationRevoke | Payload.UserUpdate | Payload.UserWhisperMessage;
 export namespace Payload {
-	export interface Base<Subscription_ extends Subscription = Subscription, Status extends string = "enabled"> {
+	export interface Base<Subscription_ extends Subscription = Subscription, Status extends Subscription.Status = "enabled"> {
 		/** An object that contains information about your subscription. */
 		subscription: Subscription_ & {
 			/** An ID that uniquely identifies this subscription. */
 			id: string;
-			/** The subscription's status. */
+			/** The subscription's status. The subscriber receives events only for enabled subscriptions.
+			 * Type|Description
+			 * -|-
+			 * `enabled`|The subscription is enabled.
+			 * `webhook_callback_verification_pending`|The subscription is pending verification of the specified callback URL.
+			 * `webhook_callback_verification_failed`|The specified callback URL failed verification.
+			 * `notification_failures_exceeded`|The notification delivery failure rate was too high.
+			 * `authorization_revoked`|The authorization was revoked for one or more users specified in the Condition object.
+			 * `moderator_removed`|The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
+			 * `user_removed`|One of the users specified in the Condition object was removed.
+			 * `version_removed`|The subscription to subscription type and version is no longer supported.
+			 * `beta_maintenance`|The subscription to the beta subscription type was removed due to maintenance.
+			 * `websocket_disconnected`|The client closed the connection.
+			 * `websocket_failed_ping_pong`|The client failed to respond to a ping message.
+			 * `websocket_received_inbound_traffic`|The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+			 * `websocket_connection_unused`|The client failed to subscribe to events within the required time.
+			 * `websocket_internal_error`|The Twitch WebSocket server experienced an unexpected error.
+			 * `websocket_network_timeout`|The Twitch WebSocket server timed out writing the message to the client.
+			 * `websocket_network_error`|The Twitch WebSocket server experienced a network error writing the message to the client.
+			 */
 			status: Status;
 			/** The event's cost. See [Subscription limits](https://dev.twitch.tv/docs/eventsub/manage-subscriptions#subscription-limits). */
 			cost: number;

@@ -828,31 +828,27 @@ export interface GetEventSubSubscriptions extends Base {
 	data: EventSub.Subscription<EventSub.Transport.WebHook | EventSub.Transport.WebSocket.ConnectedAndDisconnected> & {
 		/** An ID that identifies the subscription. */
 		id: string;
-		/**
-		 * The subscription's status. The subscriber receives events only for enabled subscriptions. Possible values are:
-		 * - `enabled` — The subscription is enabled.
-		 * - `webhook_callback_verification_pending` — The subscription is pending verification of the specified callback URL.
-		 * - `webhook_callback_verification_failed` — The specified callback URL failed verification.
-		 * - `notification_failures_exceeded` — The notification delivery failure rate was too high.
-		 * - `authorization_revoked` — The authorization was revoked for one or more users specified in the Condition object.
-		 * - `moderator_removed` — The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
-		 * - `user_removed` — One of the users specified in the Condition object was removed.
-		 * - `version_removed` — The subscription to subscription type and version is no longer supported.
-		 * - `beta_maintenance` — The subscription to the beta subscription type was removed due to maintenance.
-		 * - `websocket_disconnected` — The client closed the connection.
-		 * - `websocket_failed_ping_pong` — The client failed to respond to a ping message.
-		 * - `websocket_received_inbound_traffic` — The client sent a non-pong message.
-		 * - `websocket_connection_unused` — The client failed to subscribe to events within the required time.
-		 * - `websocket_internal_error` — The Twitch WebSocket server experienced an unexpected error.
-		 * - `websocket_network_timeout` — The Twitch WebSocket server timed out writing the message to the client.
-		 * - `websocket_network_error` — The Twitch WebSocket server experienced a network error writing the message to the client.
+		/** The subscription's status. The subscriber receives events only for enabled subscriptions.
+		 * Type|Description
+		 * -|-
+		 * `enabled`|The subscription is enabled.
+		 * `webhook_callback_verification_pending`|The subscription is pending verification of the specified callback URL.
+		 * `webhook_callback_verification_failed`|The specified callback URL failed verification.
+		 * `notification_failures_exceeded`|The notification delivery failure rate was too high.
+		 * `authorization_revoked`|The authorization was revoked for one or more users specified in the Condition object.
+		 * `moderator_removed`|The moderator that authorized the subscription is no longer one of the broadcaster's moderators.
+		 * `user_removed`|One of the users specified in the Condition object was removed.
+		 * `version_removed`|The subscription to subscription type and version is no longer supported.
+		 * `beta_maintenance`|The subscription to the beta subscription type was removed due to maintenance.
+		 * `websocket_disconnected`|The client closed the connection.
+		 * `websocket_failed_ping_pong`|The client failed to respond to a ping message.
+		 * `websocket_received_inbound_traffic`|The client sent a non-pong message. Clients may only send pong messages (and only in response to a ping message).
+		 * `websocket_connection_unused`|The client failed to subscribe to events within the required time.
+		 * `websocket_internal_error`|The Twitch WebSocket server experienced an unexpected error.
+		 * `websocket_network_timeout`|The Twitch WebSocket server timed out writing the message to the client.
+		 * `websocket_network_error`|The Twitch WebSocket server experienced a network error writing the message to the client.
 		 */
-		status:
-			'enabled' | 'webhook_callback_verification_pending' | 'webhook_callback_verification_failed' |
-			'notification_failures_exceeded' | 'authorization_revoked' | 'moderator_removed' |
-			'user_removed' | 'version_removed' | 'beta_maintenance' | 'websocket_disconnected' |
-			'websocket_failed_ping_pong' | 'websocket_received_inbound_traffic' | 'websocket_connection_unused' |
-			'websocket_internal_error' | 'websocket_network_timeout' | 'websocket_network_error';
+		status: EventSub.Subscription.Status;
 		/** The date and time (in RFC3339 format) of when the subscription was created. */
 		created_at: string;
 		/** The amount that the subscription counts against your limit. [Read More](https://dev.twitch.tv/docs/eventsub/manage-subscriptions/#subscription-limits) */
@@ -1768,7 +1764,7 @@ export namespace OAuth2Token {
 		/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
 		refresh_token: string;
 		/** Authorization scopes which contains this access token */
-		scope: S;
+		scopes: S;
 		/** Type of token */
 		token_type: "bearer";
 	}
@@ -1780,7 +1776,7 @@ export namespace OAuth2Token {
 		/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
 		refresh_token: string;
 		/** Authorization scopes which contains this access token */
-		scope: S;
+		scopes: S;
 		/** Type of token */
 		token_type: "bearer";
 	}
