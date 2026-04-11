@@ -1844,7 +1844,7 @@ export namespace OAuth2Token {
 	 * @param client_id Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID.
 	 * @param client_secret Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client secret.
 	 * @param redirect_uri Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) redirect URI.
-	 * @param code The code that the `/authorize` response returned in the `code` query parameter.
+	 * @param code The code that the response returned after user authorized app from response `Authorization.URL.Code` in the `code` query parameter.
 	 */
 	export async function AuthorizationCode<S extends Authorization.Scope[]>(client_id: string, client_secret: string, redirect_uri: string, code: string): Promise<ResponseBody.OAuth2Token.AuthorizationCode<S> | ResponseBody.Error> {
 		try {
@@ -1853,7 +1853,12 @@ export namespace OAuth2Token {
 			}).setSearch({ client_id, client_secret, redirect_uri, code, grant_type: "authorization_code" }).fetch();
 			const response: any = await getResponse(request);
 			if (request.ok) {
-				if (!response.scopes) response.scopes = [];
+				if (response.scope) {
+					response.scopes = response.scope;
+					delete response.scope;
+				}
+				else
+					response.scopes = [];
 			}
 			return response;
 		} catch(e) { return getError(e) }
@@ -1875,7 +1880,12 @@ export namespace OAuth2Token {
 			}).setSearch({ client_id, client_secret, refresh_token, grant_type: "refresh_token" }).fetch();
 			const response: any = await getResponse(request);
 			if (request.ok) {
-				if (!response.scopes) response.scopes = [];
+				if (response.scope) {
+					response.scopes = response.scope;
+					delete response.scope;
+				}
+				else
+					response.scopes = [];
 			}
 			return response;
 		} catch(e) { return getError(e) }
