@@ -1904,8 +1904,10 @@ function getError<ResponseBodyError_ = ResponseBody.Error>(error: unknown) {
 
 	if (message.startsWith(`#`)) {
 		const index = message.indexOf(' ');
-		status = parseInt(message.substring(2, index));
-		message = message.substring(index + 1);
+		if (index > -1) {
+			status = parseInt(message.substring(1, index));
+			message = message.substring(index + 1);
+		}
 	}
 
 	return { ok, status, message } as ResponseBodyError_;
