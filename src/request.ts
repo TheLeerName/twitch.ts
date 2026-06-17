@@ -1892,7 +1892,7 @@ export namespace OAuth2Token {
 	}
 }
 
-function getError<ResponseBodyError_ = ResponseBody.Error>(error: unknown) {
+export function getError<ResponseBodyError_ = ResponseBody.Error>(error: unknown) {
 	var message: string = `Unknown error`;
 	var ok = false;
 	var status = 400;
@@ -1913,7 +1913,7 @@ function getError<ResponseBodyError_ = ResponseBody.Error>(error: unknown) {
 	return { ok, status, message } as ResponseBodyError_;
 }
 /** @param data0_to_data `response.data = response.data[0];` */
-async function getResponse<ResponseBody_ = ResponseBody.Base>(request: Response, data0_to_data?: boolean) {
+export async function getResponse<ResponseBody_ = ResponseBody.Base>(request: Response, data0_to_data?: boolean) {
 	const response: any = await request.json();
 	response.ok = request.ok;
 	response.status = request.status;
@@ -1921,7 +1921,7 @@ async function getResponse<ResponseBody_ = ResponseBody.Base>(request: Response,
 	return response as ResponseBody_;
 }
 
-class FetchBuilder {
+export class FetchBuilder {
 	readonly url: string = "";
 	readonly search: Record<string, string | string[]> = {};
 	readonly hash: Record<string, string | string[]> = {};

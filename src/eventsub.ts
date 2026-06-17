@@ -20,7 +20,7 @@ export type SubscriptionType =
 	'websocket_connection_unused' | 'websocket_internal_error' | 'websocket_network_timeout' |
 	'websocket_network_error' | 'websocket_failed_to_reconnect';
 
-interface ConnectionEvents {
+export interface ConnectionEvents {
 	/**
 	 * Calls on closing WebSocket
 	 * @param listener.code WebSocket connection close code
