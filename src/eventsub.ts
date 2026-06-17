@@ -185,7 +185,7 @@ export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]>
 	}
 
 	/** Closes the connection with code `1000` */
-	async close() {
+	close() {
 		this.emit("close", 1000, `client closed the connection`);
 		this.ws.onclose = _ => {};
 		this.ws.onmessage = _ => {};
