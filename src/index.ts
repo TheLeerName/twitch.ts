@@ -1,14 +1,26 @@
 import * as ResponseBody from "./responsebody";
 
-export const Paths: {
-	apiHelix: string;
-	idOAuth2: string;
-	eventSubWS: string;
-} = {
-	apiHelix: "https://api.twitch.tv/helix",
-	idOAuth2: "https://id.twitch.tv/oauth2",
-	eventSubWS: "wss://eventsub.wss.twitch.tv/ws"
-};
+export namespace Options {
+	export let apiHelixPath = "https://api.twitch.tv/helix";
+	export let idOAuth2Path = "https://id.twitch.tv/oauth2";
+	export let eventSubWSPath = "wss://eventsub.wss.twitch.tv/ws";
+	/** Change this with `setTwitchCLIMode` */
+	export let twitchCLIMode = false;
+	/** https://dev.twitch.tv/docs/cli */
+	export function setTwitchCLIMode(twitchCLIMode: boolean) {
+		Options.twitchCLIMode = twitchCLIMode;
+		if (twitchCLIMode) {
+			Options.apiHelixPath = "http://127.0.0.1:8080/mock";
+			Options.idOAuth2Path = "http://127.0.0.1:8080/auth";
+			Options.eventSubWSPath = "ws://127.0.0.1:8080/ws";
+		}
+		else {
+			Options.apiHelixPath = "https://api.twitch.tv/helix";
+			Options.idOAuth2Path = "https://id.twitch.tv/oauth2";
+			Options.eventSubWSPath = "wss://eventsub.wss.twitch.tv/ws";
+		}
+	}
+}
 
 export type Authorization<S extends Authorization.Scope[] = Authorization.Scope[]> = Authorization.App<S> | Authorization.User<S>;
 export namespace Authorization {
@@ -145,7 +157,7 @@ export namespace Authorization {
 		 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
 		 */
 		export function Token(client_id: string, redirect_uri: string, scopes?: Scope[], force_verify: boolean = false, state?: string): string {
-			var url = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+			var url = `${Options.idOAuth2Path}/authorize?response_type=token&client_id=${client_id}&redirect_uri=${redirect_uri}`;
 			if (scopes && scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
 			if (force_verify) url += `&force_verify=true`;
 			if (state) url += `&state=${state}`;
@@ -162,7 +174,7 @@ export namespace Authorization {
 		 * @param state Although optional, you are **strongly encouraged** to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the state parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request.
 		 */
 		export function Code(client_id: string, redirect_uri: string, scopes?: Scope[], force_verify: boolean = false, state?: string): string {
-			var url = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`;
+			var url = `${Options.idOAuth2Path}/authorize?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`;
 			if (scopes && scopes.length > 0) url += `&scope=${encodeURI((scopes ?? []).join(' '))}`;
 			if (force_verify) url += `&force_verify=true`;
 			if (state) url += `&state=${state}`;

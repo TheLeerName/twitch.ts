@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:stream";
-import { Authorization, Paths } from ".";
+import { Authorization, Options } from ".";
 
 /**
  * Starts WebSocket for subscribing and getting EventSub events
@@ -89,7 +89,7 @@ export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]>
 		this.authorization = tokenData;
 		if (reconnectMS) this.reconnectMS = reconnectMS;
 
-		this.ws = new WebSocket(Paths.eventSubWS);
+		this.ws = new WebSocket(Options.eventSubWSPath);
 		this.networkTimeout = setTimeout(() => this.giveCloseCodeToClient(4005, `client didnt received session_welcome message within 10 seconds`), 10000);
 		this.ws.onopen = this.storeFirstConnectedTimestamp;
 
@@ -150,7 +150,7 @@ export class Connection<S extends Authorization.Scope[] = Authorization.Scope[]>
 	}
 	private onClose = (e: CloseEvent) => {
 		setTimeout(() => {
-			this.ws = new WebSocket(Paths.eventSubWS);
+			this.ws = new WebSocket(Options.eventSubWSPath);
 			this.networkTimeout = setTimeout(() => this.giveCloseCodeToClient(4005, `client doesnt received session_welcome message within 10 seconds`), 10000);
 			this.ws.onmessage = this.onMessage;
 			this.ws.onclose = this.onClose;

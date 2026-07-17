@@ -1756,19 +1756,7 @@ export namespace OAuth2Token {
 		/** Type of token */
 		token_type: "bearer";
 	}
-	export interface AuthorizationCode<S extends Authorization.Scope[]> extends Base {
-		/** User access token gotten with authorization code grant flow */
-		access_token: string;
-		/** How long, in seconds, the access token is valid for */
-		expires_in: number;
-		/** Token to use in `Request.OAuth2Token.RefreshToken` when access token expires */
-		refresh_token: string;
-		/** Authorization scopes which contains this access token */
-		scopes: S;
-		/** Type of token */
-		token_type: "bearer";
-	}
-	export interface RefreshToken<S extends Authorization.Scope[]> extends Base {
+	export interface AuthorizationCode<S extends Authorization.Scope[] = Authorization.Scope[]> extends Base {
 		/** User access token gotten with authorization code grant flow */
 		access_token: string;
 		/** How long, in seconds, the access token is valid for */
@@ -1782,13 +1770,26 @@ export namespace OAuth2Token {
 	}
 }
 
-export interface Error extends Base<false, 400 | 401 | 404 | 408 | 409 | 410 | 422 | 425 | 429 | 500> {
-	/** The error message of request. */
-	message: string;
+export interface Error extends globalThis.Error {
+	/** The code status of request. */
+	status: 400 | 401 | 404 | 408 | 409 | 410 | 422 | 425 | 429 | 500;
+	/** The code status of request. */
+	ok: false;
 }
 export namespace Error {
+	export function makeFromGlobalError(error: globalThis.Error, status: Error["status"]): Error {
+		(error as Error).status = status;
+		(error as Error).ok = false;
+		return error as Error;
+	}
 	export interface OAuth2Validate<Token extends string = string> extends Error {
 		/** The access token you specified in first argument of `Request.OAuth2Validate` */
 		token: Token;
+	}
+	export function makeFromGlobalError_OAuth2Validate<Token extends string = string>(error: globalThis.Error, status: Error["status"], token: Token): Error.OAuth2Validate {
+		(error as Error.OAuth2Validate).status = status;
+		(error as Error.OAuth2Validate).ok = false;
+		(error as Error.OAuth2Validate).token = token;
+		return error as Error.OAuth2Validate;
 	}
 }
