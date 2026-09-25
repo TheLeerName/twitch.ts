@@ -36,3 +36,4 @@ export interface Response<ResponseJson> extends globalThis.Response {
 import * as StartCommercial from "./channels/commercial/post";
 import * as GetAdSchedule from "./channels/ads/get";
 import * as SnoozeNextAd from "./channels/ads/schedule/snooze/post";
+import * as GetExtensionAnalytics from "./analytics/extensions/get";
