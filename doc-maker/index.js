@@ -194,6 +194,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
+		tds[0].textContent = tds[0].textContent.replaceAll(/ +/g, "\t");
 		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
 		fieldDeclaration += tds[0].textContent;
 		fieldDeclaration += tds[2].textContent === "Yes" ? ":" : "?:";
