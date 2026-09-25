@@ -1,6 +1,9 @@
-node_modules/
-package-lock.json
+/node_modules/
+/package-lock.json
 
-dist/types/
-dist/*.js
-data.json
+/dist/types/
+/dist/*.js
+/data.json
+
+/doc-maker/node_modules/
+/doc-maker/package-lock.json
