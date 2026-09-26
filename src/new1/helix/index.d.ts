@@ -65,3 +65,4 @@ import * as GetChatSettings from "./chat/settings/get";
 import * as GetSharedChatSession from "./shared_chat/session/get";
 import * as GetUserEmotes from "./chat/emotes/user/get";
 import * as UpdateChatSettings from "./chat/settings/patch";
+import * as SendChatAnnouncement from "./chat/announcements/post";
