@@ -68,3 +68,4 @@ import * as UpdateChatSettings from "./chat/settings/patch";
 import * as SendChatAnnouncement from "./chat/announcements/post";
 import * as SendShoutout from "./chat/shoutouts/post";
 import * as SendChatMessage from "./chat/messages/post";
+import * as GetPinnedChatMessage from "./chat/pins/get";
