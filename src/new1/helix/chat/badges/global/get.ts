@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import { Options, Helix } from "../../../..";
 
 export interface Authentication {
 	/**
@@ -18,12 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
-	/** The ID of the broadcaster whose chat badges you want to get. */
-	broadcaster_id: string;
-}
-
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Authentication & Helix.RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of chat badges. The list is sorted in ascending order by `set_id`, and within a set, the list is sorted in ascending order by `id`. */
@@ -47,29 +42,25 @@ export interface ResponseBody {
 			/** The action to take when clicking on the badge. Set to `null` if no action is specified. */
 			click_action: string | null;
 			/** The URL to navigate to when clicking on the badge. Set to `null` if no URL is specified. */
-			click_url: string | null;
+			click_url: null;
 		}[];
 	}[];
 }
 
 /**
- * ## [Get Channel Chat Badges](https://dev.twitch.tv/docs/api/reference/#get-channel-chat-badges)
- * Gets the broadcaster’s list of custom chat badges. The list is empty if the broadcaster hasn’t created custom chat badges. For information about custom badges, see [subscriber badges](https://help.twitch.tv/s/article/subscriber-badge-guide) and [Bits badges](https://help.twitch.tv/s/article/custom-bit-badges-guide).
+ * ## [Get Global Chat Badges](https://dev.twitch.tv/docs/api/reference/#get-global-chat-badges)
+ * Gets Twitch’s list of chat badges, which users may use in any channel’s chat room. For information about chat badges, see [Twitch Chat Badges Guide](https://help.twitch.tv/s/article/twitch-chat-badges-guide).
 
  * ### Response Codes
  * Code|Description
  * -|-
- * 200 OK|Successfully retrieved the broadcaster’s custom chat badges.
- * 400 Bad Request|The `broadcaster_id` query parameter is required.
+ * 200 OK|Successfully retrieved the list of global chat badges.
  * 401 Unauthorized|The Authorization header is required and must specify a valid app access token or user access token.
  * ㅤ|The OAuth token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
 export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/badges", Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
+	const url = new Helix.URL(params.apiPath ?? "chat/badges/global", Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "GET",
 		headers: {
