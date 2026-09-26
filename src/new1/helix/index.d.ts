@@ -122,3 +122,4 @@ export * as CheckAutoModStatus from "./moderation/enforcements/status/post";
 export * as ManageHeldAutoModMessages from "./moderation/automod/message/post";
 export * as GetAutoModSettings from "./moderation/automod/settings/get";
 export * as UpdateAutoModSettings from "./moderation/automod/settings/put";
+export * as GetBannedUsers from "./moderation/banned/get";
