@@ -87,6 +87,7 @@ export async function fetch(params: RequestParameters): Promise<Helix.Response<u
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
+			"content-type": "application/json",
 		},
 		signal: params.signal,
 		body: JSON.stringify({

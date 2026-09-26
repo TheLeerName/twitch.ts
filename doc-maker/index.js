@@ -442,6 +442,8 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	addTextToOutput(`\t\theaders: {`);
 	addTextToOutput(`\t\t\t"client-id": params.client_id,`);
 	addTextToOutput(`\t\t\tauthorization: params.authorization,`);
+	if (requestBody.length > 0)
+		addTextToOutput(`\t\t\t"content-type": "application/json",`);
 	addTextToOutput(`\t\t},`);
 	addTextToOutput(`\t\tsignal: params.signal,`);
 	if (requestBody.length > 0) {
