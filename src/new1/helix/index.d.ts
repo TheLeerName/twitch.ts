@@ -120,3 +120,4 @@ export * as UpdateGuestStarSlotSettings from "./guest_star/slot_settings/patch";
 export * as GetHypeTrainStatus from "./hypetrain/status/get";
 export * as CheckAutoModStatus from "./moderation/enforcements/status/post";
 export * as ManageHeldAutoModMessages from "./moderation/automod/message/post";
+export * as GetAutoModSettings from "./moderation/automod/settings/get";
