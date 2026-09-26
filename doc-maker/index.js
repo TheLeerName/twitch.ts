@@ -489,8 +489,7 @@ async function main() {
 		fs.mkdirSync(outputFileNameWithoutExt, {recursive: true});
 	outputFileNameWithoutExt += "/" + method.toLowerCase();
 
-	fs.writeFileSync(outputFileNameWithoutExt + ".ts", "");
-	addTextToOutput(`import { Options, Helix } from "../${url.replaceAll(/[\w_]+/g, "..")}";`);
+	fs.writeFileSync(outputFileNameWithoutExt + ".ts", `import { Options, Helix } from "../${url.replaceAll(/[\w_]+/g, "..")}";`);
 	makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText);
 	const requestQueryParameters = makeRequestQueryParameters(requestQueryParametersHTML);
 	const requestBody = makeRequestBody(requestBodyHTML);

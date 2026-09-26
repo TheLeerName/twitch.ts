@@ -1,4 +1,3 @@
-
 import { Options, Helix } from "../../..";
 
 export interface Authentication {
