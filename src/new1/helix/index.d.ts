@@ -55,3 +55,5 @@ import * as UpdateCustomReward from "./channel_points/custom_rewards/patch";
 import * as UpdateRedemptionStatus from "./channel_points/custom_rewards/redemptions/patch";
 import * as GetCharityCampaign from "./charity/campaigns/get";
 import * as GetCharityCampaignDonations from "./charity/donations/get";
+import * as GetChatters from "./chat/chatters/get";
+import * as GetChannelEmotes from "./chat/emotes/get";
