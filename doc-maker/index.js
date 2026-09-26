@@ -194,7 +194,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
-		tds[0].textContent = tds[0].textContent.replaceAll(/ +/g, "\t");
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
 		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
 		fieldDeclaration += tds[0].textContent;
 		fieldDeclaration += tds[2].textContent === "Yes" ? ":" : "?:";
@@ -259,7 +259,7 @@ function makeRequestBody(requestBodyHTML) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
-		tds[0].textContent = tds[0].textContent.replaceAll(/ +/g, "\t");
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
 		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
 		if (tds.length === 3) {
 			fieldDeclaration += tds[0].textContent + ":";
@@ -337,7 +337,7 @@ function makeRequestParameters(requestQueryParameters, requestBody) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
-		tds[0].textContent = tds[0].textContent.replaceAll(/ +/g, "\t");
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
 		fieldDeclaration += tds[0].textContent + ":";
 
 		const tds_1_textlower = tds[1].textContent.toLowerCase();
