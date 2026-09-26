@@ -116,3 +116,4 @@ export * as DeleteGuestStarInvite from "./guest_star/invites/delete";
 export * as AssignGuestStarSlot from "./guest_star/slot/post";
 export * as UpdateGuestStarSlot from "./guest_star/slot/patch";
 export * as DeleteGuestStarSlot from "./guest_star/slot/delete";
+export * as UpdateGuestStarSlotSettings from "./guest_star/slot_settings/patch";
