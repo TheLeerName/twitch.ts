@@ -77,3 +77,4 @@ import * as UpdateUserChatColor from "./chat/color/put";
 import * as CreateClip from "./clips/post";
 import * as CreateClipFromVOD from "./videos/clips/post";
 import * as GetClips from "./clips/get";
+import * as GetClipsDownload from "./clips/downloads/get";
