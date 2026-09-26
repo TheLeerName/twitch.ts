@@ -41,3 +41,4 @@ import * as GetGameAnalytics from "./analytics/games/get";
 import * as GetBitsLeaderboard from "./bits/leaderboard/get";
 import * as GetCheermotes from "./bits/cheermotes/get";
 import * as GetCustomPowerup from "./bits/custom_power_ups/get";
+import * as GetExtensionTransactions from "./extensions/transactions/get";
