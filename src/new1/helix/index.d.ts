@@ -88,3 +88,4 @@ import * as GetContentClassificationLabels from "./content_classification_labels
 import * as GetDropsEntitlements from "./entitlements/drops/get";
 import * as UpdateDropsEntitlements from "./entitlements/drops/patch";
 import * as GetExtensionConfigurationSegment from "./extensions/configurations/get";
+import * as SetExtensionConfigurationSegment from "./extensions/configurations/put";
