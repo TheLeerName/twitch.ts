@@ -96,3 +96,4 @@ import * as GetExtensionSecrets from "./extensions/jwt/secrets/get";
 import * as CreateExtensionSecret from "./extensions/jwt/secrets/post";
 import * as SendExtensionChatMessage from "./extensions/chat/post";
 import * as GetExtensions from "./extensions/get";
+import * as GetReleasedExtensions from "./extensions/released/get";
