@@ -129,3 +129,4 @@ export * as GetUnbanRequests from "./moderation/unban_requests/get";
 export * as ResolveUnbanRequests from "./moderation/unban_requests/patch";
 export * as GetBlockedTerms from "./moderation/blocked_terms/get";
 export * as AddBlockedTerm from "./moderation/blocked_terms/post";
+export * as RemoveBlockedTerm from "./moderation/blocked_terms/delete";
