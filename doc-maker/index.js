@@ -404,25 +404,27 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 			addTextToOutput(line.length > 0 ? ` * ${line}\n` : "");
 	}
 
-	addTextToOutput(` * ### Response Codes`);
-	const dom = new JSDOM(responseCodesHTML, "application/xhtml+xml");
-	const ths = dom.window.document.querySelectorAll("table thead tr th");
-	addTextToOutput(` * ${Array.from(ths).map(th => th.textContent).join("|")}`);
-	addTextToOutput(` * ${Array.from(Array(ths.length), _ => "-").join("|")}`);
-	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
-		let code = tr.children[0];
-		const description = tr.children[1];
+	if (responseCodesHTML.length > 0) {
+		addTextToOutput(` * ### Response Codes`);
+		const dom = new JSDOM(responseCodesHTML, "application/xhtml+xml");
+		const ths = dom.window.document.querySelectorAll("table thead tr th");
+		addTextToOutput(` * ${Array.from(ths).map(th => th.textContent).join("|")}`);
+		addTextToOutput(` * ${Array.from(Array(ths.length), _ => "-").join("|")}`);
+		for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
+			let code = tr.children[0];
+			const description = tr.children[1];
 
-		if (description.childNodes) {
-			const descriptionLines = [];
-			addDescriptionLines(description, descriptionLines, descriptionLines.length);
-			for (const line of descriptionLines) {
-				addTextToOutput(` * ${code?.textContent ?? "ㅤ"}|${line.startsWith("- ") ? line.substring(2) : line}`);
-				code = null;
+			if (description.childNodes) {
+				const descriptionLines = [];
+				addDescriptionLines(description, descriptionLines, descriptionLines.length);
+				for (const line of descriptionLines) {
+					addTextToOutput(` * ${code?.textContent ?? "ㅤ"}|${line.startsWith("- ") ? line.substring(2) : line}`);
+					code = null;
+				}
 			}
+			else
+				addTextToOutput(` * ${code.textContent}|${description.textContent}`);
 		}
-		else
-			addTextToOutput(` * ${code.textContent}|${description.textContent}`);
 	}
 
 	addTextToOutput(` */`);
