@@ -103,3 +103,5 @@ import * as CreateEventSubSubscription from "./eventsub/subscriptions/post";
 import * as DeleteEventSubSubscription from "./eventsub/subscriptions/delete";
 import * as GetEventSubSubscriptions from "./eventsub/subscriptions/get";
 import * as GetTopGames from "./games/top/get";
+import * as GetGames from "./games/get";
+import * as GetCreatorGoals from "./goals/get";
