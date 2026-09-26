@@ -105,3 +105,4 @@ import * as GetEventSubSubscriptions from "./eventsub/subscriptions/get";
 import * as GetTopGames from "./games/top/get";
 import * as GetGames from "./games/get";
 import * as GetCreatorGoals from "./goals/get";
+import * as GetChannelGuestStarSettings from "./guest_star/channel_settings/get";
