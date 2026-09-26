@@ -44,3 +44,4 @@ import * as GetCustomPowerup from "./bits/custom_power_ups/get";
 import * as GetExtensionTransactions from "./extensions/transactions/get";
 import * as GetChannelInformation from "./channels/get";
 import * as ModifyChannelInformation from "./channels/patch";
+import * as GetChannelEditors from "./channels/editors/get";
