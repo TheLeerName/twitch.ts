@@ -110,3 +110,4 @@ import * as UpdateChannelGuestStarSettings from "./guest_star/channel_settings/p
 import * as GetGuestStarSession from "./guest_star/session/get";
 import * as CreateGuestStarSession from "./guest_star/session/post";
 import * as EndGuestStarSession from "./guest_star/session/delete";
+import * as GetGuestStarInvites from "./guest_star/invites/get";
