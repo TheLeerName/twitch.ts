@@ -23,29 +23,26 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. */
 	moderator_id: string;
-	/** The ID of the pinned message to update. */
+	/** The ID of the message to unpin. */
 	message_id: string;
-	/** **Integer**. The new number of seconds the message should remain pinned, starting from now. Minimum: 30. Maximum: 1800. If not specified, the message will be pinned until the stream ends. */
-	duration_seconds?: number;
 }
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
 /**
- * ## [Update Pinned Chat Message](https://dev.twitch.tv/docs/api/reference/#update-pinned-chat-message)
- * Updates the duration of an existing pinned chat message.
+ * ## [Unpin Chat Message](https://dev.twitch.tv/docs/api/reference/#unpin-chat-message)
+ * **NEW** Unpins a pinned chat message from the specified broadcaster’s chat room.
 
  * ### Response Codes
  * Code|Description
  * -|-
- * 204 No Content|Successfully updated the pinned message.
- * 400 Bad Request|A required query parameter is missing or invalid.
- * ㅤ|The `duration_seconds` value is invalid.
+ * 204 No Content|Successfully unpinned the message.
+ * 400 Bad Request|A required query parameter is missing.
  * 401 Unauthorized|The Authorization header is required and must specify a user access token or app access token.
  * ㅤ|The access token must include the **moderator:manage:chat_messages** scope.
- * 403 Forbidden|The user does not have permission to update pinned messages in this channel.
+ * 403 Forbidden|The user does not have permission to unpin messages in this channel.
  * 404 Not Found|The specified pinned message was not found.
- * 429 Too Many Requests|The rate limit for updating pinned messages has been exceeded.
+ * 429 Too Many Requests|The rate limit for unpinning messages has been exceeded.
  */
 export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
 	const url = new Helix.URL(params.apiPath ?? "chat/pins", Options.apiHelixPath);
@@ -53,10 +50,9 @@ export async function fetch(params: RequestParameters): Promise<Helix.Response<u
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,
 		message_id: params.message_id,
-		duration_seconds: params.duration_seconds,
 	});
 	return global.fetch(url as any, {
-		method: "PATCH",
+		method: "DELETE",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
