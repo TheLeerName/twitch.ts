@@ -113,3 +113,5 @@ import * as EndGuestStarSession from "./guest_star/session/delete";
 import * as GetGuestStarInvites from "./guest_star/invites/get";
 import * as SendGuestStarInvite from "./guest_star/invites/post";
 import * as DeleteGuestStarInvite from "./guest_star/invites/delete";
+import * as AssignGuestStarSlot from "./guest_star/slot/post";
+import * as UpdateGuestStarSlot from "./guest_star/slot/patch";
