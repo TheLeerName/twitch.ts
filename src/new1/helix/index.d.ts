@@ -82,3 +82,4 @@ import * as GetConduits from "./eventsub/conduits/get";
 import * as CreateConduits from "./eventsub/conduits/post";
 import * as UpdateConduits from "./eventsub/conduits/patch";
 import * as DeleteConduit from "./eventsub/conduits/delete";
+import * as GetConduitShards from "./eventsub/conduits/shards/get";
