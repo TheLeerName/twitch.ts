@@ -46,3 +46,4 @@ import * as GetChannelInformation from "./channels/get";
 import * as ModifyChannelInformation from "./channels/patch";
 import * as GetChannelEditors from "./channels/editors/get";
 import * as GetFollowedChannels from "./channels/followed/get";
+import * as GetChannelFollowers from "./channels/followers/get";
