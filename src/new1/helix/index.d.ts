@@ -38,3 +38,4 @@ import * as GetAdSchedule from "./channels/ads/get";
 import * as SnoozeNextAd from "./channels/ads/schedule/snooze/post";
 import * as GetExtensionAnalytics from "./analytics/extensions/get";
 import * as GetGameAnalytics from "./analytics/games/get";
+import * as GetBitsLeaderboard from "./bits/leaderboard/get";
