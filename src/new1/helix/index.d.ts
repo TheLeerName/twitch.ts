@@ -125,3 +125,4 @@ export * as UpdateAutoModSettings from "./moderation/automod/settings/put";
 export * as GetBannedUsers from "./moderation/banned/get";
 export * as BanUser from "./moderation/bans/post";
 export * as UnbanUser from "./moderation/bans/delete";
+export * as GetUnbanRequests from "./moderation/unban_requests/get";
