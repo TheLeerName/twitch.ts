@@ -73,3 +73,4 @@ import * as PinChatMessage from "./chat/pins/put";
 import * as UpdatePinnedChatMessage from "./chat/pins/patch";
 import * as UnpinChatMessage from "./chat/pins/delete";
 import * as GetUserChatColor from "./chat/color/get";
+import * as UpdateUserChatColor from "./chat/color/put";
