@@ -144,7 +144,7 @@ function addDescriptionLines(cell, descriptionLines, i) {
 			descriptionLines[i] += el.textContent;
 		else if (el.nodeName === "BR")
 			i++;
-		else if (el.nodeName === "STRONG" || el.nodeName === "B")
+		else if (el.nodeName === "STRONG" || el.nodeName === "B" || el.nodeName === "SPAN")
 			descriptionLines[i] += `**${el.textContent}**`;
 		else if (el.nodeName === "A") {
 			/** @type {string} */
