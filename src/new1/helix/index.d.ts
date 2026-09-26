@@ -107,3 +107,4 @@ import * as GetGames from "./games/get";
 import * as GetCreatorGoals from "./goals/get";
 import * as GetChannelGuestStarSettings from "./guest_star/channel_settings/get";
 import * as UpdateChannelGuestStarSettings from "./guest_star/channel_settings/put";
+import * as GetGuestStarSession from "./guest_star/session/get";
