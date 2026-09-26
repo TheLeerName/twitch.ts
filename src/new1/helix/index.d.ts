@@ -93,3 +93,4 @@ import * as SetExtensionRequiredConfiguration from "./extensions/required_config
 import * as SendExtensionPubSubMessage from "./extensions/pubsub/post";
 import * as GetExtensionLiveChannels from "./extensions/live/get";
 import * as GetExtensionSecrets from "./extensions/jwt/secrets/get";
+import * as CreateExtensionSecret from "./extensions/jwt/secrets/post";
