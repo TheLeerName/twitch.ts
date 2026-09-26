@@ -61,3 +61,4 @@ import * as GetGlobalEmotes from "./chat/emotes/global/get";
 import * as GetEmoteSets from "./chat/emotes/set/get";
 import * as GetChannelChatBadges from "./chat/badges/get";
 import * as GetGlobalChatBadges from "./chat/badges/global/get";
+import * as GetChatSettings from "./chat/settings/get";
