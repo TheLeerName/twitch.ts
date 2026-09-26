@@ -42,7 +42,7 @@ export interface ResponseBody {
 		id: string;
 		/** A URL you can use to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to third-party platforms. */
 		edit_url: string;
-	]];
+	}];
 }
 
 /**
