@@ -25,7 +25,7 @@ export type RequestParameters = Authentication & RequestQueryParameters;
 
 /**
  * ## [Delete Conduit](https://dev.twitch.tv/docs/api/reference/#delete-conduit)
- * Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to show as disabled when calling [Get Eventsub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions).
+ * Deletes a specified [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). Note that it may take some time for Eventsub subscriptions on a deleted [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/) to show as disabled when calling {@link Helix.GetEventSubSubscriptions | Get Eventsub Subscriptions}.
 
  * ### Response Codes
  * Code|Meaning

@@ -64,7 +64,7 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	| "conduit_deleted";
 	/** Filter subscriptions by subscription type. For a list of subscription types, see [Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#subscription-types). */
 	type?: string;
-	/** Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you [created the subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription). */
+	/** Filter subscriptions by user ID. The response contains subscriptions where this ID matches a user ID that you specified in the **Condition** object when you {@link Helix.GetEventSubSubscriptions | created the subscription}. */
 	user_id?: string;
 	/** Returns an array with the subscription matching the ID (as long as it is owned by the client making the request), or an empty array if there is no matching subscription. */
 	subscription_id?: string;

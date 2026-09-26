@@ -146,12 +146,8 @@ function addDescriptionLines(cell, descriptionLines, i) {
 			i++;
 		else if (el.nodeName === "STRONG" || el.nodeName === "B" || el.nodeName === "SPAN")
 			descriptionLines[i] += `**${el.textContent}**`;
-		else if (el.nodeName === "A") {
-			/** @type {string} */
-			const href = el.getAttribute("href");
-			const url = href.startsWith("/") ? `https://dev.twitch.tv${href}` : href;
-			descriptionLines[i] += `[${el.textContent}](${url})`;
-		}
+		else if (el.nodeName === "A")
+			descriptionLines[i] += `[${el.textContent}](${new URL(el.getAttribute("href"), "https://dev.twitch.tv/docs/api/reference").toString()})`;
 		else if (el.nodeName === "EM" || el.nodeName === "CODE" || el.nodeName === "I")
 			descriptionLines[i] += `\`${el.textContent}\``;
 		else if (el.nodeName === "UL" || el.nodeName === "P")
@@ -501,7 +497,7 @@ async function main() {
 	const isResponseBody = makeResponseBody(responseBodyHTML);
 	makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody);
 
-	const newString = `\nimport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
+	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
 	const content = fs.readFileSync("../src/new1/helix/index.d.ts").toString();
 	if (content.substring(content.lastIndexOf("\n")) !== newString)
 		fs.writeFileSync("../src/new1/helix/index.d.ts", content + newString);

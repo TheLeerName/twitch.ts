@@ -22,7 +22,7 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	/**
 	 * An ID that identifies the emote set to get. You may specify a maximum of 25 IDs. The response contains only the IDs that were found and ignores duplicate IDs.
 
-	 * To get emote set IDs, use the [Get Channel Emotes](#get-channel-emotes) API.
+	 * To get emote set IDs, use the {@link Helix.GetChannelEmotes | Get Channel Emotes} API.
 	 */
 	emote_set_id: string | string[];
 }

@@ -18,15 +18,15 @@ export interface Authentication {
 
 export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	/** The ID of the broadcaster running the Guest Star session. */
-	broadcaster_id?: yes;
+	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
-	moderator_id?: yes;
+	moderator_id: string;
 	/** The ID of the Guest Star session in which to assign the slot. */
-	session_id?: yes;
+	session_id: string;
 	/** The Twitch User ID corresponding to the guest to assign a slot in the session. This user must already have an invite to this session, and have indicated that they are ready to join. */
-	guest_id?: yes;
-	/** The slot assignment to give to the user. Must be a numeric identifier between “1” and “N” where N is the max number of slots for the session. Max number of slots allowed for the session is reported by [Get Channel Guest Star Settings](#get-channel-guest-star-settings). */
-	slot_id?: yes;
+	guest_id: string;
+	/** The slot assignment to give to the user. Must be a numeric identifier between “1” and “N” where N is the max number of slots for the session. Max number of slots allowed for the session is reported by {@link Helix.GetChannelGuestStarSettings | Get Channel Guest Star Settings}. */
+	slot_id: string;
 }
 
 export type RequestParameters = Authentication & RequestQueryParameters;
