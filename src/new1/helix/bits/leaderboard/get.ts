@@ -28,7 +28,7 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	 * - year — A year spans from 00:00:00 on the first day of the year specified in `started_at` and runs through 00:00:00 of the first day of the next year.
 	 * - all — Default. The lifetime of the broadcaster's channel.
 	 */
-	period?: string;
+	period?: "day" | "week" | "month" | "year" | "all";
 	/**
 	 * The start date, in RFC3339 format, used for determining the aggregation period. Specify this parameter only if you specify the `period` query parameter. The start date is ignored if `period` is all.
 

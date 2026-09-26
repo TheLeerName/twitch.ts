@@ -24,7 +24,7 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	 * The type of analytics report to get. Possible values are:
 	 * - overview_v2
 	 */
-	type?: string;
+	type?: "overview_v2";
 	/**
 	 * The reporting window's start date, in RFC3339 format. Set the time portion to zeroes (for example, 2021-10-22T00:00:00Z).
 
