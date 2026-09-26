@@ -9,7 +9,7 @@ export interface Authentication {
 	client_id: string;
 	/**
 	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see JWT Schema). The `role` field must be set to **external** and the `user_id` field to the ID of the user that owns the extension.
+	 * - `token` must be replaced by signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to **external** and the `user_id` field to the ID of the user that owns the extension.
 
 	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
