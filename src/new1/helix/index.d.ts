@@ -101,3 +101,4 @@ import * as GetExtensionBitsProducts from "./bits/extensions/get";
 import * as UpdateExtensionBitsProduct from "./bits/extensions/put";
 import * as CreateEventSubSubscription from "./eventsub/subscriptions/post";
 import * as DeleteEventSubSubscription from "./eventsub/subscriptions/delete";
+import * as GetEventSubSubscriptions from "./eventsub/subscriptions/get";
