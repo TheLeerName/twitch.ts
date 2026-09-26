@@ -98,3 +98,4 @@ import * as SendExtensionChatMessage from "./extensions/chat/post";
 import * as GetExtensions from "./extensions/get";
 import * as GetReleasedExtensions from "./extensions/released/get";
 import * as GetExtensionBitsProducts from "./bits/extensions/get";
+import * as UpdateExtensionBitsProduct from "./bits/extensions/put";
