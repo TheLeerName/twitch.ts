@@ -51,3 +51,4 @@ import * as CreateCustomRewards from "./channel_points/custom_rewards/post";
 import * as DeleteCustomReward from "./channel_points/custom_rewards/delete";
 import * as GetCustomReward from "./channel_points/custom_rewards/get";
 import * as GetCustomRewardRedemption from "./channel_points/custom_rewards/redemptions/get";
+import * as UpdateCustomReward from "./channel_points/custom_rewards/patch";
