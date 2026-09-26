@@ -70,3 +70,4 @@ import * as SendShoutout from "./chat/shoutouts/post";
 import * as SendChatMessage from "./chat/messages/post";
 import * as GetPinnedChatMessage from "./chat/pins/get";
 import * as PinChatMessage from "./chat/pins/put";
+import * as UpdatePinnedChatMessage from "./chat/pins/patch";
