@@ -79,3 +79,4 @@ import * as CreateClipFromVOD from "./videos/clips/post";
 import * as GetClips from "./clips/get";
 import * as GetClipsDownload from "./clips/downloads/get";
 import * as GetConduits from "./eventsub/conduits/get";
+import * as CreateConduits from "./eventsub/conduits/post";
