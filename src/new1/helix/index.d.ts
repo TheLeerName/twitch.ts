@@ -59,3 +59,4 @@ import * as GetChatters from "./chat/chatters/get";
 import * as GetChannelEmotes from "./chat/emotes/get";
 import * as GetGlobalEmotes from "./chat/emotes/global/get";
 import * as GetEmoteSets from "./chat/emotes/set/get";
+import * as GetChannelChatBadges from "./chat/badges/get";
