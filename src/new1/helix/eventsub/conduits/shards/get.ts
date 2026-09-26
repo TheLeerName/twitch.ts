@@ -77,9 +77,9 @@ export interface ResponseBody {
 		};
 	}[];
 	/** Contains information used to page through a list of results. The object is empty if there are no more pages left to page through. */
-	pagination: {
+	pagination?: {
 		/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
-		cursor: string;
+		cursor?: string;
 	};
 }
 
