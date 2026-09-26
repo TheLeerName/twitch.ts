@@ -102,3 +102,4 @@ import * as UpdateExtensionBitsProduct from "./bits/extensions/put";
 import * as CreateEventSubSubscription from "./eventsub/subscriptions/post";
 import * as DeleteEventSubSubscription from "./eventsub/subscriptions/delete";
 import * as GetEventSubSubscriptions from "./eventsub/subscriptions/get";
+import * as GetTopGames from "./games/top/get";
