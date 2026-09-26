@@ -49,3 +49,4 @@ import * as GetFollowedChannels from "./channels/followed/get";
 import * as GetChannelFollowers from "./channels/followers/get";
 import * as CreateCustomRewards from "./channel_points/custom_rewards/post";
 import * as DeleteCustomReward from "./channel_points/custom_rewards/delete";
+import * as GetCustomReward from "./channel_points/custom_rewards/get";
