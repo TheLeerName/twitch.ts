@@ -154,7 +154,7 @@ function addDescriptionLines(cell, descriptionLines, i) {
 		}
 		else if (el.nodeName === "EM" || el.nodeName === "CODE" || el.nodeName === "I")
 			descriptionLines[i] += `\`${el.textContent}\``;
-		else if (el.nodeName === "UL")
+		else if (el.nodeName === "UL" || el.nodeName === "P")
 			i = addDescriptionLines(el, descriptionLines, i);
 		else if (el.nodeName === "LI") {
 			if (descriptionLines[i] !== "") {
