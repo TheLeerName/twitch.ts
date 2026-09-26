@@ -75,3 +75,4 @@ import * as UnpinChatMessage from "./chat/pins/delete";
 import * as GetUserChatColor from "./chat/color/get";
 import * as UpdateUserChatColor from "./chat/color/put";
 import * as CreateClip from "./clips/post";
+import * as CreateClipFromVOD from "./videos/clips/post";
