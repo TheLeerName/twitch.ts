@@ -58,3 +58,4 @@ import * as GetCharityCampaignDonations from "./charity/donations/get";
 import * as GetChatters from "./chat/chatters/get";
 import * as GetChannelEmotes from "./chat/emotes/get";
 import * as GetGlobalEmotes from "./chat/emotes/global/get";
+import * as GetEmoteSets from "./chat/emotes/set/get";
