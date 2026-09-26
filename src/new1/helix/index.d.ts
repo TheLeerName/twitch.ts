@@ -87,3 +87,4 @@ import * as UpdateConduitShards from "./eventsub/conduits/shards/patch";
 import * as GetContentClassificationLabels from "./content_classification_labels/get";
 import * as GetDropsEntitlements from "./entitlements/drops/get";
 import * as UpdateDropsEntitlements from "./entitlements/drops/patch";
+import * as GetExtensionConfigurationSegment from "./extensions/configurations/get";
