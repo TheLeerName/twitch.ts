@@ -42,7 +42,8 @@ export interface ResponseBody {
 		game_id: string;
 		/** The title of the stream that the broadcaster is currently streaming or last streamed. The value is an empty string if the broadcaster has never streamed. */
 		title: string;
-		/** **Unsigned Integer**. The value of the broadcaster’s stream delay setting, in seconds. This field’s value defaults to zero unless:
+		/**
+		 * **Unsigned Integer**. The value of the broadcaster’s stream delay setting, in seconds. This field’s value defaults to zero unless:
 		 * - the request specifies a user access token
 		 * - the ID in the `broadcaster_id` query parameter matches the user ID in the access token
 		 * - the broadcaster has partner status and they set a non-zero stream delay value
