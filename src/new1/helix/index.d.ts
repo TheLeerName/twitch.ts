@@ -112,3 +112,4 @@ import * as CreateGuestStarSession from "./guest_star/session/post";
 import * as EndGuestStarSession from "./guest_star/session/delete";
 import * as GetGuestStarInvites from "./guest_star/invites/get";
 import * as SendGuestStarInvite from "./guest_star/invites/post";
+import * as DeleteGuestStarInvite from "./guest_star/invites/delete";
