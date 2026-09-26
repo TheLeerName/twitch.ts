@@ -90,3 +90,4 @@ import * as UpdateDropsEntitlements from "./entitlements/drops/patch";
 import * as GetExtensionConfigurationSegment from "./extensions/configurations/get";
 import * as SetExtensionConfigurationSegment from "./extensions/configurations/put";
 import * as SetExtensionRequiredConfiguration from "./extensions/required_configuration/put";
+import * as SendExtensionPubSubMessage from "./extensions/pubsub/post";
