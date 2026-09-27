@@ -173,3 +173,4 @@ export * as UpdateUser from "./users/put";
 export * as GetAuthorizationByUser from "./authorization/users/get";
 export * as GetUserBlockList from "./users/blocks/get";
 export * as BlockUser from "./users/blocks/put";
+export * as UnblockUser from "./users/blocks/delete";
