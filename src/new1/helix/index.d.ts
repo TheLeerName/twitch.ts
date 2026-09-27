@@ -136,3 +136,4 @@ export * as GetModerators from "./moderation/moderators/get";
 export * as AddModerator from "./moderation/moderators/post";
 export * as RemoveModerator from "./moderation/moderators/delete";
 export * as GetVIPs from "./channels/vips/get";
+export * as AddVIP from "./channels/vips/post";
