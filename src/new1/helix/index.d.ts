@@ -164,3 +164,4 @@ export * as GetStreams from "./streams/get";
 export * as GetFollowedStreams from "./streams/followed/get";
 export * as CreateStreamMarker from "./streams/markers/post";
 export * as GetStreamMarkers from "./streams/markers/get";
+export * as GetBroadcasterSubscriptions from "./subscriptions/get";
