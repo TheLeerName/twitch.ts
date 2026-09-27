@@ -142,3 +142,4 @@ export * as UpdateShieldModeStatus from "./moderation/shield_mode/put";
 export * as GetShieldModeStatus from "./moderation/shield_mode/get";
 export * as WarnChatUser from "./moderation/warnings/post";
 export * as AddSuspiciousStatusToChatUser from "./moderation/suspicious_users/post";
+export * as RemoveSuspiciousStatusFromChatUser from "./moderation/suspicious_users/delete";
