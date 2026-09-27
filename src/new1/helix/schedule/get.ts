@@ -35,48 +35,54 @@ export type RequestParameters = Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The broadcaster’s streaming schedule. */
-	data: {
-		/** The list of broadcasts in the broadcaster’s streaming schedule. */
-		segments: {
-			/** An ID that identifies this broadcast segment. */
-			id: string;
-			/** The UTC date and time (in RFC3339 format) of when the broadcast starts. */
-			start_time: string;
-			/** The UTC date and time (in RFC3339 format) of when the broadcast ends. */
-			end_time: string;
-			/** The broadcast segment’s title. */
-			title: string;
-			/** Indicates whether the broadcaster canceled this segment of a recurring broadcast. If the broadcaster canceled this segment, this field is set to the same value that’s in the  `end_time` field; otherwise, it’s set to **null**. */
-			canceled_until: string | null;
-			/** The type of content that the broadcaster plans to stream or **null** if not specified. */
-			category: {
-				/** An ID that identifies the category that best represents the content that the broadcaster plans to stream. For example, the game’s ID if the broadcaster will play a game or the Just Chatting ID if the broadcaster will host a talk show. */
-				id: string;
-				/** The name of the category. For example, the game’s title if the broadcaster will playing a game or Just Chatting if the broadcaster will host a talk show. */
-				name: string;
-			} | null;
-			/** A Boolean value that determines whether the broadcast is part of a recurring series that streams at the same time each week or is a one-time broadcast. Is **true** if the broadcast is part of a recurring series. */
-			is_recurring: boolean;
-		}[];
-		/** The ID of the broadcaster that owns the broadcast schedule. */
-		broadcaster_id: string;
-		/** The broadcaster’s display name. */
-		broadcaster_name: string;
-		/** The broadcaster’s login name. */
-		broadcaster_login: string;
-		/** The dates when the broadcaster is on vacation and not streaming. Is set to **null** if vacation mode is not enabled. */
-		vacation: {
-			/** The UTC date and time (in RFC3339 format) of when the broadcaster’s vacation starts. */
-			start_time: string;
-			/** The UTC date and time (in RFC3339 format) of when the broadcaster’s vacation ends. */
-			end_time: string;
-		} | null;
-	};
+	data: Schedule;
 	/** The information used to page through a list of results. The object is empty if there are no more pages left to page through. [Read more](https://dev.twitch.tv/docs/api/guide#pagination). */
 	pagination?: {
 		/** The cursor used to get the next page of results. Set the request’s `after` query parameter to this value. */
 		cursor?: string;
 	};
+}
+
+export interface Schedule {
+	/** The list of broadcasts in the broadcaster’s streaming schedule. */
+	segments: Segment[];
+	/** The ID of the broadcaster that owns the broadcast schedule. */
+	broadcaster_id: string;
+	/** The broadcaster’s display name. */
+	broadcaster_name: string;
+	/** The broadcaster’s login name. */
+	broadcaster_login: string;
+	/** The dates when the broadcaster is on vacation and not streaming. Is set to **null** if vacation mode is not enabled. */
+	vacation: Vacation | null;
+}
+
+export interface Vacation {
+	/** The UTC date and time (in RFC3339 format) of when the broadcaster’s vacation starts. */
+	start_time: string;
+	/** The UTC date and time (in RFC3339 format) of when the broadcaster’s vacation ends. */
+	end_time: string;
+}
+
+export interface Segment {
+	/** An ID that identifies this broadcast segment. */
+	id: string;
+	/** The UTC date and time (in RFC3339 format) of when the broadcast starts. */
+	start_time: string;
+	/** The UTC date and time (in RFC3339 format) of when the broadcast ends. */
+	end_time: string;
+	/** The broadcast segment’s title. */
+	title: string;
+	/** Indicates whether the broadcaster canceled this segment of a recurring broadcast. If the broadcaster canceled this segment, this field is set to the same value that’s in the  `end_time` field; otherwise, it’s set to **null**. */
+	canceled_until: string | null;
+	/** The type of content that the broadcaster plans to stream or **null** if not specified. */
+	category: {
+		/** An ID that identifies the category that best represents the content that the broadcaster plans to stream. For example, the game’s ID if the broadcaster will play a game or the Just Chatting ID if the broadcaster will host a talk show. */
+		id: string;
+		/** The name of the category. For example, the game’s title if the broadcaster will playing a game or Just Chatting if the broadcaster will host a talk show. */
+		name: string;
+	} | null;
+	/** A Boolean value that determines whether the broadcast is part of a recurring series that streams at the same time each week or is a one-time broadcast. Is **true** if the broadcast is part of a recurring series. */
+	is_recurring: boolean;
 }
 
 /**
