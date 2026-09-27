@@ -33,7 +33,7 @@ export interface RequestBody {
 	start_time?: string;
 	/** The length of time, in minutes, that the broadcast is scheduled to run. The duration must be in the range 30 through 1380 (23 hours). */
 	duration?: string;
-	/** The ID of the category that best represents the broadcast’s content. To get the category ID, use the [Search Categories](https://dev.twitch.tv/docs/api/reference#search-categories) endpoint. */
+	/** The ID of the category that best represents the broadcast’s content. To get the category ID, use the {@link Helix.SearchCategories | Search Categories} endpoint. */
 	category_id?: string;
 	/** The broadcast’s title. The title may contain a maximum of 140 characters. */
 	title?: string;

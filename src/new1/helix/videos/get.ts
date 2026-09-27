@@ -32,7 +32,7 @@ export interface RequestQueryParameters extends Helix.RequestQueryParameters {
 	 */
 	user_id?: string;
 	/**
-	 * A category or game ID. The response contains a maximum of 500 videos that show this content. To get category/game IDs, use the [Search Categories](https://dev.twitch.tv/docs/api/reference#search-categories) endpoint.
+	 * A category or game ID. The response contains a maximum of 500 videos that show this content. To get category/game IDs, use the {@link Helix.SearchCategories | Search Categories} endpoint.
 
 	 * The `id`, `user_id`, and `game_id` parameters are mutually exclusive.
 	 */

@@ -44,7 +44,7 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the `broadcaster_id` query parameter must match the user ID in the access token.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
- * 422 Unprocessable Entity|The user in `user_id` is a VIP. To make them a moderator, you must first remove them as a VIP (see [Remove Channel VIP](https://dev.twitch.tv/docs/api/reference#remove-channel-vip)).
+ * 422 Unprocessable Entity|The user in `user_id` is a VIP. To make them a moderator, you must first remove them as a VIP (see {@link Helix.RemoveVIP | Remove VIP}).
  * 429 Too Many Requests|The broadcaster has exceeded the number of requests allowed within a 10-second window. See this endpoint's rate limits.
  */
 export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {

@@ -46,7 +46,7 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The ID in `broadcaster_id` was not found.
  * ㅤ|The ID in `user_id` was not found.
  * 409 Conflict|The broadcaster doesn’t have available VIP slots. [Read More](https://help.twitch.tv/s/article/Managing-Roles-for-your-Channel?language=en_US#types)
- * 422 Unprocessable Entity|The user in `user_id` is a moderator. To make them a VIP, you must first remove them as a moderator (see [Remove Channel Moderator](https://dev.twitch.tv/docs/api/reference#remove-channel-moderator)).
+ * 422 Unprocessable Entity|The user in `user_id` is a moderator. To make them a VIP, you must first remove them as a moderator (see {@link Helix.RemoveModerator | Remove Moderator}).
  * ㅤ|The user in the `user_id` query parameter is already a VIP.
  * 425 Too Early|The broadcaster must complete the Build a Community requirement before they may assign VIPs.
  * 429 Too Many Requests|The broadcaster exceeded the number of VIP that they may add within a 10-second window. See Rate Limits for this endpoint above.

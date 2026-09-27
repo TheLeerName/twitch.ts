@@ -31,7 +31,7 @@ export interface RequestBody {
 	duration: string;
 	/** A Boolean value that determines whether the broadcast recurs weekly. Is **true** if the broadcast recurs weekly. Only partners and affiliates may add non-recurring broadcasts. */
 	is_recurring?: boolean;
-	/** The ID of the category that best represents the broadcast’s content. To get the category ID, use the [Search Categories](https://dev.twitch.tv/docs/api/reference#search-categories) endpoint. */
+	/** The ID of the category that best represents the broadcast’s content. To get the category ID, use the {@link Helix.SearchCategories | Search Categories} endpoint. */
 	category_id?: string;
 	/** The broadcast’s title. The title may contain a maximum of 140 characters. */
 	title?: string;
