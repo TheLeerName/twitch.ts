@@ -90,8 +90,8 @@ export interface ResponseBody {
  * 403 Forbidden|The user in the access token is not authorized to get the video's markers. The user in the access token must own the video or be one of the broadcaster's editors.
  * 404 Not Found|The user specified in the `user_id` query parameter doesn't have videos.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "streams/markers", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "streams/markers", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		video_id: params.video_id,

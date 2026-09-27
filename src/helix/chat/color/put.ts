@@ -62,8 +62,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID in the `user_id` query parameter must match the user ID in the access token.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "chat/color", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "chat/color", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		color: params.color,

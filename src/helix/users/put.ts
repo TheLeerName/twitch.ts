@@ -50,8 +50,8 @@ export interface ResponseBody {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 429 Too Many Requests|The app exceeded the number of requests that it may make. 
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "users", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "users", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		description: params.description,
 	});

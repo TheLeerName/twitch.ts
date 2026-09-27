@@ -86,8 +86,8 @@ export interface ResponseBody {
  * ㅤ|Missing `moderator_id`
  * 401 Unauthenticated|`moderator_id` and user token do not match
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

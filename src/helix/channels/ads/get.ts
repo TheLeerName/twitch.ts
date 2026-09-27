@@ -54,8 +54,8 @@ export interface ResponseBody {
  * 400 Bad Request|The broadcaster ID is not valid.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "channels/ads", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "channels/ads", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

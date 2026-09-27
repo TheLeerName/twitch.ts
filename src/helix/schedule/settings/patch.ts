@@ -51,8 +51,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 404 Not Found|The broadcaster's schedule was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "schedule/settings", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "schedule/settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		is_vacation_enabled: params.is_vacation_enabled,

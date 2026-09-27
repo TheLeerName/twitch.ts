@@ -122,8 +122,8 @@ export interface ResponseBody {
  * 404 Not Found|All of the redemptions specified using the `id` query parameter were not found.
  * 500 Internal Server Error| 
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		reward_id: params.reward_id,

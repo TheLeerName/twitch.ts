@@ -67,8 +67,8 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 404 Not Found|The ID in `to_user_id` was not found.
  * 429 Too Many Requests|The sending user exceeded the number of whisper requests that they may make. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		from_user_id: params.from_user_id,
 		to_user_id: params.to_user_id,

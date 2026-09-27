@@ -43,8 +43,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|Missing or invalid `session_id` 
  * ㅤ|Missing or invalid `slot_id`
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

@@ -52,8 +52,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The ID in `message_id` was not found.
  * ㅤ|The specified message was created more than 6 hours ago.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/chat", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/chat", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

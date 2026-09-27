@@ -124,8 +124,8 @@ export interface ResponseBody {
  * 410 Gone|The subscription type and version combination has been removed and can no longer be subscribed to.
  * 429 Too Many Requests|The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "POST",
 		headers: {

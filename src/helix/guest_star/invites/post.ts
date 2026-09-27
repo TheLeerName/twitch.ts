@@ -45,8 +45,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 403 Forbidden|Unauthorized guest invited 
  * ㅤ|Guest already invited
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

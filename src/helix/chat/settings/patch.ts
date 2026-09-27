@@ -175,8 +175,8 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 403 Forbidden|The user in the `moderator_id` query parameter must have moderator privileges in the broadcaster's channel.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "chat/settings", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "chat/settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

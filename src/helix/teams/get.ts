@@ -75,8 +75,8 @@ export interface ResponseBody {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 404 Not Found|The specified team was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "teams", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "teams", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		name: params.name,
 		id: params.id,

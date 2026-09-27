@@ -67,8 +67,8 @@ export interface ResponseBody {
  * 403 Forbidden|        
  * ㅤ|The user in the moderator_id query parameter is not one of the broadcaster's moderators.      
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/suspicious_users", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/suspicious_users", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

@@ -55,8 +55,8 @@ export interface ResponseBody {
  * 403 Forbidden|The client-id in the header must match the client ID in the access token.
  * 500 Internal Error|Internal Server Error.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "authorization/users", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "authorization/users", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 	});

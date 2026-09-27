@@ -52,8 +52,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 403 Forbidden|`moderator_id` is not a Guest Star moderator 
  * ㅤ|The request is attempting to modify a restricted slot
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/slot_settings", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/slot_settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

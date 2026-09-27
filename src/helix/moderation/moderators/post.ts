@@ -47,8 +47,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 422 Unprocessable Entity|The user in `user_id` is a VIP. To make them a moderator, you must first remove them as a VIP (see {@link Helix.RemoveVIP | Remove VIP}).
  * 429 Too Many Requests|The broadcaster has exceeded the number of requests allowed within a 10-second window. See this endpoint's rate limits.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/moderators", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/moderators", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		user_id: params.user_id,

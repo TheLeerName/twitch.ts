@@ -72,8 +72,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 403 Forbidden|The user in `moderator_id` is not one of the broadcaster's moderators.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/automod/settings", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/automod/settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

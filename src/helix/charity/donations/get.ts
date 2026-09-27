@@ -75,8 +75,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header must match the client ID specified in the access token.
  * 403 Forbidden|The broadcaster is not a partner or affiliate.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "charity/donations", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "charity/donations", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		first: params.first,

@@ -96,8 +96,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 404 Not Found|The unban request ID was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/unban_requests", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/unban_requests", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

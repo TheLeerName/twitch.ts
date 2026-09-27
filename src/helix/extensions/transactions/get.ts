@@ -103,8 +103,8 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 404 Not Found|One or more of the transaction IDs specified using the `id` query parameter were not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "extensions/transactions", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "extensions/transactions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		extension_id: params.extension_id,
 		id: params.id,

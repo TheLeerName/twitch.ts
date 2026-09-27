@@ -439,8 +439,8 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 
 	addTextToOutput(` */`);
 
-	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
-	addTextToOutput(`\tconst url = new Main.Helix.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
+	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Main.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
+	addTextToOutput(`\tconst url = new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
 	if (requestQueryParameters.length > 0) {
 		addTextToOutput(`\turl.searchParams.appendMany({`);
 		for (const param of requestQueryParameters)

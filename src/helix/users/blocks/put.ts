@@ -55,8 +55,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		target_user_id: params.target_user_id,
 		source_context: params.source_context,

@@ -71,8 +71,8 @@ export interface ResponseBody {
  * ## [Get Content Classification Labels](https://dev.twitch.tv/docs/api/reference/#get-content-classification-labels)
  * Gets information about Twitch content classification labels.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "content_classification_labels", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "content_classification_labels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		locale: params.locale,
 	});

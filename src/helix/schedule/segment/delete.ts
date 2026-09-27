@@ -45,8 +45,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "schedule/segment", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "schedule/segment", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		id: params.id,

@@ -86,8 +86,8 @@ export interface ResponseBody {
  * 403 Forbidden|Insufficient authorization for creating session
  * 409 Conflict|Broadcaster is already in another session
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

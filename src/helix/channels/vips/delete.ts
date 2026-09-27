@@ -50,8 +50,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 422 Unprocessable Entity|The user in `user_id` is not a VIP in the broadcaster's channel.
  * 429 Too Many Requests|The broadcaster exceeded the number of VIPs that they may remove within a 10-second window. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		broadcaster_id: params.broadcaster_id,

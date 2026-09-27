@@ -53,8 +53,8 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
  * 403 Forbidden|The user in `user_id` is not one of the broadcaster's moderators.
  * 404 Not Found|The message specified in the `msg_id` field was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/automod/message", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/automod/message", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "POST",
 		headers: {

@@ -76,8 +76,8 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * ㅤ|The broadcaster must have authorized the app with the **channel:bot** scope.
  * 429 Too Many Requests|The sender has exceeded the number of announcements they may send to this **broadcaster_id** within a given window.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "chat/announcements", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "chat/announcements", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

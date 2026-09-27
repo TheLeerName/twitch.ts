@@ -103,8 +103,8 @@ export interface Segment {
  * 403 Forbidden|Only partners and affiliates may add non-recurring broadcast segments.
  * 404 Not Found|The broadcaster has not created a streaming schedule.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "schedule", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "schedule", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		id: params.id,

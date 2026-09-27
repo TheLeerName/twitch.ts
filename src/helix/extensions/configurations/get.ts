@@ -71,8 +71,8 @@ export interface ResponseBody {
  * ㅤ|The Client-Id header is required.
  * 429 Too many requests|The app exceeded the number of requests that it may make per minute. See Rate Limits above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		extension_id: params.extension_id,

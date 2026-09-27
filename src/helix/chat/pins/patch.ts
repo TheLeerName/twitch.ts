@@ -47,8 +47,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The specified pinned message was not found.
  * 429 Too Many Requests|The rate limit for updating pinned messages has been exceeded.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "chat/pins", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "chat/pins", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

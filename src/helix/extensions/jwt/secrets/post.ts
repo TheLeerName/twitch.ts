@@ -56,8 +56,8 @@ export interface ResponseBody {
  * ㅤ|The JWT token is not valid.
  * ㅤ|The Client-Id header is required.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "extensions/jwt/secrets", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "extensions/jwt/secrets", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		extension_id: params.extension_id,
 		delay: params.delay,

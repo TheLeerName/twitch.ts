@@ -49,8 +49,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The request is attempting to modify a restricted slot
  * 404 Not Found|`guest_id` or `slot_id` not found
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

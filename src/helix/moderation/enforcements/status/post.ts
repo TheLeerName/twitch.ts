@@ -75,8 +75,8 @@ export interface ResponseBody {
  * 403 Forbidden|The ID in `broadcaster_id` must match the user ID in the user access token.
  * 429 Too Many Requests|The broadcaster exceeded the number of chat message checks that they may make. See the endpoint's rate limits.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/enforcements/status", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/enforcements/status", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

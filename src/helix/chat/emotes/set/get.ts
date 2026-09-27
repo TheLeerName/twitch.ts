@@ -102,8 +102,8 @@ export interface ResponseBody {
  * ㅤ|The OAuth token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "chat/emotes/set", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "chat/emotes/set", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		emote_set_id: params.emote_set_id,
 	});

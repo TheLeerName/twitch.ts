@@ -94,8 +94,8 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 409 Too Many Requests|User set the Branded Content flag too frequently
  * 500 Internal server error| 
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "channels", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "channels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

@@ -23,8 +23,8 @@ export type RequestParameters = RequestQueryParameters;
  * 400 Bad Request|The `broadcaster_id` query parameter is required.
  * ㅤ|The ID in the `broadcaster_id` query parameter is not valid.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

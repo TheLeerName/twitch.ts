@@ -77,8 +77,8 @@ export interface ResponseBody {
  * ㅤ|The VOD is not found..
  * ㅤ|The `broadcaster_id` or the `editor_id` does not exist.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		editor_id: params.editor_id,
 		broadcaster_id: params.broadcaster_id,

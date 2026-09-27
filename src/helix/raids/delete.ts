@@ -44,8 +44,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The broadcaster doesn't have a pending raid to cancel.
  * 429 Too Many Requests|The broadcaster exceeded the number of raid requests that they may make. The limit is 10 requests within a 10-minute window.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

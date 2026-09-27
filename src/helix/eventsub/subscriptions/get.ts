@@ -176,8 +176,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		status: params.status,
 		type: params.type,

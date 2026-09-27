@@ -114,8 +114,8 @@ export interface Stream {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "streams", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "streams", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		user_login: params.user_login,

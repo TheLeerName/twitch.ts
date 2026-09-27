@@ -101,8 +101,8 @@ export interface ResponseBody {
  * ㅤ|The organization associated with the client in the access token must own the entitlements specified in the `id` query parameter.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 		user_id: params.user_id,

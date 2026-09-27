@@ -44,8 +44,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 403 Forbidden|The user specified in `moderator_id` is not permitted to delete invites for the broadcaster.
  * 404 Not Found|No invite exists for specified `guest_id`
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

@@ -51,8 +51,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 425 Too Early|The broadcaster must complete the Build a Community requirement before they may assign VIPs.
  * 429 Too Many Requests|The broadcaster exceeded the number of VIP that they may add within a 10-second window. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		broadcaster_id: params.broadcaster_id,

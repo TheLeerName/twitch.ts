@@ -70,8 +70,8 @@ export interface ResponseBody {
  * 409 Conflict|The broadcaster is already in the process of raiding another channel.
  * 429 Too Many Requests|The broadcaster exceeded the number of raid requests that they may make. The limit is 10 requests within a 10-minute window.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		from_broadcaster_id: params.from_broadcaster_id,
 		to_broadcaster_id: params.to_broadcaster_id,

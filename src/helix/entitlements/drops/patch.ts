@@ -70,8 +70,8 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the Client ID in the access token.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "PATCH",
 		headers: {

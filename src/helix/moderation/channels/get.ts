@@ -54,8 +54,8 @@ export interface ResponseBody {
  * ## [Get Moderated Channels](https://dev.twitch.tv/docs/api/reference/#get-moderated-channels)
  * Gets a list of channels that the specified user has moderator privileges in.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/channels", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/channels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		after: params.after,

@@ -45,8 +45,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 429 Too Many Requests|The broadcaster has exceeded the number of requests allowed within a 10-second window. See this endpoint's rate limits.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "moderation/moderators", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	const url = new Main.URL(params.apiPath ?? "moderation/moderators", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		user_id: params.user_id,

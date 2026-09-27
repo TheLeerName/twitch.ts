@@ -61,8 +61,8 @@ export interface ResponseBody {
  * 403 Forbidden|The user is not an editor for the specified broadcaster.
  * 500 Internal Error|Internal Server Error.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "clips/downloads", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "clips/downloads", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		editor_id: params.editor_id,
 		broadcaster_id: params.broadcaster_id,

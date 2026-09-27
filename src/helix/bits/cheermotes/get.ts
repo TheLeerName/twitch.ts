@@ -87,8 +87,8 @@ export interface ResponseBody {
  * 401 Unauthorized|The Authorization header is required and must specify an app access token or user access token.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "bits/cheermotes", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "bits/cheermotes", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

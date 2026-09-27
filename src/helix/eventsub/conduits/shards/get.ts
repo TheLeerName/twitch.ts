@@ -96,8 +96,8 @@ export interface ResponseBody {
  * 404 Not Found|Conduit not found.
  * ㅤ|Conduit’s owner must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/conduits/shards", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "eventsub/conduits/shards", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		conduit_id: params.conduit_id,
 		status: params.status,

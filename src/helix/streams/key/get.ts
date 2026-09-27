@@ -48,8 +48,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header must match the client ID specified in the access token.
  * 403 Forbidden|The user must complete additional steps in order to stream. Present the user with the returned error message.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "streams/key", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "streams/key", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

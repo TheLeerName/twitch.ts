@@ -171,8 +171,8 @@ export interface ResponseBody {
  * ㅤ|The request must specify the Client-Id header.
  * 404 Not Found|The extension in the `extension_id` query parameter was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "extensions", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "extensions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		extension_id: params.extension_id,
 		extension_version: params.extension_version,

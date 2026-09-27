@@ -71,8 +71,8 @@ export interface ResponseBody {
  * ㅤ|The user is banned or timed out from the broadcaster’s channel.      
  * 404 Not Found|The broadcaster in the `broadcaster_id` query parameter must be broadcasting live.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "clips", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "clips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		title: params.title,

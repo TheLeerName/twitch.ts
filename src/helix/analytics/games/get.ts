@@ -98,8 +98,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  * 404 Not Found|The game specified in the `game_id` query parameter was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
-	const url = new Main.Helix.URL(params.apiPath ?? "analytics/games", Main.Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	const url = new Main.URL(params.apiPath ?? "analytics/games", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		game_id: params.game_id,
 		type: params.type,

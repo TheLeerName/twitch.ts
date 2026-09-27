@@ -39,3 +39,4 @@ export interface RequestQueryParameters {
 }
 
 export * as Helix from "./helix";
+export { URL, URLSearchParams, Response } from "./url";
