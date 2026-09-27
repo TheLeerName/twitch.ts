@@ -1,5 +1,8 @@
 import fs from 'fs';
 import { Request, EventSub, Authorization } from './index';
+import Session from "./helix/guest_star/session";
+
+Session
 
 // To run:
 // node dist/test.js <user_access_token> <broadcaster_login>

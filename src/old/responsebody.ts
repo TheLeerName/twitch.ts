@@ -1,4 +1,5 @@
 import { Authorization } from ".";
+import * as RequestBody from "./requestbody";
 import * as EventSub from "./eventsub";
 
 export interface Base<OK extends boolean = true, Status extends number = 200> {
@@ -9,7 +10,7 @@ export interface Base<OK extends boolean = true, Status extends number = 200> {
 }
 
 export interface StartCommercial extends Base {
-	/** An array that contains a single object with the status of your start commercial request. */
+	/** An object with the status of your start commercial request. */
 	data: {
 		/** The length of the commercial you requested. If you request a commercial that’s longer than 180 seconds, the API uses 180 seconds. */
 		length: number;
@@ -19,6 +20,7 @@ export interface StartCommercial extends Base {
 		retry_after: number;
 	};
 }
+
 export interface GetAdSchedule extends Base {
 	/** An object that contains information related to the channel’s ad schedule. */
 	data: {
@@ -36,8 +38,9 @@ export interface GetAdSchedule extends Base {
 		preroll_free_time: number;
 	};
 }
+
 export interface SnoozeNextAd extends Base {
-	/** An array that contains information about the channel’s snoozes and next upcoming ad after successfully snoozing. */
+	/** A list that contains information about the channel’s snoozes and next upcoming ad after successfully snoozing. */
 	data: {
 		/** The number of snoozes available for the broadcaster. */
 		snooze_count: number;
@@ -47,6 +50,7 @@ export interface SnoozeNextAd extends Base {
 		next_ad_at: string;
 	}[];
 }
+
 export interface GetExtensionAnalytics extends Base {
 	/** A list of reports. The reports are returned in no particular order; however, the data within each report is in ascending order by date (newest first). The report contains one row of data per day of the reporting window; the report contains rows for only those days that the extension was used. The array is empty if there are no reports. */
 	data: {
@@ -55,7 +59,7 @@ export interface GetExtensionAnalytics extends Base {
 		/** The URL that you use to download the report. The URL is valid for 5 minutes. */
 		URL: string;
 		/** The type of report. */
-		type: "overview_v2";
+		type: RequestBody.GetExtensionAnalytics.Type;
 		/** The reporting window’s start and end dates, in RFC3339 format. */
 		date_range: {
 			/** The reporting window’s start date. */
@@ -66,10 +70,11 @@ export interface GetExtensionAnalytics extends Base {
 	}[];
 	/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 	pagination?: {
-		/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
-		cursor?: string;
+		/** The cursor used to get the next page of results. Use the cursor to set the request’s `after` query parameter. */
+		cursor: string;
 	}
 }
+
 export interface GetGameAnalytics extends Base {
 	/** A list of reports. The reports are returned in no particular order; however, the data within each report is in ascending order by date (newest first). The report contains one row of data per day of the reporting window; the report contains rows for only those days that the game was used. A report is available only if the game was broadcast for at least 5 hours over the reporting period. The array is empty if there are no reports. */
 	data: {
@@ -93,6 +98,7 @@ export interface GetGameAnalytics extends Base {
 		cursor?: string;
 	};
 }
+
 export interface GetBitsLeaderboard extends Base {
 	/** A list of leaderboard leaders. The leaders are returned in rank order by how much they’ve cheered. The array is empty if nobody has cheered bits. */
 	data: {
@@ -117,6 +123,7 @@ export interface GetBitsLeaderboard extends Base {
 	/** The number of ranked users in `data`. This is the value in the `count` query parameter or the total number of entries on the leaderboard, whichever is less. */
 	total: number;
 }
+
 export interface GetCheermotes extends Base {
 	/** The list of Cheermotes. The list is in ascending order by the `order` field’s value. */
 	data: {
@@ -159,6 +166,80 @@ export interface GetCheermotes extends Base {
 		is_charitable: boolean;
 	}[];
 }
+
+export interface GetCustomPowerups extends Base {
+	/** A list of custom Power-ups. The list is in ascending order by id. If the broadcaster hasn't created custom Power-ups, the list is empty. */
+	data: {
+		/** The ID that uniquely identifies the broadcaster. */
+		broadcaster_id: string;
+		/** The broadcaster's login name. */
+		broadcaster_login: string;
+		/** The broadcaster's display name. */
+		broadcaster_name: string;
+		/** The ID that uniquely identifies this custom Power-up. */
+		id: string;
+		/** The title of the custom Power-up. */
+		title: string;
+		/** The prompt shown to the viewer when they redeem the custom Power-up if user input is required (see the `is_user_input_required` field). */
+		prompt: string;
+		/** The amount of Bits for the custom Power-up. */
+		bits: number;
+		/** A set of custom images for the custom Power-up. This field is `null` if the broadcaster didn’t upload images. */
+		image: {
+			/** The URL to a small version of the image. */
+			url_1x: string;
+			/**	The URL to a medium version of the image. */
+			url_2x: string;
+			/** The URL to a large version of the image. */
+			url_4x: string;
+		} | null;
+		/** A set of default images for the custom Power-up. */
+		default_image: {
+			/** The URL to a small version of the image. */
+			url_1x: string;
+			/**	The URL to a medium version of the image. */
+			url_2x: string;
+			/** The URL to a large version of the image. */
+			url_4x: string;
+		} | null;
+		/** The background color to use for the custom Power-up. The color is in Hex format (for example, #00E5CB). */
+		background_color: string;
+		/** A Boolean value that determines whether the custom Power-up is enabled. Is `true` if enabled; otherwise, `false`. Disabled custom Power-ups aren’t shown to the user. */
+		is_enabled: boolean;
+		/** A Boolean value that determines whether the user must enter information when redeeming the custom Power-up. Is `true` if the user is prompted. */
+		is_user_input_required: boolean;
+		/** The settings used to determine whether to apply a maximum to the number of redemptions allowed per live stream. */
+		max_per_stream_setting: {
+			/** A Boolean value that determines whether the custom Power-up applies a limit on the number of redemptions allowed per live stream. Is `true` if the custom Power-up applies a limit. */
+			is_enabled: boolean;
+			/** The maximum number of redemptions allowed per live stream. */
+			max_per_stream: number;
+		};
+		/** The settings used to determine whether to apply a maximum to the number of redemptions allowed per user per live stream. */
+		max_per_user_per_stream_setting: {
+			/** A Boolean value that determines whether the custom Power-up applies a limit on the number of redemptions allowed per user per live stream. Is `true` if the custom Power-up applies a limit. */
+			is_enabled: boolean;
+			/**The maximum number of redemptions allowed per user per live stream. */
+			max_per_user_per_stream: number;
+		};
+		/** The settings used to determine whether to apply a cooldown period between redemptions and the length of the cooldown. */
+		global_cooldown_setting: {
+			/** A Boolean value that determines whether to apply a cooldown period. Is `true` if a cooldown period is enabled. */
+			is_enabled: boolean;
+			/** The cooldown period, in seconds. */
+			global_cooldown_seconds: number;
+		};
+		/** A Boolean value that determines whether the custom Power-up is currently paused. Is `true` if the custom Power-up is paused. Viewers can’t redeem paused custom Power-ups. */
+		is_paused: boolean;
+		/** A Boolean value that determines whether the custom Power-up is currently in stock. Is `true` if the custom Power-up is in stock. Viewers can’t redeem out of stock custom Power-ups. */
+		is_in_stock: boolean;
+		/** The number of redemptions redeemed during the current live stream. The number counts against the `max_per_stream_setting` limit. This field is `null` if the broadcaster’s stream isn’t live or `max_per_stream_setting` isn’t enabled. */
+		redemptions_redeemed_current_stream: number;
+		/** The timestamp of when the cooldown period expires. Is `null` if the custom Power-up isn’t in a cooldown state. See the `global_cooldown_setting` field. */
+		cooldown_expires_at: string;
+	}[];
+}
+
 export interface GetExtensionTransactions<ExtensionID extends string> extends Base {
 	/** The list of transactions. */
 	data: {
@@ -209,6 +290,7 @@ export interface GetExtensionTransactions<ExtensionID extends string> extends Ba
 		cursor: string;
 	};
 }
+
 export interface GetChannelInformation extends Base {
 	/** A list that contains information about the specified channels. The list is empty if the specified channels weren’t found. */
 	data: {
@@ -241,7 +323,9 @@ export interface GetChannelInformation extends Base {
 		is_branded_content: boolean;
 	}[];
 }
+
 export type ModifyChannelInformation = Base<true, 204>;
+
 export interface GetChannelEditors extends Base {
 	/** A list of users that are editors for the specified broadcaster. The list is empty if the broadcaster doesn’t have editors. */
 	data: {
@@ -253,6 +337,7 @@ export interface GetChannelEditors extends Base {
 		created_at: string;
 	}[];
 }
+
 export interface GetFollowedChannels extends Base {
 	/** The list of broadcasters that the user follows. The list is in descending order by `followed_at` (with the most recently followed broadcaster first). The list is empty if the user doesn’t follow anyone. */
 	data: {
@@ -273,6 +358,7 @@ export interface GetFollowedChannels extends Base {
 	/** The total number of broadcasters that the user follows. As someone pages through the list, the number may change as the user follows or unfollows broadcasters. */
 	total: number;
 }
+
 export interface GetChannelFollowers extends Base {
 	/** The list of users that follow the specified broadcaster. The list is in descending order by `followed_at` (with the most recent follower first). The list is empty if nobody follows the broadcaster, the specified `user_id` isn’t in the follower list, the user access token is missing the `moderator:read:followers` scope, or the user isn’t the broadcaster or moderator for the channel. */
 	data: {
@@ -293,11 +379,14 @@ export interface GetChannelFollowers extends Base {
 	/** The total number of users that follow this broadcaster. As someone pages through the list, the number of users may change as users follow or unfollow the broadcaster. */
 	total: number;
 }
+
 export interface CreateCustomReward extends Base {
 	/** A list that contains the single custom reward you created. */
 	data: GetCustomRewards["data"][0];
 }
+
 export type DeleteCustomReward = Base<true, 204>;
+
 export interface GetCustomRewards extends Base {
 	/** A list of custom rewards. The list is in ascending order by `id`. If the broadcaster hasn't created custom rewards, the list is empty. */
 	data: {
@@ -365,6 +454,7 @@ export interface GetCustomRewards extends Base {
 		cooldown_expires_at: string | null;
 	}[];
 }
+
 export interface GetCustomRewardRedemptions extends Base {
 	/** The list of redemptions for the specified reward. The list is empty if there are no redemptions that match the redemption criteria. */
 	data: {
@@ -401,14 +491,17 @@ export interface GetCustomRewardRedemptions extends Base {
 		};
 	}[];
 }
+
 export interface UpdateCustomReward extends Base {
 	/** The list contains the single reward that you updated. */
 	data: GetCustomRewards["data"][0];
 }
+
 export interface UpdateCustomRewardRedemptionStatus extends Base {
 	/** The list contains the single redemption that you updated. */
 	data: GetCustomRewardRedemptions["data"][0];
 }
+
 export interface GetCharityCampaigns extends Base {
 	/** A list that contains the charity campaign that the broadcaster is currently running. The list is empty if the broadcaster is not running a charity campaign; the campaign information is not available after the campaign ends. */
 	data: {
@@ -441,6 +534,7 @@ export interface GetCharityCampaigns extends Base {
 		target_amount: GetCharityCampaigns["data"][0]["current_amount"] | null;
 	}[];
 }
+
 export interface GetCharityCampaignDonations extends Base {
 	/** A list that contains the donations that users have made to the broadcaster's charity campaign. The list is empty if the broadcaster is not currently running a charity campaign; the donation information is not available after the campaign ends. */
 	data: {
@@ -463,6 +557,7 @@ export interface GetCharityCampaignDonations extends Base {
 		cursor?: string;
 	};
 }
+
 export interface GetChatters extends Base {
 	/** The list of users that are connected to the broadcaster's chat room. The list is empty if no users are connected to the chat room. */
 	data: {
@@ -481,6 +576,7 @@ export interface GetChatters extends Base {
 	/** The total number of users that are connected to the broadcaster's chat room. As you page through the list, the number of users may change as users join and leave the chat room. */
 	total: number;
 }
+
 export interface GetChannelEmotes extends Base {
 	/** The list of emotes that the specified broadcaster created. If the broadcaster hasn't created custom emotes, the list is empty. */
 	data: {
@@ -513,12 +609,14 @@ export interface GetChannelEmotes extends Base {
 	/** A templated URL. Use the values from the `id`, `format`, `scale`, and `theme_mode` fields to replace the like-named placeholder strings in the templated URL to create a CDN URL that you use to fetch the emote. */
 	template: `https://static-cdn.jtvnw.net/emoticons/v2/{{id}}/{{format}}/{{theme_mode}}/{{scale}}`;
 }
+
 export interface GetGlobalEmotes extends Base {
 	/** The list of global emotes. */
 	data: Omit<GetChannelEmotes["data"][0], "tier" | "emote_type" | "emote_set_id">[];
 	/** A templated URL. Use the values from the `id`, `format`, `scale`, and `theme_mode` fields to replace the like-named placeholder strings in the templated URL to create a CDN URL that you use to fetch the emote. */
 	template: GetChannelEmotes["template"];
 }
+
 export interface GetEmoteSets extends Base {
 	/** The list of emotes found in the specified emote sets. The list is empty if none of the IDs were found. The list is in the same order as the set IDs specified in the request. Each set contains one or more emoticons. */
 	data: (Omit<GetChannelEmotes["data"][0], "tier"> & {
@@ -528,6 +626,7 @@ export interface GetEmoteSets extends Base {
 	/** A templated URL. Use the values from the `id`, `format`, `scale`, and `theme_mode` fields to replace the like-named placeholder strings in the templated URL to create a CDN URL that you use to fetch the emote. */
 	template: GetChannelEmotes["template"];
 }
+
 export interface GetChannelChatBadges extends Base {
 	/** The list of chat badges. The list is sorted in ascending order by `set_id`, and within a set, the list is sorted in ascending order by `id`. */
 	data: {
@@ -554,6 +653,7 @@ export interface GetChannelChatBadges extends Base {
 		}[];
 	}[];
 }
+
 export type GetGlobalChatBadges = GetChannelChatBadges;
 export interface GetChatSettings extends Base {
 	/** The list of chat settings. The list contains a single object with all the settings. */
@@ -582,8 +682,10 @@ export interface GetChatSettings extends Base {
 		unique_chat_mode: boolean;
 	};
 }
+
 export interface GetSharedChatSession extends Base {
-	data: {
+	/** The object of shared chat session. Is **undefined**, if the channel doesn't have active session. */
+	data?: {
 		/** The unique identifier for the shared chat session. */
 		session_id: string;
 		/** The User ID of the host channel. */
@@ -597,8 +699,9 @@ export interface GetSharedChatSession extends Base {
 		created_at: string;
 		/** The UTC date and time (in RFC3339 format) for when the session was last updated. */
 		updated_at: string;
-	}[];
+	};
 }
+
 export interface GetUserEmotes extends Base {
 	data: (Omit<GetEmoteSets["data"][0], "images" | "emote_type"> & {
 		/**
@@ -630,9 +733,13 @@ export interface GetUserEmotes extends Base {
 		cursor?: string;
 	};
 }
+
 export type UpdateChatSettings = GetChatSettings;
+
 export type SendChatAnnouncement = Base<true, 204>;
+
 export type SendShoutout = Base<true, 204>;
+
 export interface SendChatMessage extends Base {
 	data: {
 		/** The message id for the message that was sent. */
@@ -648,6 +755,48 @@ export interface SendChatMessage extends Base {
 		};
 	};
 }
+
+export interface GetPinnedChatMessage extends Base {
+	/** Pinned messages. Empty if none pinned. */
+	data: {
+		/** The ID of the pinned chat message. */
+		message_id: string;
+		/** The ID of the broadcaster. */
+		broadcaster_id: string;
+		/** The ID of the user who sent the pinned message. */
+		sender_user_id: string;
+		/** The login of the user who sent the pinned message. */
+		sender_user_login: string;
+		/** The display name of the user who sent the pinned message. */
+		sender_user_name: string;
+		/** The ID of the user who pinned the message. */
+		pinned_by_user_id: string;
+		/** The login of the user who pinned the message. */
+		pinned_by_user_login: string;
+		/** The display name of the user who pinned the message. */
+		pinned_by_user_name: string;
+		/** The pinned message content. */
+		message: {
+			/** Plain text of the message. */
+			text: string;
+			/** Ordered list of message fragments. */
+			fragments: EventSub.Payload.ChannelChat.MessageFragment.Text | EventSub.Payload.ChannelChat.MessageFragment.Emote | EventSub.Payload.ChannelChat.MessageFragment.Cheermote | EventSub.Payload.ChannelChat.MessageFragment.Mention[];
+		};
+		/** RFC3339 timestamp of when the message was pinned. */
+		starts_at: string;
+		/** RFC3339 expiry timestamp. Is `null` if pinned until stream ends. */
+		ends_at: string | null;
+		/** RFC3339 timestamp of last update. */
+		updated_at: string;
+	}[];
+}
+
+export type PinChatMessage = Base<true, 204>;
+
+export type UpdatePinnedChatMessage = Base<true, 204>;
+
+export type UnpinChatMessage = Base<true, 204>;
+
 export interface GetUserChatColor extends Base {
 	/** The list of users and the color code they use for their name. */
 	data: {
@@ -661,15 +810,29 @@ export interface GetUserChatColor extends Base {
 		color: string;
 	}[];
 }
+
 export type UpdateUserChatColor = Base<true, 204>;
+
 export interface CreateClip extends Base {
+	/** An object containing the created clip. */
 	data: {
 		/** A URL that you can use to edit the clip’s title, identify the part of the clip to publish, and publish the clip The URL is valid for up to 24 hours or until the clip is published, whichever comes first. [Learn More](https://help.twitch.tv/s/article/how-to-use-clips) */
 		edit_url: string;
 		/** An ID that uniquely identifies the clip. */
 		id: string;
-	}
+	};
 }
+
+export interface CreateClipFromVOD extends Base {
+	/** An object containing the created clip. */
+	data: {
+		/** An ID that uniquely identifies the clip. */
+		id: string;
+		/** A URL you can use to edit the clip’s title, feature the clip, create a portrait version of the clip, download the clip media, and share the clip directly to third-party platforms. */
+		edit_url: string;
+	};
+}
+
 export interface GetClips extends Base {
 	/** The list of video clips. For clips returned by game_id or broadcaster_id, the list is in descending order by view count. For lists returned by id, the list is in the same order as the input IDs. */
 	data: {
@@ -714,6 +877,19 @@ export interface GetClips extends Base {
 		cursor?: string;
 	};
 }
+
+export interface GetClipsDownload extends Base {
+	/** List of clips and their download URLs. */
+	data: {
+		/** An ID that uniquely identifies the clip. */
+		clip_id: string;
+		/** The landscape URL to download the clip. This field is `null` if the URL is not available. */
+		landscape_download_url: string | null;
+		/** The portrait URL to download the clip. This field is `null` if the URL is not available. */
+		portrait_download_url: string | null;
+	}[];
+}
+
 export interface GetConduits extends Base {
 	/** List of information about the client’s conduits. */
 	data: {
@@ -723,15 +899,19 @@ export interface GetConduits extends Base {
 		shard_count: number;
 	}[];
 }
+
 export interface CreateConduit extends Base {
 	/** Information about the created conduit. */
 	data: GetConduits["data"][0];
 }
+
 export interface UpdateConduit extends Base {
 	/** Updated information about the conduit. */
 	data: GetConduits["data"][0];
 }
+
 export type DeleteConduit = Base<true, 204>;
+
 export interface GetConduitShards extends Base {
 	/** List of information about a conduit's shards. */
 	data: {
@@ -751,10 +931,17 @@ export interface GetConduitShards extends Base {
 		 * - `websocket_failed_to_reconnect` - The client failed to reconnect to the Twitch WebSocket server within the required time after a Reconnect Message.
 		 */
 		status: 
-			'enabled' | 'webhook_callback_verification_pending' | 'webhook_callback_verification_failed' |
-			'notification_failures_exceeded' | 'websocket_disconnected' | 'websocket_failed_ping_pong' |
-			'websocket_received_inbound_traffic' | 'websocket_internal_error' | 'websocket_network_timeout' |
-			'websocket_network_error' | 'websocket_failed_to_reconnect';
+		| "enabled"
+		| "webhook_callback_verification_pending"
+		| "webhook_callback_verification_failed"
+		| "notification_failures_exceeded"
+		| "websocket_disconnected"
+		| "websocket_failed_ping_pong"
+		| "websocket_received_inbound_traffic"
+		| "websocket_internal_error"
+		| "websocket_network_timeout"
+		| "websocket_network_error"
+		| "websocket_failed_to_reconnect";
 		/** The transport details used to send the notifications. */
 		transport: EventSub.Transport.WebHook | EventSub.Transport.WebSocket.ConnectedAndDisconnected;
 	}[];
@@ -762,8 +949,9 @@ export interface GetConduitShards extends Base {
 	pagination?: {
 		/** The cursor used to get the next page of results. Use the cursor to set the request’s after query parameter. */
 		cursor?: string;
-	}
+	};
 }
+
 export interface UpdateConduitShards extends Base<true, 202> {
 	/** List of successful shard updates. */
 	data: GetConduitShards["data"];
@@ -785,6 +973,7 @@ export interface UpdateConduitShards extends Base<true, 202> {
 		code: string;
 	}[];
 }
+
 export interface GetContentClassificationLabels extends Base {
 	/** A list that contains information about the available content classification labels. */
 	data: {
@@ -796,10 +985,286 @@ export interface GetContentClassificationLabels extends Base {
 		name: string;
 	}[];
 }
-// im lazy to make this for methods from Get Drops Entitlements to Update Extension Bits Product
-export interface CreateEventSubSubscription<Subscription_ extends EventSub.Subscription = EventSub.Subscription> extends Base<true, 202> {
+
+export interface GetDropsEntitlements extends Base {
+	/** The list of entitlements. */
+	data: {
+		/** An ID that identifies the entitlement. */
+		id: string;
+		/** An ID that identifies the benefit (reward). */
+		benefit_id: string;
+		/** The UTC date and time (in RFC3339 format) of when the entitlement was granted. */
+		timestamp: string;
+		/** An ID that identifies the user who was granted the entitlement. */
+		user_id: string;
+		/** An ID that identifies the game the user was playing when the reward was entitled. */
+		game_id: string;
+		/**
+		 * The entitlement’s fulfillment status. Possible values are:
+		 * - CLAIMED — The user claimed the benefit.
+		 * - FULFILLED — The developer granted the benefit that the user claimed.
+		 */
+		fulfillment_status: "CLAIMED" | "FULFILLED";
+		/** The UTC date and time (in RFC3339 format) of when the entitlement was last updated. */
+		last_updated: string;
+	}[];
+	/** The information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+	pagination?: {
+		/** The cursor used to get the next page of results. Use the cursor to set the request’s `after` query parameter. */
+		cursor?: string;
+	};
+}
+
+export interface UpdateDropsEntitlements extends Base {
+	/** A list that indicates which entitlements were successfully updated and those that weren’t. */
+	data: {
+		/**
+		 * A string that indicates whether the status of the entitlements in the ids field were successfully updated. Possible values are:
+		 * - INVALID_ID — The entitlement IDs in the ids field are not valid.
+		 * - NOT_FOUND — The entitlement IDs in the ids field were not found.
+		 * - SUCCESS — The status of the entitlements in the ids field were successfully updated.
+		 * - UNAUTHORIZED — The user or organization identified by the user access token is not authorized to update the entitlements.
+		 * - UPDATE_FAILED — The update failed. These are considered transient errors and the request should be retried later.
+		 */
+		status: "INVALID_ID" | "NOT_FOUND" | "SUCCESS" | "UNAUTHORIZED" | "UPDATE_FAILED";
+		/** The list of entitlements that the status in the `status` field applies to. */
+		ids: string[];
+	}[];
+}
+
+export interface GetExtensionConfigurationSegment extends Base {
+	/** The list of requested configuration segments. The list is returned in the same order that you specified the list of segments in the request. */
+	data: {
+		/** The type of segment. Possible values are:
+		 * - broadcaster
+		 * - developer
+		 * - global
+		 */
+		segment: "broadcaster" | "developer" | "global";
+		/** The ID of the broadcaster that installed the extension. The object includes this field only if the `segment` query parameter is set to developer or broadcaster. */
+		broadcaster_id?: string;
+		/** The contents of the segment. This string may be a plain-text string or a string-encoded JSON object. */
+		content: string;
+		/** The version number that identifies this definition of the segment’s data. */
+		version: string;
+	}[];
+}
+
+export type SetExtensionConfigurationSegment = Base<true, 204>;
+
+export type SetExtensionRequiredConfiguration = Base<true, 204>;
+
+export type SendExtensionPubSubMessage = Base<true, 204>;
+
+export interface GetExtensionLiveChannels extends Base {
+	/** The list of broadcasters that are streaming live and that have installed or activated the extension. */
+	data: {
+		/** The ID of the broadcaster that is streaming live and has installed or activated the extension. */
+		broadcaster_id: string;
+		/** The broadcaster’s display name. */
+		broadcaster_name: string;
+		/** The name of the category or game being streamed. */
+		game_name: string;
+		/** The ID of the category or game being streamed. */
+		game_id: string;
+		/** The title of the broadcaster’s stream. May be an empty string if not specified. */
+		title: string;
+	}[];
+	/** This field contains the cursor used to page through the results. The field is empty if there are no more pages left to page through. Note that this field is a string compared to other endpoints that use a **Pagination** object. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
+	pagination?: string;
+}
+
+export interface GetExtensionSecrets extends Base {
+	/** The list of shared secrets that the extension created. */
+	data: {
+		/** The version number that identifies this definition of the secret’s data. */
+		format_version: number;
+		secrets: {
+			/** The raw secret that you use with JWT encoding. */
+			content: string;
+			/** The UTC date and time (in RFC3339 format) that you may begin using this secret to sign a JWT. */
+			active_at: string;
+			/** The UTC date and time (in RFC3339 format) that you must stop using this secret to decode a JWT. */
+			expires_at: string;
+		}[];
+	}[];
+}
+
+export interface CreateExtensionSecret extends Base {
+	/** A list that contains the newly added secrets. */
+	data: {
+		/** The version number that identifies this definition of the secret’s data. */
+		format_version: number;
+		secrets: {
+			/** The raw secret that you use with JWT encoding. */
+			content: string;
+			/** The UTC date and time (in RFC3339 format) that you may begin using this secret to sign a JWT. */
+			active_at: string;
+			/** The UTC date and time (in RFC3339 format) that you must stop using this secret to decode a JWT. */
+			expires_at: string;
+		}[];
+	}[];
+}
+
+export type SendExtensionChatMessage = Base<true, 204>;
+
+export interface GetExtension extends Base {
+	/** An object that contains the specified extension. */
+	data: {
+		/** The name of the user or organization that owns the extension. */
+		author_name: string;
+		/** A Boolean value that determines whether the extension has features that use Bits. Is **true** if the extension has features that use Bits. */
+		bits_enabled: boolean;
+		/**
+		 * A Boolean value that determines whether a user can install the extension on their channel. Is **true** if a user can install the extension.
+		 * 
+		 * Typically, this is set to **false** if the extension is currently in testing mode and requires users to be allowlisted (the allowlist is configured on Twitch’s [developer site](https://dev.twitch.tv/console/extensions) under the **Extensions** -> **Extension** -> **Version** -> **Access**).
+		 */
+		can_install: boolean;
+		/** The location of where the extension’s configuration is stored. Possible values are:
+		 * - hosted — The Extensions Configuration Service hosts the configuration.
+		 * - custom — The Extension Backend Service (EBS) hosts the configuration.
+		 * - none — The extension doesn't require configuration.
+		 */
+		configuration_location: "hosted" | "custom" | "none";
+		/** A longer description of the extension. It appears on the details page. */
+		description: string;
+		/** A URL to the extension’s Terms of Service. */
+		eula_tos_url: string;
+		/** A Boolean value that determines whether the extension can communicate with the installed channel’s chat. Is **true** if the extension can communicate with the channel’s chat room. */
+		has_chat_support: boolean;
+		/** A URL to the default icon that’s displayed in the Extensions directory. */
+		icon_url: string;
+		/** A dictionary that contains URLs to different sizes of the default icon. The dictionary’s key identifies the icon’s size (for example, 24x24), and the dictionary’s value contains the URL to the icon. */
+		icon_urls: Record<string, string>;
+		/** The extension’s ID. */
+		id: string;
+		/** The extension’s name. */
+		name: string;
+		/** A URL to the extension’s privacy policy. */
+		privacy_policy_url: string;
+		/** A Boolean value that determines whether the extension wants to explicitly ask viewers to link their Twitch identity. */
+		request_identity_link: boolean;
+		/** A list of URLs to screenshots that are shown in the Extensions marketplace. */
+		screenshot_urls: string[];
+		/** The extension’s state. Possible values are:
+		 * - Approved
+		 * - AssetsUploaded
+		 * - Deleted
+		 * - Deprecated
+		 * - InReview
+		 * - InTest
+		 * - PendingAction
+		 * - Rejected
+		 * - Released
+		 */
+		state: "Approved" | "AssetsUploaded" | "Deleted" | "Deprecated" | "InReview" | "InTest" | "PendingAction" | "Rejected" | "Released";
+		/** Indicates whether the extension can view the user’s subscription level on the channel that the extension is installed on. Possible values are:
+		 * - none — The extension can't view the user’s subscription level.
+		 * - optional — The extension can view the user’s subscription level.
+		 */
+		subscriptions_support_level: "none" | "optional";
+		/** A short description of the extension that streamers see when hovering over the discovery splash screen in the Extensions manager. */
+		summary: string;
+		/** The email address that users use to get support for the extension. */
+		support_email: string;
+		/** The extension’s version number. */
+		version: string;
+		/** A brief description displayed on the channel to explain how the extension works. */
+		viewer_summary: string;
+		/** Describes all views-related information such as how the extension is displayed on mobile devices. */
+		views: {
+			/** Describes how the extension is displayed on mobile devices. */
+			mobile: {
+				/** The HTML file that is shown to viewers on mobile devices. This page is presented to viewers as a panel behind the chat area of the mobile app. */
+				viewer_url: string;
+			};
+			/** Describes how the extension is rendered if the extension may be activated as a panel extension. */
+			panel: {
+				/** The HTML file that is shown to viewers on the channel page when the extension is activated in a Panel slot. */
+				viewer_url: string;
+				/** The height, in pixels, of the panel component that the extension is rendered in. */
+				height: number;
+				/** A Boolean value that determines whether the extension can link to non-Twitch domains. */
+				can_link_external_content: boolean;
+			};
+			/** Describes how the extension is rendered if the extension may be activated as a video-overlay extension. */
+			video_overlay: {
+				/** The HTML file that is shown to viewers on the channel page when the extension is activated on the Video - Overlay slot. */
+				viewer_url: string;
+				/** A Boolean value that determines whether the extension can link to non-Twitch domains. */
+				can_link_external_content: boolean;
+			};
+			/** Describes how the extension is rendered if the extension may be activated as a video-component extension. */
+			component: {
+				/** The HTML file that is shown to viewers on the channel page when the extension is activated in a Video - Component slot. */
+				viewer_url: string;
+				/** The width value of the ratio (width : height) which determines the extension’s width, and how the extension’s iframe will resize in different video player environments. */
+				aspect_ratio_x: number;
+				/** The height value of the ratio (width : height) which determines the extension’s height, and how the extension’s iframe will resize in different video player environments. */
+				aspect_ratio_y: number;
+				/** A Boolean value that determines whether to apply CSS zoom. If **true**, a CSS zoom is applied such that the size of the extension is variable but the inner dimensions are fixed based on Scale Pixels. This allows your extension to render as if it is of fixed width and height. If **false**, the inner dimensions of the extension iframe are variable, meaning your extension must implement responsiveness. */
+				autoscale: boolean;
+				/** The base width, in pixels, of the extension to use when scaling (see `autoscale`). This value is ignored if `autoscale` is **false**. */
+				scale_pixels: number;
+				/** The height as a percent of the maximum height of a video component extension. Values are between 1% - 100%. */
+				target_height: number;
+				/** A Boolean value that determines whether the extension can link to non-Twitch domains. */
+				can_link_external_content: boolean;
+			};
+			/** Describes the view that is shown to broadcasters while they are configuring your extension within the Extension Manager. */
+			config: {
+				/** The HTML file shown to broadcasters while they are configuring your extension within the Extension Manager. */
+				viewer_url: string;
+				/** A Boolean value that determines whether the extension can link to non-Twitch domains. */
+				can_link_external_content: boolean;
+			};
+		};
+		/** Allowlisted configuration URLs for displaying the extension (the allowlist is configured on Twitch’s [developer site](https://dev.twitch.tv/console/extensions) under the **Extensions** -> **Extension** -> **Version** -> **Capabilities**). */
+		allowlisted_config_urls: string[];
+		/** Allowlisted panel URLs for displaying the extension (the allowlist is configured on Twitch’s [developer site](https://dev.twitch.tv/console/extensions) under the **Extensions** -> **Extension** -> **Version** -> **Capabilities**). */
+		allowlisted_panel_urls: string[];
+	};
+}
+
+export interface GetReleasedExtension extends Base {
+	/** A list that contains the specified extension. */
+	data: GetExtension["data"];
+}
+
+export interface GetExtensionBitsProducts extends Base {
+	/** A list of Bits products that the extension created. The list is in ascending SKU order. The list is empty if the extension hasn’t created any products or they’re all expired or disabled. */
+	data: {
+		/** The product’s SKU. The SKU is unique across an extension’s products. */
+		sku: string;
+		/** An object that contains the product’s cost information. */
+		cost: {
+			/** The product’s price. */
+			amount: number;
+			/** The type of currency. Possible values are:
+			 * - bits
+			 */
+			type: "bits";
+		};
+		/** A Boolean value that indicates whether the product is in development. If **true**, the product is not available for public use. */
+		in_development: boolean;
+		/** The product’s name as displayed in the extension. */
+		display_name: string;
+		/** The date and time, in RFC3339 format, when the product expires. */
+		expiration: string;
+		/** A Boolean value that determines whether Bits product purchase events are broadcast to all instances of an extension on a channel. The events are broadcast via the `onTransactionComplete` helper callback. Is **true** if the event is broadcast to all instances. */
+		is_broadcast: boolean;
+	}[];
+}
+
+export interface UpdateExtensionBitsProduct extends Base {
+	/** An object of Bits product that the extension created. The list is in ascending SKU order. The list is empty if the extension hasn't created any products or they're all expired or disabled. */
+	data: GetExtensionBitsProducts["data"][0];
+}
+
+export interface CreateEventSubSubscription<_Subscription extends EventSub.Subscription> extends Base<true, 202> {
 	/** A object that contains the single subscription that you created. */
-	data: Subscription_ & {
+	data: _Subscription & {
 		/** An ID that identifies the subscription. */
 		id: string;
 		/**
@@ -822,7 +1287,9 @@ export interface CreateEventSubSubscription<Subscription_ extends EventSub.Subsc
 	/** The maximum total cost that you’re allowed to incur for all subscriptions you create. */
 	max_total_cost: number;
 }
+
 export type DeleteEventSubSubscription = Base<true, 204>;
+
 export interface GetEventSubSubscriptions extends Base {
 	/** The list of subscriptions. The list is ordered by the oldest subscription first. The list is empty if the client hasn't created subscriptions or there are no subscriptions that match the specified filter criteria. */
 	data: EventSub.Subscription<EventSub.Transport.WebHook | EventSub.Transport.WebSocket.ConnectedAndDisconnected> & {
@@ -866,6 +1333,7 @@ export interface GetEventSubSubscriptions extends Base {
 		cursor?: string;
 	};
 }
+
 export interface GetTopGames extends Base {
 	/** The list of broadcasts. The broadcasts are sorted by the number of viewers, with the most popular first. */
 	data: {
@@ -884,10 +1352,12 @@ export interface GetTopGames extends Base {
 		cursor?: string;
 	};
 }
+
 export interface GetGames extends Base {
 	/** The list of categories and games. The list is empty if the specified categories and games weren’t found. */
 	data: GetTopGames["data"];
 }
+
 export interface GetCreatorGoals extends Base {
 	/** The list of goals. The list is empty if the broadcaster hasn’t created goals. */
 	data: {
@@ -900,14 +1370,25 @@ export interface GetCreatorGoals extends Base {
 		/** The broadcaster’s login name. */
 		broadcaster_login: string;
 		/** 
-		 * The type of goal. Possible values are:
-		 * - `follower` — The goal is to increase followers.
-		 * - `subscription` — The goal is to increase subscriptions. This type shows the net increase or decrease in tier points associated with the subscriptions.
-		 * - `subscription_count` — The goal is to increase subscriptions. This type shows the net increase or decrease in the number of subscriptions.
-		 * - `new_subscription` — The goal is to increase subscriptions. This type shows only the net increase in tier points associated with the subscriptions (it does not account for users that unsubscribed since the goal started).
-		 * - `new_subscription_count` — The goal is to increase subscriptions. This type shows only the net increase in the number of subscriptions (it does not account for users that unsubscribed since the goal started)
+		 * Goal type|Description
+		 * -|-
+		 * `follower`|The goal is to increase followers.
+		 * `follower`|The goal is to increase followers.
+		 * `subscription`|The goal is to increase subscriptions. This type shows the net increase or decrease in tier points associated with the subscriptions.
+		 * `subscription_count`|The goal is to increase subscriptions. This type shows the net increase or decrease in the number of subscriptions.
+		 * `new_subscription`|The goal is to increase subscriptions. This type shows only the net increase in tier points associated with the subscriptions (it does not account for users that unsubscribed since the goal started).
+		 * `new_subscription_count`|The goal is to increase subscriptions. This type shows only the net increase in the number of subscriptions (it does not account for users that unsubscribed since the goal started)
+		 * `new_bit`|The goal is to increase the amount of Bits used on the channel.
+		 * `new_cheerer`|The goal is to increase the amount of unique Cheerers on to Cheer on the channel.
 		 */
-		type: 'follower' | 'subscription' | 'subscription_count' | 'new_subscription' | 'new_subscription_count';
+		type:
+		| "follower"
+		| "subscription"
+		| "subscription_count"
+		| "new_subscription"
+		| "new_subscription_count"
+		| "new_bit"
+		| "new_cheerer";
 		/** A description of the goal. Is an empty string if not specified. */
 		description: string;
 		/** 
@@ -925,7 +1406,72 @@ export interface GetCreatorGoals extends Base {
 		created_at: string;
 	}[];
 }
-// here must be Channel Guest Star things but who needs this anyways?
+
+export interface GetChannelGuestStarSettings extends Base {
+	data: {
+		/** Flag determining if Guest Star moderators have access to control whether a guest is live once assigned to a slot. */
+		is_moderator_send_live_enabled: boolean;
+		/** Number of slots the Guest Star call interface will allow the host to add to a call. Required to be between 1 and 6. */
+		slot_count: number;
+		/** Flag determining if Browser Sources subscribed to sessions on this channel should output audio */
+		is_browser_source_audio_enabled: boolean;
+		/**
+		 * This setting determines how the guests within a session should be laid out within the browser source. Can be one of the following values:
+		 * Value|Description
+		 * TILED_LAYOUT|All live guests are tiled within the browser source with the same size.
+		 * SCREENSHARE_LAYOUT|All live guests are tiled within the browser source with the same size. If there is an active screen share, it is sized larger than the other guests.
+		 * HORIZONTAL_LAYOUT|All live guests are arranged in a horizontal bar within the browser source
+		 * VERTICAL_LAYOUT|All live guests are arranged in a vertical bar within the browser source
+		 */
+		group_layout: "TILED_LAYOUT" | "SCREENSHARE_LAYOUT" | "HORIZONTAL_LAYOUT" | "VERTICAL_LAYOUT";
+		/** View only token to generate browser source URLs */
+		browser_source_token: string;
+	};
+}
+
+export type UpdateChannelGuestStarSettings = Base<true, 204>;
+
+export interface GetGuestStarSession extends Base {
+	/** Summary of the session details */
+	data: {
+		/** ID uniquely representing the Guest Star session. */
+		id: string;
+		/** List of guests currently interacting with the Guest Star session. */
+		guests: {
+			/**
+			 * ID representing this guest’s slot assignment.
+			 * - Host is always in slot "0"
+			 * - Guests are assigned the following consecutive IDs (e.g, "1", "2", "3", etc)
+			 * - Screen Share is represented as a special guest with the ID "SCREENSHARE"
+			 * - The identifier here matches the ID referenced in browser source links used in broadcasting software.
+			 */
+			slot_id: string;
+			/** Flag determining whether or not the guest is visible in the browser source in the host’s streaming software. */
+			is_live: boolean;
+			/** User ID of the guest assigned to this slot. */
+			user_id: string;
+			/** Display name of the guest assigned to this slot. */
+			user_display_name: string;
+			/** Login of the guest assigned to this slot. */
+			user_login: string;
+			/** Value from 0 to 100 representing the host’s volume setting for this guest. */
+			volume: number;
+			/** Timestamp when this guest was assigned a slot in the session. */
+			assigned_at: string;
+			/** Information about the guest’s audio settings */
+			audio_settings: {
+				/** Flag determining whether the host is allowing the guest’s audio to be seen or heard within the session. */
+				is_host_enabled: boolean;
+				/** Flag determining whether the guest is allowing their audio to be transmitted to the session. */
+				is_guest_enabled: boolean;
+				/** Flag determining whether the guest has an appropriate audio device available to be transmitted to the session. */
+				is_available: boolean;
+			};
+			/** Information about the guest’s video settings */
+		}[];
+	};
+}
+
 export interface GetHypeTrainEvents extends Base {
 	/** The list of Hype Train events. The list is empty if the broadcaster hasn’t run a Hype Train within the last 5 days. */
 	data: {
@@ -1585,10 +2131,10 @@ export interface GetChannelTeams extends Base {
 		broadcaster_login: string;
 		/** The broadcaster’s display name. */
 		broadcaster_name: string;
-		/** A URL to the team’s background image. */
-		background_image_url: string;
-		/** A URL to the team’s banner. */
-		banner: string;
+		/** A URL to the team’s background image. This field is null if the team does not have a background image set. */
+		background_image_url: string | null;
+		/** A URL to the team’s banner. This field is `null` if the team does not have a banner set. */
+		banner: string | null;
 		/** The UTC date and time (in RFC3339 format) of when the team was created. */
 		created_at: string;
 		/** The UTC date and time (in RFC3339 format) of the last time the team was updated. */

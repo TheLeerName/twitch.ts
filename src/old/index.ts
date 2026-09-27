@@ -10,8 +10,8 @@ export namespace Options {
 	export function setTwitchCLIMode(twitchCLIMode: boolean) {
 		Options.twitchCLIMode = twitchCLIMode;
 		if (twitchCLIMode) {
-			Options.apiHelixPath = "http://127.0.0.1:8080/mock";
-			Options.idOAuth2Path = "http://127.0.0.1:8080/auth";
+			Options.apiHelixPath = "http://localhost:8080/mock";
+			Options.idOAuth2Path = "http://localhost:8080/auth";
 			Options.eventSubWSPath = "ws://127.0.0.1:8080/ws";
 		}
 		else {

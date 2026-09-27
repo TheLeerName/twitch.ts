@@ -13,12 +13,24 @@ export function startWebSocket<S extends Authorization.Scope[]>(tokenData: Autho
 }
 
 export type SubscriptionType =
-	'enabled' | 'webhook_callback_verification_pending' | 'webhook_callback_verification_failed' |
-	'notification_failures_exceeded' | 'authorization_revoked' | 'moderator_removed' |
-	'user_removed' | 'chat_user_banned' | 'version_removed' | 'beta_maintenance' |
-	'websocket_disconnected' | 'websocket_failed_ping_pong' | 'websocket_received_inbound_traffic' |
-	'websocket_connection_unused' | 'websocket_internal_error' | 'websocket_network_timeout' |
-	'websocket_network_error' | 'websocket_failed_to_reconnect';
+| "enabled"
+| "webhook_callback_verification_pending"
+| "webhook_callback_verification_failed"
+| "notification_failures_exceeded"
+| "authorization_revoked"
+| "moderator_removed"
+| "user_removed"
+| "chat_user_banned"
+| "version_removed"
+| "beta_maintenance"
+| "websocket_disconnected"
+| "websocket_failed_ping_pong"
+| "websocket_received_inbound_traffic"
+| "websocket_connection_unused"
+| "websocket_internal_error"
+| "websocket_network_timeout" 
+| "websocket_network_error"
+| "websocket_failed_to_reconnect";
 
 export interface ConnectionEvents {
 	/**
@@ -428,6 +440,12 @@ export namespace Condition {
 		/** Optional. Specify a reward id to only receive notifications for a specific reward. */
 		reward_id?: string;
 	}
+	export interface ChannelCustomPowerupRedemptionAdd extends Condition {
+		/** The broadcaster user ID for the channel you want to receive custom Power-up redemption add notifications for. */
+		broadcaster_user_id: string;
+		/** Optional. Specify a reward id to only receive notifications for a specific custom Power-up. */
+		reward_id?: string;
+	}
 	export interface ChannelPollBegin extends Condition {
 		/** The broadcaster user ID of the channel for which “poll begin” notifications will be received. */
 		broadcaster_user_id: string;
@@ -644,7 +662,90 @@ export namespace Transport {
 }
 
 /** Subscription-related parameters */
-export type Subscription<_Transport extends Transport = Transport> = Subscription.AutomodMessageHold<_Transport> | Subscription.AutomodMessageHoldV2<_Transport> | Subscription.AutomodMessageUpdate<_Transport> | Subscription.AutomodMessageUpdateV2<_Transport> | Subscription.AutomodSettingsUpdate<_Transport> | Subscription.AutomodTermsUpdate<_Transport> | Subscription.ChannelAdBreakBegin<_Transport> | Subscription.ChannelBan<_Transport> | Subscription.ChannelBitsUse<_Transport> | Subscription.ChannelCharityCampaignDonate<_Transport> | Subscription.ChannelCharityCampaignProgress<_Transport> | Subscription.ChannelCharityCampaignStart<_Transport> | Subscription.ChannelCharityCampaignStop<_Transport> | Subscription.ChannelChatClear<_Transport> | Subscription.ChannelChatClearUserMessages<_Transport> | Subscription.ChannelChatMessage<_Transport> | Subscription.ChannelChatMessageDelete<_Transport> | Subscription.ChannelChatNotification<_Transport> | Subscription.ChannelChatSettingsUpdate<_Transport> | Subscription.ChannelChatUserMessageHold<_Transport> | Subscription.ChannelChatUserMessageUpdate<_Transport> | Subscription.ChannelCheer<_Transport> | Subscription.ChannelFollow<_Transport> | Subscription.ChannelGoalBegin<_Transport> | Subscription.ChannelGoalEnd<_Transport> | Subscription.ChannelGoalProgress<_Transport> | Subscription.ChannelGuestStarGuestUpdate<_Transport> | Subscription.ChannelGuestStarSessionBegin<_Transport> | Subscription.ChannelGuestStarSessionEnd<_Transport> | Subscription.ChannelGuestStarSettingsUpdate<_Transport> | Subscription.ChannelHypeTrainBegin<_Transport> | Subscription.ChannelHypeTrainEnd<_Transport> | Subscription.ChannelHypeTrainProgress<_Transport> | Subscription.ChannelModerate<_Transport> | Subscription.ChannelModerateV2<_Transport> | Subscription.ChannelModeratorAdd<_Transport> | Subscription.ChannelModeratorRemove<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsAutomaticRewardRedemptionAddV2<_Transport> | Subscription.ChannelPointsCustomRewardAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionAdd<_Transport> | Subscription.ChannelPointsCustomRewardRedemptionUpdate<_Transport> | Subscription.ChannelPointsCustomRewardRemove<_Transport> | Subscription.ChannelPointsCustomRewardUpdate<_Transport> | Subscription.ChannelPollBegin<_Transport> | Subscription.ChannelPollEnd<_Transport> | Subscription.ChannelPollProgress<_Transport> | Subscription.ChannelPredictionBegin<_Transport> | Subscription.ChannelPredictionEnd<_Transport> | Subscription.ChannelPredictionLock<_Transport> | Subscription.ChannelPredictionProgress<_Transport> | Subscription.ChannelRaid<_Transport> | Subscription.ChannelSharedChatSessionBegin<_Transport> | Subscription.ChannelSharedChatSessionEnd<_Transport> | Subscription.ChannelSharedChatSessionUpdate<_Transport> | Subscription.ChannelShieldModeBegin<_Transport> | Subscription.ChannelShieldModeEnd<_Transport> | Subscription.ChannelShoutoutCreate<_Transport> | Subscription.ChannelShoutoutReceive<_Transport> | Subscription.ChannelSubscribe<_Transport> | Subscription.ChannelSubscriptionEnd<_Transport> | Subscription.ChannelSubscriptionGift<_Transport> | Subscription.ChannelSubscriptionMessage<_Transport> | Subscription.ChannelSuspiciousUserMessage<_Transport> | Subscription.ChannelSuspiciousUserUpdate<_Transport> | Subscription.ChannelUnban<_Transport> | Subscription.ChannelUnbanRequestCreate<_Transport> | Subscription.ChannelUnbanRequestResolve<_Transport> | Subscription.ChannelUpdate<_Transport> | Subscription.ChannelVipAdd<_Transport> | Subscription.ChannelVipRemove<_Transport> | Subscription.ChannelWarningAcknowledge<_Transport> | Subscription.ChannelWarningSend<_Transport> | Subscription.ConduitShardDisabled<_Transport> | Subscription.DropEntitlementGrant<_Transport> | Subscription.ExtensionBitsTransactionCreate<_Transport> | Subscription.StreamOffline<_Transport> | Subscription.StreamOnline<_Transport> | Subscription.UserAuthorizationGrant<_Transport> | Subscription.UserAuthorizationRevoke<_Transport> | Subscription.UserUpdate<_Transport> | Subscription.UserWhisperMessage;
+export type Subscription<_Transport extends Transport = Transport> =
+| Subscription.AutomodMessageHold<_Transport>
+| Subscription.AutomodMessageHoldV2<_Transport>
+| Subscription.AutomodMessageUpdate<_Transport>
+| Subscription.AutomodMessageUpdateV2<_Transport>
+| Subscription.AutomodSettingsUpdate<_Transport>
+| Subscription.AutomodTermsUpdate<_Transport>
+| Subscription.ChannelAdBreakBegin<_Transport>
+| Subscription.ChannelBan<_Transport>
+| Subscription.ChannelBitsUse<_Transport>
+| Subscription.ChannelCharityCampaignDonate<_Transport>
+| Subscription.ChannelCharityCampaignProgress<_Transport>
+| Subscription.ChannelCharityCampaignStart<_Transport>
+| Subscription.ChannelCharityCampaignStop<_Transport>
+| Subscription.ChannelChatClear<_Transport>
+| Subscription.ChannelChatClearUserMessages<_Transport>
+| Subscription.ChannelChatMessage<_Transport>
+| Subscription.ChannelChatMessageDelete<_Transport>
+| Subscription.ChannelChatNotification<_Transport>
+| Subscription.ChannelChatSettingsUpdate<_Transport>
+| Subscription.ChannelChatUserMessageHold<_Transport>
+| Subscription.ChannelChatUserMessageUpdate<_Transport>
+| Subscription.ChannelCheer<_Transport>
+| Subscription.ChannelFollow<_Transport>
+| Subscription.ChannelGoalBegin<_Transport>
+| Subscription.ChannelGoalEnd<_Transport>
+| Subscription.ChannelGoalProgress<_Transport>
+| Subscription.ChannelGuestStarGuestUpdate<_Transport>
+| Subscription.ChannelGuestStarSessionBegin<_Transport>
+| Subscription.ChannelGuestStarSessionEnd<_Transport>
+| Subscription.ChannelGuestStarSettingsUpdate<_Transport>
+| Subscription.ChannelHypeTrainBegin<_Transport>
+| Subscription.ChannelHypeTrainEnd<_Transport>
+| Subscription.ChannelHypeTrainProgress<_Transport>
+| Subscription.ChannelModerate<_Transport>
+| Subscription.ChannelModerateV2<_Transport>
+| Subscription.ChannelModeratorAdd<_Transport>
+| Subscription.ChannelModeratorRemove<_Transport>
+| Subscription.ChannelPointsAutomaticRewardRedemptionAdd<_Transport>
+| Subscription.ChannelPointsAutomaticRewardRedemptionAddV2<_Transport>
+| Subscription.ChannelPointsCustomRewardAdd<_Transport>
+| Subscription.ChannelPointsCustomRewardRedemptionAdd<_Transport>
+| Subscription.ChannelPointsCustomRewardRedemptionUpdate<_Transport>
+| Subscription.ChannelPointsCustomRewardRemove<_Transport>
+| Subscription.ChannelPointsCustomRewardUpdate<_Transport>
+| Subscription.ChannelCustomPowerupRedemptionAdd<_Transport>
+| Subscription.ChannelPollBegin<_Transport>
+| Subscription.ChannelPollEnd<_Transport>
+| Subscription.ChannelPollProgress<_Transport>
+| Subscription.ChannelPredictionBegin<_Transport>
+| Subscription.ChannelPredictionEnd<_Transport>
+| Subscription.ChannelPredictionLock<_Transport>
+| Subscription.ChannelPredictionProgress<_Transport>
+| Subscription.ChannelRaid<_Transport>
+| Subscription.ChannelSharedChatSessionBegin<_Transport>
+| Subscription.ChannelSharedChatSessionEnd<_Transport>
+| Subscription.ChannelSharedChatSessionUpdate<_Transport>
+| Subscription.ChannelShieldModeBegin<_Transport>
+| Subscription.ChannelShieldModeEnd<_Transport>
+| Subscription.ChannelShoutoutCreate<_Transport>
+| Subscription.ChannelShoutoutReceive<_Transport>
+| Subscription.ChannelSubscribe<_Transport>
+| Subscription.ChannelSubscriptionEnd<_Transport>
+| Subscription.ChannelSubscriptionGift<_Transport>
+| Subscription.ChannelSubscriptionMessage<_Transport>
+| Subscription.ChannelSuspiciousUserMessage<_Transport>
+| Subscription.ChannelSuspiciousUserUpdate<_Transport>
+| Subscription.ChannelUnban<_Transport>
+| Subscription.ChannelUnbanRequestCreate<_Transport>
+| Subscription.ChannelUnbanRequestResolve<_Transport>
+| Subscription.ChannelUpdate<_Transport>
+| Subscription.ChannelVipAdd<_Transport>
+| Subscription.ChannelVipRemove<_Transport>
+| Subscription.ChannelWarningAcknowledge<_Transport>
+| Subscription.ChannelWarningSend<_Transport>
+| Subscription.ConduitShardDisabled<_Transport>
+| Subscription.DropEntitlementGrant<_Transport>
+| Subscription.ExtensionBitsTransactionCreate<_Transport>
+| Subscription.StreamOffline<_Transport>
+| Subscription.StreamOnline<_Transport>
+| Subscription.UserAuthorizationGrant<_Transport>
+| Subscription.UserAuthorizationRevoke<_Transport>
+| Subscription.UserUpdate<_Transport>
+| Subscription.UserWhisperMessage<_Transport>;
 export namespace Subscription {
 	/**
 	 * Type|Description
@@ -665,24 +766,26 @@ export namespace Subscription {
 	 * `websocket_internal_error`|The Twitch WebSocket server experienced an unexpected error.
 	 * `websocket_network_timeout`|The Twitch WebSocket server timed out writing the message to the client.
 	 * `websocket_network_error`|The Twitch WebSocket server experienced a network error writing the message to the client.
+	 * `conduit_deleted`|The conduit associated with the subscription was deleted.
 	 */
 	export type Status = 
-		"enabled" | 
-		"webhook_callback_verification_pending" | 
-		"webhook_callback_verification_failed" | 
-		"notification_failures_exceeded" | 
-		"authorization_revoked" | 
-		"moderator_removed" | 
-		"user_removed" | 
-		"version_removed" | 
-		"beta_maintenance" | 
-		"websocket_disconnected" |
-		"websocket_failed_ping_pong" |
-		"websocket_received_inbound_traffic" | 
-		"websocket_connection_unused" |
-		"websocket_internal_error" | 
-		"websocket_network_timeout" | 
-		"websocket_network_error";
+	| "enabled"
+	| "webhook_callback_verification_pending"
+	| "webhook_callback_verification_failed"
+	| "notification_failures_exceeded"
+	| "authorization_revoked"
+	| "moderator_removed"
+	| "user_removed"
+	| "version_removed"
+	| "beta_maintenance"
+	| "websocket_disconnected"
+	| "websocket_failed_ping_pong"
+	| "websocket_received_inbound_traffic"
+	| "websocket_connection_unused"
+	| "websocket_internal_error"
+	| "websocket_network_timeout"
+	| "websocket_network_error"
+	| "conduit_deleted";
 	export interface Base<Type extends string = string, Version_ extends Version = Version, Condition_ extends Condition = Condition, Transport_ extends Transport = Transport> {
 		/** The subscription type name. */
 		type: Type;
@@ -1546,6 +1649,24 @@ export namespace Subscription {
 	}
 
 	/**
+	 * The `channel.custom_power_up_redemption.add` subscription type sends a notification when a viewer has redeemed a custom Power-up on the specified channel.
+	 * 
+	 * Must have `bits:read` scope.
+	 * */
+	export type ChannelCustomPowerupRedemptionAdd<_Transport extends Transport = Transport> = Base<"channel.custom_power_up_redemption.add", "1", Condition.ChannelCustomPowerupRedemptionAdd, _Transport>;
+	/**
+	 * @param connection
+	 * If using `Connection` object, `moderator_user_id` gets from `authorization.user_id`, otherwise use these parameters:
+	 * - `transport` — The transport details that you want Twitch to use when sending you notifications.
+	 * @param broadcaster_user_id The broadcaster user ID for the channel you want to receive channel points custom reward redemption update notifications for.
+	 * @param reward_id Optional. Specify a reward id to only receive notifications for a specific reward.
+	 */
+	export function ChannelCustomPowerupRedemptionAdd(connection: Connection | {transport: Transport}, broadcaster_user_id: string, reward_id?: string): ChannelCustomPowerupRedemptionAdd {
+		if (Connection.is(connection)) return { transport: connection.transport, type: "channel.custom_power_up_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+		else return { transport: connection.transport, type: "channel.custom_power_up_redemption.add", version: "1", condition: { broadcaster_user_id, reward_id } };
+	}
+
+	/**
 	 * The `channel.poll.begin` subscription type sends a notification when a poll begins on the specified channel. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollbegin)
 	 * 
 	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
@@ -2222,8 +2343,92 @@ export namespace Subscription {
 }
 
 /** An object that contains the message. */
-export type Payload = Payload.AutomodMessageHold | Payload.AutomodMessageHoldV2 | Payload.AutomodMessageUpdate | Payload.AutomodMessageUpdateV2 | Payload.AutomodSettingsUpdate | Payload.AutomodTermsUpdate | Payload.ChannelAdBreakBegin | Payload.ChannelBan | Payload.ChannelBitsUse | Payload.ChannelCharityCampaignDonate | Payload.ChannelCharityCampaignProgress | Payload.ChannelCharityCampaignStart | Payload.ChannelCharityCampaignStop | Payload.ChannelChatClear | Payload.ChannelChatClearUserMessages | Payload.ChannelChatMessage | Payload.ChannelChatMessageDelete | Payload.ChannelChatNotification | Payload.ChannelChatSettingsUpdate | Payload.ChannelChatUserMessageHold | Payload.ChannelChatUserMessageUpdate | Payload.ChannelCheer | Payload.ChannelFollow | Payload.ChannelGoalBegin | Payload.ChannelGoalEnd | Payload.ChannelGoalProgress | Payload.ChannelGuestStarGuestUpdate | Payload.ChannelGuestStarSessionBegin | Payload.ChannelGuestStarSessionEnd | Payload.ChannelGuestStarSettingsUpdate | Payload.ChannelHypeTrainBegin | Payload.ChannelHypeTrainEnd | Payload.ChannelHypeTrainProgress | Payload.ChannelModerate | Payload.ChannelModerateV2 | Payload.ChannelModeratorAdd | Payload.ChannelModeratorRemove | Payload.ChannelPointsAutomaticRewardRedemptionAdd | Payload.ChannelPointsAutomaticRewardRedemptionAddV2 | Payload.ChannelPointsCustomRewardAdd | Payload.ChannelPointsCustomRewardRedemptionAdd | Payload.ChannelPointsCustomRewardRedemptionUpdate | Payload.ChannelPointsCustomRewardRemove | Payload.ChannelPointsCustomRewardUpdate | Payload.ChannelPollBegin | Payload.ChannelPollEnd | Payload.ChannelPollProgress | Payload.ChannelPredictionBegin | Payload.ChannelPredictionEnd | Payload.ChannelPredictionLock | Payload.ChannelPredictionProgress | Payload.ChannelRaid | Payload.ChannelSharedChatSessionBegin | Payload.ChannelSharedChatSessionEnd | Payload.ChannelSharedChatSessionUpdate | Payload.ChannelShieldModeBegin | Payload.ChannelShieldModeEnd | Payload.ChannelShoutoutCreate | Payload.ChannelShoutoutReceive | Payload.ChannelSubscribe | Payload.ChannelSubscriptionEnd | Payload.ChannelSubscriptionGift | Payload.ChannelSubscriptionMessage | Payload.ChannelSuspiciousUserMessage | Payload.ChannelSuspiciousUserUpdate | Payload.ChannelUnban | Payload.ChannelUnbanRequestCreate | Payload.ChannelUnbanRequestResolve | Payload.ChannelUpdate | Payload.ChannelVipAdd | Payload.ChannelVipRemove | Payload.ChannelWarningAcknowledge | Payload.ChannelWarningSend | Payload.ConduitShardDisabled | Payload.DropEntitlementGrant | Payload.ExtensionBitsTransactionCreate | Payload.StreamOffline | Payload.StreamOnline | Payload.UserAuthorizationGrant | Payload.UserAuthorizationRevoke | Payload.UserUpdate | Payload.UserWhisperMessage;
+export type Payload = 
+| Payload.AutomodMessageHold
+| Payload.AutomodMessageHoldV2
+| Payload.AutomodMessageUpdate
+| Payload.AutomodMessageUpdateV2
+| Payload.AutomodSettingsUpdate
+| Payload.AutomodTermsUpdate
+| Payload.ChannelAdBreakBegin
+| Payload.ChannelBan
+| Payload.ChannelBitsUse
+| Payload.ChannelCharityCampaignDonate
+| Payload.ChannelCharityCampaignProgress
+| Payload.ChannelCharityCampaignStart
+| Payload.ChannelCharityCampaignStop
+| Payload.ChannelChatClear
+| Payload.ChannelChatClearUserMessages
+| Payload.ChannelChatMessage
+| Payload.ChannelChatMessageDelete
+| Payload.ChannelChatNotification
+| Payload.ChannelChatSettingsUpdate
+| Payload.ChannelChatUserMessageHold
+| Payload.ChannelChatUserMessageUpdate
+| Payload.ChannelCheer
+| Payload.ChannelFollow
+| Payload.ChannelGoalBegin
+| Payload.ChannelGoalEnd
+| Payload.ChannelGoalProgress
+| Payload.ChannelGuestStarGuestUpdate
+| Payload.ChannelGuestStarSessionBegin
+| Payload.ChannelGuestStarSessionEnd
+| Payload.ChannelGuestStarSettingsUpdate
+| Payload.ChannelHypeTrainBegin
+| Payload.ChannelHypeTrainEnd
+| Payload.ChannelHypeTrainProgress
+| Payload.ChannelModerate
+| Payload.ChannelModerateV2
+| Payload.ChannelModeratorAdd
+| Payload.ChannelModeratorRemove
+| Payload.ChannelPointsAutomaticRewardRedemptionAdd
+| Payload.ChannelPointsAutomaticRewardRedemptionAddV2
+| Payload.ChannelPointsCustomRewardAdd
+| Payload.ChannelPointsCustomRewardRedemptionAdd
+| Payload.ChannelPointsCustomRewardRedemptionUpdate
+| Payload.ChannelPointsCustomRewardRemove
+| Payload.ChannelPointsCustomRewardUpdate
+| Payload.ChannelCustomPowerupRedemptionAdd
+| Payload.ChannelPollBegin
+| Payload.ChannelPollEnd
+| Payload.ChannelPollProgress
+| Payload.ChannelPredictionBegin
+| Payload.ChannelPredictionEnd
+| Payload.ChannelPredictionLock
+| Payload.ChannelPredictionProgress
+| Payload.ChannelRaid
+| Payload.ChannelSharedChatSessionBegin
+| Payload.ChannelSharedChatSessionEnd
+| Payload.ChannelSharedChatSessionUpdate
+| Payload.ChannelShieldModeBegin
+| Payload.ChannelShieldModeEnd
+| Payload.ChannelShoutoutCreate
+| Payload.ChannelShoutoutReceive
+| Payload.ChannelSubscribe
+| Payload.ChannelSubscriptionEnd
+| Payload.ChannelSubscriptionGift
+| Payload.ChannelSubscriptionMessage
+| Payload.ChannelSuspiciousUserMessage
+| Payload.ChannelSuspiciousUserUpdate
+| Payload.ChannelUnban
+| Payload.ChannelUnbanRequestCreate
+| Payload.ChannelUnbanRequestResolve
+| Payload.ChannelUpdate
+| Payload.ChannelVipAdd
+| Payload.ChannelVipRemove
+| Payload.ChannelWarningAcknowledge
+| Payload.ChannelWarningSend
+| Payload.ConduitShardDisabled
+| Payload.DropEntitlementGrant
+| Payload.ExtensionBitsTransactionCreate
+| Payload.StreamOffline
+| Payload.StreamOnline
+| Payload.UserAuthorizationGrant
+| Payload.UserAuthorizationRevoke
+| Payload.UserUpdate
+| Payload.UserWhisperMessage;
 export namespace Payload {
+	/** Interface for extending each event payload. */
 	export interface Base<Subscription_ extends Subscription = Subscription, Status extends Subscription.Status = "enabled"> {
 		/** An object that contains information about your subscription. */
 		subscription: Subscription_ & {
@@ -2255,7 +2460,7 @@ export namespace Payload {
 			/** The UTC date and time that the subscription was created. */
 			created_at: string;
 		};
-		/** The data of event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference) */
+		/** The event information. */
 		event: any;
 	}
 	export namespace AutomodMessage {
@@ -2289,8 +2494,19 @@ export namespace Payload {
 			}
 		}
 	}
+	/**
+	 * ### automod.message.hold
+	 * The `automod.message.hold` subscription type notifies a user if a message was caught by automod for review.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessagehold)
+	 */
 	export interface AutomodMessageHold extends Base<Subscription.AutomodMessageHold> {
-		/** The data of `automod.message.hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-hold-event) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -2321,11 +2537,23 @@ export namespace Payload {
 			held_at: string;
 		};
 	}
+	/**
+	 * ### automod.message.hold V2
+	 * The `automod.message.hold` subscription type notifies a user if a message was caught by automod for review. Only public blocked terms trigger notifications, not private ones.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessagehold-v2)
+	 */
 	export interface AutomodMessageHoldV2 extends Base<Subscription.AutomodMessageHoldV2> {	
-		/** The data of `automod.message.hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-hold-event-v2) */
+		/** The event information. */
 		event: AutomodMessageHoldV2.Automod | AutomodMessageHoldV2.BlockedTerm;
 	}
 	export namespace AutomodMessageHoldV2 {
+		/** Event information interface for extending each `automod.message.hold` V2 event information. */
 		export interface Event<Reason extends string = string> {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -2353,6 +2581,7 @@ export namespace Payload {
 			/** Reason the message was held. */
 			reason: Reason;
 		}
+		/** The `automod.message.hold` V2 event information if the message was caught by automod. */
 		export interface Automod extends Event<"automod"> {
 			/** If the message was caught by automod, this will be populated. */
 			automod: {
@@ -2369,6 +2598,7 @@ export namespace Payload {
 				}>;
 			};
 		}
+		/** The `automod.message.hold` V2 event information if the message was caught due to a blocked term. */
 		export interface BlockedTerm extends Event<"blocked_term"> {
 			/** If the message was caught due to a blocked term, this will be populated. */
 			blocked_term: {
@@ -2393,8 +2623,19 @@ export namespace Payload {
 			};
 		}
 	}
+	/**
+	 * ### automod.message.update
+	 * The `automod.message.update` subscription type sends notification when a message in the automod queue has its status changed.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessageupdate)
+	 */
 	export interface AutomodMessageUpdate extends Base<Subscription.AutomodMessageUpdate> {
-		/** The data of `automod.message.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-update-event) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -2433,88 +2674,57 @@ export namespace Payload {
 			held_at: string;
 		};
 	}
+	/**
+	 * ### automod.message.update V2
+	 * The `automod.message.update` subscription type sends notification when a message in the automod queue has its status changed. Only public blocked terms trigger notifications, not private ones.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodmessageupdate-v2)
+	 */
 	export interface AutomodMessageUpdateV2 extends Base<Subscription.AutomodMessageUpdateV2> {
-		/** The data of `automod.message.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-message-update-event-v2) */
+		/** The event information. */
 		event: AutomodMessageUpdateV2.Automod | AutomodMessageUpdateV2.BlockedTerm;
 	}
 	export namespace AutomodMessageUpdateV2 {
-		export interface Reason<ReasonType extends string = string> {
-			/** The ID of the broadcaster specified in the request. */
-			broadcaster_user_id: string;
-			/** The login of the broadcaster specified in the request. */
-			broadcaster_user_login: string;
-			/** The user name of the broadcaster specified in the request. */
-			broadcaster_user_name: string;
-			/** The message sender's user ID. */
-			user_id: string;
-			/** The message sender's login name. */
-			user_login: string;
-			/** The message sender's display name. */
-			user_name: string;
+		/** Event information interface for extending each `automod.message.update` V2 event information. */
+		export interface Event<Reason extends string = string> extends AutomodMessageHoldV2.Event<Reason> {
 			/** The ID of the moderator who took action. */
 			moderator_user_id: string;
 			/** The moderator's user name. */
 			moderator_user_name: string;
 			/** The login of the moderator. */
 			moderator_user_login: string;
-			/** The ID of the message that was flagged by automod. */
-			message_id: string;
-			/** The body of the message. */
-			message: {
-				/** The contents of the message caught by automod. */
-				text: string;
-				/** Metadata surrounding the potential inappropriate fragments of the message. */
-				fragments: AutomodMessage.MessageFragment[];
-			};
 			/** The message's status. */
 			status: "Approved" | "Denied" | "Expired";
-			/** The timestamp of when automod saved the message. */
-			held_at: string;
-			/** Reason the message was held. */
-			reason: ReasonType;
 		}
-		export interface Automod extends Reason<"automod"> {
+		/** The `automod.message.update` V2 event information if the message was caught by automod. */
+		export interface Automod extends Event<"automod"> {
 			/** If the message was caught by automod, this will be populated. */
-			automod: {
-				/** The category of the caught message. */
-				category: string;
-				/** The level of severity (1-4). */
-				level: number;
-				/** The bounds of the text that caused the message to be caught. */
-				boundaries: Array<{
-					/** Index in the message for the start of the problem (0 indexed, inclusive). */
-					start_pos: number;
-					/** Index in the message for the end of the problem (0 indexed, inclusive). */
-					end_pos: number;
-				}>;
-			};
+			automod: AutomodMessageHoldV2.Automod["automod"];
 		}
-		export interface BlockedTerm extends Reason<"blocked_term"> {
+		/** The `automod.message.update` V2 event information if the message was caught due to a blocked term. */
+		export interface BlockedTerm extends Event<"blocked_term"> {
 			/** If the message was caught due to a blocked term, this will be populated. */
-			blocked_term: {
-				/** The list of blocked terms found in the message. */
-				terms_found: Array<{
-					/** The id of the blocked term found. */
-					term_id: string;
-					/** The bounds of the text that caused the message to be caught. */
-					boundary: {
-						/** Index in the message for the start of the problem (0 indexed, inclusive). */
-						start_pos: number;
-						/** Index in the message for the end of the problem (0 indexed, inclusive). */
-						end_pos: number;
-					};
-					/** The id of the broadcaster that owns the blocked term. */
-					owner_broadcaster_user_id: string;
-					/** The login of the broadcaster that owns the blocked term. */
-					owner_broadcaster_user_login: string;
-					/** The username of the broadcaster that owns the blocked term. */
-					owner_broadcaster_user_name: string;
-				}>;
-			};
+			blocked_term: AutomodMessageHoldV2.BlockedTerm["blocked_term"];
 		}
 	}
+	/**
+	 * ### automod.settings.update
+	 * The `automod.settings.update` subscription type sends a notification when a broadcaster’s automod settings are updated.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:read:automod_settings` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:read:automod_settings` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodsettingsupdate)
+	 */
 	export interface AutomodSettingsUpdate extends Base<Subscription.AutomodSettingsUpdate> {
-		/** The data of `automod.settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#automod-settings-update-event) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -2548,8 +2758,19 @@ export namespace Payload {
 			swearing: number;
 		};
 	}
+	/**
+	 * ### automod.terms.update
+	 * The `automod.settings.update` subscription type sends a notification when a broadcaster’s automod terms are updated. Changes to private terms are not sent.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
+	 * 
+	 * The moderator must be a moderator or broadcaster for the specified broadcaster.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodtermsupdate)
+	 */
 	export interface AutomodTermsUpdate extends Base<Subscription.AutomodTermsUpdate> {
-		/** The data of `automod.terms.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodtermsupdate) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -2571,8 +2792,29 @@ export namespace Payload {
 			terms: string[];
 		};
 	}
+	/**
+	 * ### channel.bits.use
+	 * The `channel.bits.use` subscription type sends a notification whenever Bits are used on a channel.
+	 * 
+	 * ### Triggers
+	 * This event is designed to be an all-purpose event for when Bits are used in a channel and might be updated in the future as more Twitch features use Bits.
+	 * 
+	 * Currently, this event will be sent when a user:
+	 * 1. Cheers
+	 * 2. Uses a Power-up
+	 * 	- Will not emit when a streamer uses a Power-up for free in their own channel
+	 * 3. Uses a custom Power-up
+	 * 	- Will not emit when a streamer uses a Power-up for free in their own channel
+	 * 
+	 * Bits transactions via Twitch Extensions are not included in this subscription type.
+	 * 
+	 * ### Authorization
+	 * Requires a user access token that includes the `bits:read` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelbitsuse)
+	 */
 	export interface ChannelBitsUse extends Base<Subscription.ChannelBitsUse> {
-		/** The data of `channel.bits.use` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelbitsuse) */
+		/** The event information. */
 		event: {
 			/** The User ID of the channel where the Bits were redeemed. */
 			broadcaster_user_id: string;
@@ -2613,8 +2855,18 @@ export namespace Payload {
 			} | null;
 		};
 	}
+	/**
+	 * ### channel.update
+	 * The `channel.update` subscription type sends notifications when a broadcaster updates the category, title, [content classification labels](https://safety.twitch.tv/s/article/Content-Classification-Guidelines), or broadcast language for their channel.
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelupdate)
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelupdate)
+	 */
 	export interface ChannelUpdate extends Base<Subscription.ChannelUpdate> {
-		/** The data of `channel.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelupdate) */
+		/** The event information. */
 		event: {
 			/** The broadcaster’s user ID. */
 			broadcaster_user_id: string;
@@ -2634,8 +2886,17 @@ export namespace Payload {
 			content_classification_labels: string[];
 		};
 	}
+	/**
+	 * ### channel.follow
+	 * The `channel.follow` subscription type sends a notification when a specified channel receives a follow.
+	 * 
+	 * ### Authorization
+	 * Must have `moderator:read:followers` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow)
+	 */
 	export interface ChannelFollow extends Base<Subscription.ChannelFollow> {
-		/** The data of `channel.follow` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelfollow) */
+		/** The event information. */
 		event: {
 			/** The user ID for the user now following the specified channel. */
 			user_id: string;
@@ -2653,8 +2914,17 @@ export namespace Payload {
 			followed_at: string;
 		};
 	}
+	/**
+	 * ### channel.ad_break.begin
+	 * The `channel.ad_break.begin` subscription type sends a notification when a user runs a midroll commercial break, either manually or automatically via ads manager.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:ads` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelad_breakbegin)
+	 */
 	export interface ChannelAdBreakBegin extends Base<Subscription.ChannelAdBreakBegin> {
-		/** The data of `channel.ad_break.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelad_breakbegin) */
+		/** The event information. */
 		event: {
 			/** Length in seconds of the mid-roll ad break requested */
 			duration_seconds: number;
@@ -2690,7 +2960,7 @@ export namespace Payload {
 			info: string;
 		}
 		export type EmoteFormats = ("animated" | "static")[];
-		export type MessageFragment = MessageFragment.Text | MessageFragment.Cheermote | MessageFragment.Emote | MessageFragment.Mention;
+		export type MessageFragment = MessageFragment.Text | MessageFragment.Cheermote | MessageFragment.Emote | MessageFragment.Mention | MessageFragment.Gif;
 		export namespace MessageFragment {
 			export interface Text<Type extends string = "text"> {
 				/** The type of message fragment. */
@@ -2733,10 +3003,28 @@ export namespace Payload {
 					user_login: string;
 				};
 			}
+			export interface Gif extends Text<"gif"> {
+				/** Optional. Metadata pertaining to the GIF. */
+				gif: {
+					/** An ID that uniquely identifies this GIF. */
+					id: string;
+					/** The URL of the GIF asset. Applications rendering the GIF must use the full URL provided; it must not be modified. */
+					url: string;
+				};
+			}
 		}
 	}
+	/**
+	 * ### channel.chat.clear
+	 * The `channel.chat.clear` subscription type sends a notification when a moderator or bot clears all messages from the chat room.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear)
+	 */
 	export interface ChannelChatClear extends Base<Subscription.ChannelChatClear> {
-		/** The data of `channel.chat.clear` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear) */
+		/** The event information. */
 		event: {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -2746,8 +3034,17 @@ export namespace Payload {
 			broadcaster_user_login: string;
 		};
 	}
+	/**
+	 * ### channel.chat.clear_user_messages
+	 * The `channel.chat.clear_user_messages` subscription type sends a notification when a moderator or bot clears all messages for a specific user.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear_user_messages)
+	 */
 	export interface ChannelChatClearUserMessages extends Base<Subscription.ChannelChatClearUserMessages> {
-		/** The data of `channel.chat.clear_user_messages` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear_user_messages) */
+		/** The event information. */
 		event: {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -2763,8 +3060,17 @@ export namespace Payload {
 			target_user_login: string;
 		};
 	}
+	/**
+	 * ### channel.chat.message
+	 * The `channel.chat.message` subscription type sends a notification when any user sends a message to a channel’s chat room.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage)
+	 */
 	export interface ChannelChatMessage extends Base<Subscription.ChannelChatMessage> {
-		/** The data of `channel.chat.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-reference/#channel-chat-message-event) */
+		/** The event information. */
 		event: {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -2835,8 +3141,17 @@ export namespace Payload {
 			is_source_only: boolean | null;
 		};
 	}
+	/**
+	 * ### channel.chat.message_delete
+	 * The `channel.chat.message_delete` subscription type sends a notification when a moderator removes a specific message.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage_delete)
+	 */
 	export interface ChannelChatMessageDelete extends Base<Subscription.ChannelChatMessageDelete> {
-		/** The data of `channel.chat.message_delete` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage_delete) */
+		/** The event information. */
 		event: {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -2854,18 +3169,42 @@ export namespace Payload {
 			message_id: string;
 		};
 	}
+	/**
+	 * ### channel.chat.notification
+	 * The `channel.chat.notification` subscription type sends a notification when an event that appears in chat occurs, such as someone subscribing to the channel or a subscription is gifted.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatnotification)
+	 */
 	export interface ChannelChatNotification extends Base<Subscription.ChannelChatNotification> {
-		/** The data of `channel.chat.notification` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatnotification) */
+		/** The event information. */
 		event:
-			| ChannelChatNotification.Sub | ChannelChatNotification.Resub | ChannelChatNotification.SubGift
-			| ChannelChatNotification.CommunitySubGift | ChannelChatNotification.GiftPaidUpgrade | ChannelChatNotification.PrimePaidUpgrade
-			| ChannelChatNotification.Raid | ChannelChatNotification.Unraid | ChannelChatNotification.PayItForward | ChannelChatNotification.Announcement
-			| ChannelChatNotification.SharedChatSub | ChannelChatNotification.SharedChatResub | ChannelChatNotification.SharedChatSubGift
-			| ChannelChatNotification.SharedChatCommunitySubGift | ChannelChatNotification.SharedChatGiftPaidUpgrade | ChannelChatNotification.SharedChatPrimePaidUpgrade
-			| ChannelChatNotification.SharedChatRaid | ChannelChatNotification.SharedChatPayItForward | ChannelChatNotification.SharedChatAnnouncement;
+		| ChannelChatNotification.Sub
+		| ChannelChatNotification.Resub
+		| ChannelChatNotification.SubGift
+		| ChannelChatNotification.CommunitySubGift
+		| ChannelChatNotification.GiftPaidUpgrade
+		| ChannelChatNotification.PrimePaidUpgrade
+		| ChannelChatNotification.Raid
+		| ChannelChatNotification.Unraid
+		| ChannelChatNotification.PayItForward
+		| ChannelChatNotification.Announcement
+		| ChannelChatNotification.Modiversary
+		| ChannelChatNotification.SharedChatSub
+		| ChannelChatNotification.SharedChatResub
+		| ChannelChatNotification.SharedChatSubGift
+		| ChannelChatNotification.SharedChatCommunitySubGift
+		| ChannelChatNotification.SharedChatGiftPaidUpgrade
+		| ChannelChatNotification.SharedChatPrimePaidUpgrade
+		| ChannelChatNotification.SharedChatRaid
+		| ChannelChatNotification.SharedChatPayItForward
+		| ChannelChatNotification.SharedChatAnnouncement
+		| ChannelChatNotification.SharedChatModiversary;
 	}
 	export namespace ChannelChatNotification {
-		export interface Event<NoticeType extends string = string> {
+		export interface Unknown<NoticeType extends string = "unknown"> {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
 			/** The broadcaster display name. */
@@ -2906,7 +3245,7 @@ export namespace Payload {
 			/** The list of chat badges for the chatter in the channel the message was sent from. Is `null` when the message happens in the same channel as the broadcaster. Is not `null` when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster. */
 			source_badges: ChannelChat.Badge[] | null;
 		}
-		export interface Sub extends Event<"sub"> {
+		export interface Sub extends Unknown<"sub"> {
 			/** Information about the `sub` event. */
 			sub: {
 				/** The type of subscription plan. */
@@ -2917,7 +3256,7 @@ export namespace Payload {
 				duration_months: number;
 			};
 		}
-		export interface Resub extends Event<"resub"> {
+		export interface Resub extends Unknown<"resub"> {
 			/** Information about the `resub` event. */
 			resub: {
 				/** The total number of months the user has subscribed. */
@@ -2947,7 +3286,7 @@ export namespace Payload {
 				gifter_user_login: string | null;
 			};
 		}
-		export interface SubGift extends Event<"sub_gift"> {
+		export interface SubGift extends Unknown<"sub_gift"> {
 			/** Information about the `sub_gift` event. */
 			sub_gift: {
 				/** The number of months the subscription is for. */
@@ -2966,7 +3305,7 @@ export namespace Payload {
 				community_gift_id: string | null;
 			};
 		}
-		export interface CommunitySubGift extends Event<"community_sub_gift"> {
+		export interface CommunitySubGift extends Unknown<"community_sub_gift"> {
 			/** Information about the `community_sub_gift` event. */
 			community_sub_gift: {
 				/** The ID of the associated community gift. */
@@ -2979,7 +3318,7 @@ export namespace Payload {
 				cumulative_total?: number;
 			};
 		}
-		export interface GiftPaidUpgrade extends Event<"gift_paid_upgrade"> {
+		export interface GiftPaidUpgrade extends Unknown<"gift_paid_upgrade"> {
 			/** Information about the `gift_paid_upgrade` event. */
 			gift_paid_upgrade: {
 				/** Whether the gift was given anonymously. */
@@ -2990,14 +3329,14 @@ export namespace Payload {
 				gifter_user_name: string | null;
 			};
 		}
-		export interface PrimePaidUpgrade extends Event<"prime_paid_upgrade"> {
+		export interface PrimePaidUpgrade extends Unknown<"prime_paid_upgrade"> {
 			/** Information about the `prime_paid_upgrade` event. */
 			prime_paid_upgrade: {
 				/** The type of subscription plan. */
 				sub_tier: "1000" | "2000" | "3000";
 			};
 		}
-		export interface Raid extends Event<"raid"> {
+		export interface Raid extends Unknown<"raid"> {
 			/** Information about the `raid` event. */
 			raid: {
 				/** The user ID of the broadcaster raiding this channel. */
@@ -3012,11 +3351,11 @@ export namespace Payload {
 				profile_image_url: string;
 			};
 		}
-		export interface Unraid extends Event<"unraid"> {
+		export interface Unraid extends Unknown<"unraid"> {
 			/** Information about the `unraid` event. */
 			unraid: {};
 		}
-		export interface PayItForward extends Event<"pay_it_forward"> {
+		export interface PayItForward extends Unknown<"pay_it_forward"> {
 			/** Information about the `pay_it_forward` event. */
 			pay_it_forward: {
 				/** Whether the gift was given anonymously. */
@@ -3029,21 +3368,21 @@ export namespace Payload {
 				gifter_user_login: string | null;
 			};
 		}
-		export interface Announcement extends Event<"announcement"> {
+		export interface Announcement extends Unknown<"announcement"> {
 			/** Information about the `announcement` event. */
 			announcement: {
 				/** Color of the announcement. */
 				color: string;
 			};
 		}
-		export interface BitsBadgeTier extends Event<"bits_badge_tier"> {
+		export interface BitsBadgeTier extends Unknown<"bits_badge_tier"> {
 			/** Information about the `bits_badge_tier` event. */
 			bits_badge_tier: {
 				/** The tier of the Bits badge. */
 				tier: number;
 			};
 		}
-		export interface CharityDonation extends Event<"charity_donation"> {
+		export interface CharityDonation extends Unknown<"charity_donation"> {
 			/** Information about the `charity_donation` event. */
 			charity_donation: {
 				/** Name of the charity. */
@@ -3057,6 +3396,13 @@ export namespace Payload {
 					/** The ISO-4217 three-letter currency code. */
 					currency: string;
 				};
+			};
+		}
+		export interface Modiversary extends Unknown<"modiversary"> {
+			/** Information about the modiversary event. */
+			modiversary: {
+				/** The number of months the user has been a moderator in this channel. */
+				months:	number;
 			};
 		}
 		export interface SharedChatSub extends Omit<Sub, "notice_type" | "sub"> {
@@ -3113,9 +3459,24 @@ export namespace Payload {
 			/** Information about the `shared_chat_announcement` event. */
 			shared_chat_announcement: Announcement["announcement"];
 		}
+		export interface SharedChatModiversary extends Omit<Modiversary, "notice_type" | "modiversary"> {
+			/** The type of notice. */
+			notice_type: "shared_chat_modiversary";
+			/** Information about the `shared_chat_modiversary` event. */
+			shared_chat_modiversary: Modiversary["modiversary"];
+		}
 	}
+	/**
+	 * ### channel.chat_settings.update
+	 * This event sends a notification when a broadcaster’s chat settings are updated.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchat_settingsupdate)
+	 */
 	export interface ChannelChatSettingsUpdate extends Base<Subscription.ChannelChatSettingsUpdate> {
-		/** The data of `channel.chat_settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchat_settingsupdate) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -3139,8 +3500,17 @@ export namespace Payload {
 			unique_chat_mode: boolean;
 		};
 	}
+	/**
+	 * ### channel.chat.user_message_hold
+	 * The `channel.chat.user_message_hold` subscription type notifies a user if their message is caught by automod.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_hold)
+	 */
 	export interface ChannelChatUserMessageHold extends Base<Subscription.ChannelChatUserMessageHold> {
-		/** The data of `channel.chat.user_message_hold` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_hold) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -3184,8 +3554,17 @@ export namespace Payload {
 			};
 		};
 	}
+	/**
+	 * ### channel.chat.user_message_update
+	 * The `channel.chat.user_message_update` subscription type notifies a user if their message’s automod status is updated.
+	 * 
+	 * ### Authorization
+	 * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_update)
+	 */
 	export interface ChannelChatUserMessageUpdate extends Base<Subscription.ChannelChatUserMessageUpdate> {
-		/** The data of `channel.chat.user_message_update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_update) */
+		/** The event information. */
 		event: {
 			/** The ID of the broadcaster specified in the request. */
 			broadcaster_user_id: string;
@@ -3230,8 +3609,17 @@ export namespace Payload {
 			};
 		};
 	}
+	/**
+	 * ### channel.shared_chat.begin
+	 * The `channel.shared_chat.begin` subscription type sends a notification when a channel becomes active in an active shared chat session.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatbegin)
+	 */
 	export interface ChannelSharedChatSessionBegin extends Base<Subscription.ChannelSharedChatSessionBegin> {
-		/** The data of `channel.shared_chat.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatbegin) */
+		/** The event information. */
 		event: {
 			/** The unique identifier for the shared chat session. */
 			session_id: string;
@@ -3258,8 +3646,17 @@ export namespace Payload {
 			}[];
 		};
 	}
+	/**
+	 * ### channel.shared_chat.update
+	 * The `channel.shared_chat.update` subscription type sends a notification when the active shared chat session the channel is in changes.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatupdate)
+	 */
 	export interface ChannelSharedChatSessionUpdate extends Base<Subscription.ChannelSharedChatSessionUpdate> {
-		/** The data of `channel.shared_chat.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatupdate) */
+		/** The event information. */
 		event: {
 			/** The unique identifier for the shared chat session. */
 			session_id: string;
@@ -3286,8 +3683,17 @@ export namespace Payload {
 			}[];
 		};
 	}
+	/**
+	 * ### channel.shared_chat.end
+	 * The `channel.shared_chat.end` subscription type sends a notification when a channel leaves a shared chat session or the session ends.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatend)
+	 */
 	export interface ChannelSharedChatSessionEnd extends Base<Subscription.ChannelSharedChatSessionEnd> {
-		/** The data of `channel.shared_chat.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshared_chatend) */
+		/** The event information. */
 		event: {
 			/** The unique identifier for the shared chat session. */
 			session_id: string;
@@ -3305,8 +3711,17 @@ export namespace Payload {
 			host_broadcaster_user_login: string;
 		};
 	}
+	/**
+	 * ### channel.subscribe
+	 * The `channel.subscribe` subscription type sends a notification when a specified channel receives a subscriber. This does not include resubscribes.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:subscriptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe)
+	 */
 	export interface ChannelSubscribe extends Base<Subscription.ChannelSubscribe> {
-		/** The data of `channel.subscribe` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscribe) */
+		/** The event information. */
 		event: {
 			/** The user ID for the user who subscribed to the specified channel. */
 			user_id: string;
@@ -3342,8 +3757,17 @@ export namespace Payload {
 			id: string;
 		}
 	}
+	/**
+	 * ### channel.subscription.end
+	 * The `channel.subscription.end` subscription type sends a notification when a subscription to the specified channel expires.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:subscriptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionend)
+	 */
 	export interface ChannelSubscriptionEnd extends Base<Subscription.ChannelSubscriptionEnd> {
-		/** The data of `channel.subscription.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionend) */
+		/** The event information. */
 		event: {
 			/** The user ID for the user whose subscription ended. */
 			user_id: string;
@@ -3363,8 +3787,17 @@ export namespace Payload {
 			is_gift: boolean;
 		};
 	}
+	/**
+	 * ### channel.subscription.gift
+	 * The `channel.subscription.gift` subscription type sends a notification when a user gives one or more gifted subscriptions in a channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:subscriptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptiongift)
+	 */
 	export interface ChannelSubscriptionGift extends Base<Subscription.ChannelSubscriptionGift> {
-		/** The data of `channel.subscription.gift` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptiongift) */
+		/** The event information. */
 		event: {
 			/** The user ID of the user who sent the subscription gift. Set to `null` if it was an anonymous subscription gift. */
 			user_id: string | null;
@@ -3388,8 +3821,17 @@ export namespace Payload {
 			is_anonymous: boolean;
 		};
 	}
+	/**
+	 * ### channel.subscription.message
+	 * The `channel.subscription.message` subscription type sends a notification when a user sends a resubscription chat message in a specific channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:subscriptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionmessage)
+	 */
 	export interface ChannelSubscriptionMessage extends Base<Subscription.ChannelSubscriptionMessage> {
-		/** The data of `channel.subscription.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsubscriptionmessage) */
+		/** The event information. */
 		event: {
 			/** The user ID of the user who sent a resubscription chat message. */
 			user_id: string;
@@ -3415,8 +3857,17 @@ export namespace Payload {
 			duration_months: number;
 		};
 	}
+	/**
+	 * ### channel.cheer
+	 * The `channel.cheer` subscription type sends a notification when a user cheers on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `bits:read` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcheer)
+	 */
 	export interface ChannelCheer extends Base<Subscription.ChannelCheer> {
-		/** The data of `channel.cheer` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcheer) */
+		/** The event information. */
 		event: {
 			/** Whether the user cheered anonymously or not. */
 			is_anonymous: boolean;
@@ -3438,8 +3889,17 @@ export namespace Payload {
 			bits: number;
 		};
 	}
+	/**
+	 * ### channel.raid
+	 * The `channel.raid` subscription type sends a notification when a broadcaster raids another broadcaster’s channel.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelraid)
+	 */
 	export interface ChannelRaid extends Base<Subscription.ChannelRaid> {
-		/** The data of `channel.raid` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelraid) */
+		/** The event information. */
 		event: {
 			/** The broadcaster ID that created the raid. */
 			from_broadcaster_user_id: string;
@@ -3457,8 +3917,17 @@ export namespace Payload {
 			viewers: number;
 		};
 	}
+	/**
+	 * ### channel.ban
+	 * The `channel.ban` subscription type sends a notification when a viewer is timed out or banned from the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:moderate` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelban)
+	 */
 	export interface ChannelBan extends Base<Subscription.ChannelBan> {
-		/** The data of `channel.ban` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelban) */
+		/** The event information. */
 		event: {
 			/** The user ID for the user who was banned on the specified channel. */
 			user_id: string;
@@ -3488,8 +3957,17 @@ export namespace Payload {
 			is_permanent: boolean;
 		};
 	}
+	/**
+	 * ### channel.unban
+	 * The `channel.unban` subscription type sends a notification when a viewer is unbanned from the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:moderate` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban)
+	 */
 	export interface ChannelUnban extends Base<Subscription.ChannelUnban> {
-		/** The data of `channel.unban` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban) */
+		/** The event information. */
 		event: {
 			/** The user id for the user who was unbanned on the specified channel. */
 			user_id: string;
@@ -3511,8 +3989,17 @@ export namespace Payload {
 			moderator_user_name: string;
 		};
 	}
+	/**
+	 * ### channel.unban_request.create
+	 * The `channel.unban_request.create` subscription type sends a notification when a user creates an unban request.
+	 * 
+	 * ### Authorization
+	 * Must have `moderator:read:unban_requests` or `moderator:manage:unban_requests` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestcreate)
+	 */
 	export interface ChannelUnbanRequestCreate extends Base<Subscription.ChannelUnbanRequestCreate> {
-		/** The data of `channel.unban_request.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestcreate) */
+		/** The event information. */
 		event: {
 			/** The ID of the unban request. */
 			id: string;
@@ -3534,8 +4021,21 @@ export namespace Payload {
 			created_at: string;
 		};
 	}
+	/**
+	 * ### channel.unban_request.resolve
+	 * The `channel.unban_request.resolve` subscription type sends a notification when an unban request has been resolved.
+	 * 
+	 * ### Authorization
+	 * Must have `moderator:read:unban_requests` or `moderator:manage:unban_requests` scope.
+	 * 
+	 * If you use webhooks, the user in `moderator_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the [Authentication section](https://dev.twitch.tv/docs/authentication/) of Create EventSub Subscription.
+	 * 
+	 * If you use WebSockets, the ID in `moderator_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestresolve)
+	 */
 	export interface ChannelUnbanRequestResolve extends Base<Subscription.ChannelUnbanRequestResolve> {
-		/** The data of `channel.unban_request.resolve` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelunban_requestresolve) */
+		/** The event information. */
 		event: {
 			/** The ID of the unban request. */
 			id: string;
@@ -3563,25 +4063,128 @@ export namespace Payload {
 			status: "approved" | "canceled" | "denied";
 		};
 	}
+	/**
+	 * ### channel.moderate
+	 * The `channel.moderate` subscription type sends a notification when a moderator performs a moderation action in a channel. Some of these actions affect chatters in other channels during Shared Chat.
+	 * - This is the first version of `channel.moderate` with no warnings, use the second version of it to receive warnings ({@link Payload.ChannelModerateV2}).
+	 * 
+	 * ### Authorization
+	 * Must have all of the following scopes:
+	 * - `moderator:read:blocked_terms` OR `moderator:manage:blocked_terms`
+	 * - `moderator:read:chat_settings` OR `moderator:manage:chat_settings`
+	 * - `moderator:read:unban_requests` OR `moderator:manage:unban_requests`
+	 * - `moderator:read:banned_users` OR `moderator:manage:banned_users`
+	 * - `moderator:read:chat_messages` OR `moderator:manage:chat_messages`
+	 * - `moderator:read:moderators`
+	 * - `moderator:read:vips`
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate)
+	 */
 	export interface ChannelModerate extends Base<Subscription.ChannelModerate> {
-		/** The data of `channel.moderate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate) */
+		/** The event information. */
 		event: 
-			| ChannelModerate.Followers | ChannelModerate.Slow | ChannelModerate.Vip | ChannelModerate.Unvip | ChannelModerate.Mod | ChannelModerate.Unmod
-			| ChannelModerate.Ban | ChannelModerate.Unban | ChannelModerate.Timeout | ChannelModerate.Untimeout | ChannelModerate.Raid | ChannelModerate.Unraid
-			| ChannelModerate.Delete | ChannelModerate.AutomodTerms | ChannelModerate.UnbanRequest | ChannelModerate.SharedChatBan | ChannelModerate.SharedChatUnban
-			| ChannelModerate.SharedChatTimeout | ChannelModerate.SharedChatUntimeout | ChannelModerate.SharedChatDelete | ChannelModerate.Other;
+			| ChannelModerate.Ban
+			| ChannelModerate.Unban
+			| ChannelModerate.Timeout
+			| ChannelModerate.Untimeout
+			| ChannelModerate.Clear
+			| ChannelModerate.EmoteOnly
+			| ChannelModerate.EmoteOnlyOff
+			| ChannelModerate.Followers
+			| ChannelModerate.FollowersOff
+			| ChannelModerate.UniqueChat
+			| ChannelModerate.UniqueChatOff
+			| ChannelModerate.Slow
+			| ChannelModerate.SlowOff
+			| ChannelModerate.Subscribers
+			| ChannelModerate.SubscribersOff
+			| ChannelModerate.Raid
+			| ChannelModerate.Unraid
+			| ChannelModerate.Delete
+			| ChannelModerate.Vip
+			| ChannelModerate.Unvip
+			| ChannelModerate.AddBlockedTerm
+			| ChannelModerate.AddPermittedTerm
+			| ChannelModerate.RemoveBlockedTerm
+			| ChannelModerate.RemovePermittedTerm
+			| ChannelModerate.Mod
+			| ChannelModerate.Unmod
+			| ChannelModerate.ApproveUnbanRequest
+			| ChannelModerate.DenyUnbanRequest
+			| ChannelModerate.SharedChatBan
+			| ChannelModerate.SharedChatUnban
+			| ChannelModerate.SharedChatTimeout
+			| ChannelModerate.SharedChatUntimeout
+			| ChannelModerate.SharedChatDelete;
+	}
+	/**
+	 * ### channel.moderate v2
+	 * The `channel.moderate` subscription type sends a notification when a moderator performs a moderation action in a channel. Some of these actions affect chatters in other channels during Shared Chat.
+	 * - This is the second version of `channel.moderate` with warnings added.
+	 * 
+	 * ### Authorization
+	 * Must have all of the following scopes:
+	 * - `moderator:read:blocked_terms` OR `moderator:manage:blocked_terms`
+	 * - `moderator:read:chat_settings` OR `moderator:manage:chat_settings`
+	 * - `moderator:read:unban_requests` OR `moderator:manage:unban_requests`
+	 * - `moderator:read:banned_users` OR `moderator:manage:banned_users`
+	 * - `moderator:read:chat_messages` OR `moderator:manage:chat_messages`
+	 * - `moderator:read:warnings` OR `moderator:manage:warnings`
+	 * - `moderator:read:moderators`
+	 * - `moderator:read:vips`
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate-v2)
+	 */
+	export interface ChannelModerateV2 extends Base<Subscription.ChannelModerateV2> {
+		/** The event information. */
+		event: 
+			| ChannelModerate.Ban
+			| ChannelModerate.Unban
+			| ChannelModerate.Timeout
+			| ChannelModerate.Untimeout
+			| ChannelModerate.Clear
+			| ChannelModerate.EmoteOnly
+			| ChannelModerate.EmoteOnlyOff
+			| ChannelModerate.Followers
+			| ChannelModerate.FollowersOff
+			| ChannelModerate.UniqueChat
+			| ChannelModerate.UniqueChatOff
+			| ChannelModerate.Slow
+			| ChannelModerate.SlowOff
+			| ChannelModerate.Subscribers
+			| ChannelModerate.SubscribersOff
+			| ChannelModerate.Raid
+			| ChannelModerate.Unraid
+			| ChannelModerate.Delete
+			| ChannelModerate.Vip
+			| ChannelModerate.Unvip
+			| ChannelModerate.AddBlockedTerm
+			| ChannelModerate.AddPermittedTerm
+			| ChannelModerate.RemoveBlockedTerm
+			| ChannelModerate.RemovePermittedTerm
+			| ChannelModerate.Mod
+			| ChannelModerate.Unmod
+			| ChannelModerate.ApproveUnbanRequest
+			| ChannelModerate.DenyUnbanRequest
+			| ChannelModerate.Warn
+			| ChannelModerate.SharedChatBan
+			| ChannelModerate.SharedChatUnban
+			| ChannelModerate.SharedChatTimeout
+			| ChannelModerate.SharedChatUntimeout
+			| ChannelModerate.SharedChatDelete;
 	}
 	export namespace ChannelModerate {
-		export interface Action<Type extends string = string> {
+		/** Event information interface for extending each moderation action. */
+		export interface Action<Type extends string> {
 			/** The ID of the broadcaster. */
 			broadcaster_user_id: string;
 			/** The login of the broadcaster. */
 			broadcaster_user_login: string;
 			/** The user name of the broadcaster. */
 			broadcaster_user_name: string;
-			/** The channel in which the action originally occurred. Is the same as the broadcaster_user_id if not in shared chat. */
+			/** The channel in which the action originally occurred. Is the same as the `broadcaster_user_id` if not in shared chat. */
 			source_broadcaster_user_id: string;
-			/** The channel in which the action originally occurred. Is the same as the broadcaster_user_login if not in shared chat. */
+			/** The channel in which the action originally occurred. Is the same as the `broadcaster_user_login` if not in shared chat. */
 			source_broadcaster_user_login: string;
 			/** The channel in which the action originally occurred. Is `null` when the moderator action happens in the same channel as the broadcaster. Is not `null` when in a shared chat session, and the action happens in the channel of a participant other than the broadcaster. */
 			source_broadcaster_user_name: string | null;
@@ -3591,69 +4194,13 @@ export namespace Payload {
 			moderator_user_login: string;
 			/** The user name of the moderator. */
 			moderator_user_name: string;
-			/** The type of action. */
+			/** The type of action performed. */
 			action: Type;
 		}
-		export interface Followers extends Action<"followers"> {
-			/** Metadata associated with the followers command. */
-			followers: {
-				/** The length of time, in minutes, that the followers must have followed the broadcaster to participate in the chat room. */
-				follow_duration_minutes: number;
-			};
-		}
-		export interface Slow extends Action<"slow"> {
-			/** Metadata associated with the slow command. */
-			slow: {
-				/** The amount of time, in seconds, that users need to wait between sending messages. */
-				wait_time_seconds: number;
-			};
-		}
-		export interface Vip extends Action<"vip"> {
-			/** Metadata associated with the vip command. */
-			vip: {
-				/** The ID of the user gaining VIP status. */
-				user_id: string;
-				/** The login of the user gaining VIP status. */
-				user_login: string;
-				/** The user name of the user gaining VIP status. */
-				user_name: string;
-			};
-		}
-		export interface Unvip extends Action<"unvip"> {
-			/** Metadata associated with the unvip command. */
-			unvip: {
-				/** The ID of the user losing VIP status. */
-				user_id: string;
-				/** The login of the user losing VIP status. */
-				user_login: string;
-				/** The user name of the user losing VIP status. */
-				user_name: string;
-			}
-		}
-		export interface Mod extends Action<"mod"> {
-			/** Metadata associated with the mod command. */
-			mod: {
-				/** The ID of the user gaining mod status. */
-				user_id: string;
-				/** The login of the user gaining mod status. */
-				user_login: string;
-				/** The user name of the user gaining mod status. */
-				user_name: string;
-			};
-		}
-		export interface Unmod extends Action<"unmod"> {
-			/** Metadata associated with the unmod command. */
-			unmod: {
-				/** The ID of the user losing mod status. */
-				user_id: string;
-				/** The login of the user losing mod status. */
-				user_login: string;
-				/** The user name of the user losing mod status. */
-				user_name: string;
-			};
-		}
+
+		/** The `channel.moderate` event information, happens when user being banned. */
 		export interface Ban extends Action<"ban"> {
-			/** Metadata associated with the ban command. */
+			/** Metadata of user being banned. */
 			ban: {
 				/** The ID of the user being banned. */
 				user_id: string;
@@ -3665,8 +4212,9 @@ export namespace Payload {
 				reason:	string | null;
 			};
 		}
+		/** The `channel.moderate` event information, happens when user being unbanned. */
 		export interface Unban extends Action<"unban"> {
-			/** Metadata associated with the unban command. */
+			/** Metadata of user being unbanned. */
 			unban: {
 				/** The ID of the user being unbanned. */
 				user_id: string;
@@ -3676,7 +4224,10 @@ export namespace Payload {
 				user_name: string;
 			}
 		}
+
+		/** The `channel.moderate` event information, happens when user being timed out. */
 		export interface Timeout extends Action<"timeout"> {
+			/** Metadata of user being timed out. */
 			timeout: {
 				/** The ID of the user being timed out. */
 				user_id: string;
@@ -3690,8 +4241,9 @@ export namespace Payload {
 				expires_at: string;
 			};
 		}
+		/** The `channel.moderate` event information, happens when user being untimed out. */
 		export interface Untimeout extends Action<"untimeout"> {
-			/** Metadata associated with the untimeout command. */
+			/** Metadata of user being untimed out. */
 			untimeout: {
 				/** The ID of the user being untimed out. */
 				user_id: string;
@@ -3701,114 +4253,233 @@ export namespace Payload {
 				user_name: string;
 			};
 		}
+
+		/**
+		 * The `channel.moderate` event information of `clear` moderation action.
+		 * 
+		 * Not sure what it is, but i guess it works like {@link Payload.ChannelChatClear}.
+		 */
+		export type Clear = Action<"clear">;
+
+		/** The `channel.moderate` event information, happens when the emote-only mode in chat was enabled. */
+		export type EmoteOnly = Action<"emoteonly">;
+		/** The `channel.moderate` event information, happens when the emote-only mode in chat was disabled. */
+		export type EmoteOnlyOff = Action<"emoteonlyoff">;
+
+		/** The `channel.moderate` event information, happens when the follower-only mode in chat was enabled or metadata of it was updated. */
+		export interface Followers extends Action<"followers"> {
+			/** Metadata associated with the `followers` moderation action. */
+			followers: {
+				/** The length of time, in minutes, that the followers must have followed the broadcaster to participate in the chat room. */
+				follow_duration_minutes: number;
+			};
+		}
+		/** The `channel.moderate` event information, happens when the follower-only mode in chat was disabled. */
+		export type FollowersOff = Action<"followersoff">;
+
+		/** The `channel.moderate` event information, happens when the unique chat mode was enabled. */
+		export type UniqueChat = Action<"uniquechat">;
+		/** The `channel.moderate` event information, happens when the unique chat mode was disabled. */
+		export type UniqueChatOff = Action<"uniquechatoff">;
+
+		/** Event information, happens when the slow mode in chat was enabled. */
+		export interface Slow extends Action<"slow"> {
+			/** Metadata of slow mode in chat. */
+			slow: {
+				/** The amount of time, in seconds, that users need to wait between sending messages. */
+				wait_time_seconds: number;
+			};
+		}
+		/** The `channel.moderate` event information, happens when the slow mode in chat was disabled. */
+		export type SlowOff = Action<"slowoff">;
+
+		/** The `channel.moderate` event information, happens when the subscribers-only mode in chat was enabled. */
+		export type Subscribers = Action<"subscribers">;
+		/** The `channel.moderate` event information, happens when the subscribers-only mode in chat was disabled. */
+		export type SubscribersOff = Action<"subscribersoff">;
+
+		/** The `channel.moderate` event information, happens when raid to other channel was started. */
 		export interface Raid extends Action<"raid"> {
-			/** Metadata associated with the raid command. */
+			/** Metadata associated with the raid to other channel. */
 			raid: {
 				/** The ID of the user being raided. */
 				user_id: string;
 				/** The login of the user being raided. */
 				user_login: string;
-				/** The user name of the user raided. */
+				/** The user name of the user being raided. */
 				user_name: string;
 				/** The viewer count. */
 				viewer_count: number;
 			};
 		}
+		/** The `channel.moderate` event information, happens when raid to other channel was ended. */
 		export interface Unraid extends Action<"unraid"> {
-			/** Metadata associated with the unraid command. */
+			/** Metadata associated with the raid to other channel. */
 			unraid: {
-				/** The ID of the user no longer being raided. */
+				/** The ID of the user no longer raided. */
 				user_id: string;
-				/** The login of the user no longer being raided. */
+				/** The login of the user no longer raided. */
 				user_login: string;
-				/** The user name of the no longer user raided. */
+				/** The user name of the user no longer raided. */
 				user_name: string;
 			};
 		}
+
+		/** The `channel.moderate` event information, happens when chat message was deleted. */
 		export interface Delete extends Action<"delete"> {
-			/** Metadata associated with the delete command. */
+			/** Metadata associated with the deleted chat message. */
 			"delete": {
 				/** The ID of the user whose message is being deleted. */
 				user_id: string;
-				/** The login of the user. */
+				/** The login of the user whose message is being deleted. */
 				user_login: string;
-				/** The user name of the user. */
+				/** The user name of the user whose message is being deleted. */
 				user_name: string;
 				/** The ID of the message being deleted. */
 				message_id: string;
-				/** The message body of the message being deleted. */
+				/** The body of the message being deleted. */
 				message_body: string;
 			}
 		}
-		export interface AutomodTerms extends Action<"add_blocked_term" | "add_permitted_term" | "remove_blocked_term" | "remove_permitted_term"> {
-			/** Metadata associated with the automod terms changes. */
+
+		/** The `channel.moderate` event information, happens when a user gaining their VIP status. */
+		export interface Vip extends Action<"vip"> {
+			/** Metadata associated with the gaining VIP status. */
+			vip: {
+				/** The ID of the user gaining VIP status. */
+				user_id: string;
+				/** The login of the user gaining VIP status. */
+				user_login: string;
+				/** The user name of the user gaining VIP status. */
+				user_name: string;
+			};
+		}
+		/** The `channel.moderate` event information, happens when a user losing their VIP status. */
+		export interface Unvip extends Action<"unvip"> {
+			/** Metadata associated with the losing VIP status. */
+			unvip: {
+				/** The ID of the user losing VIP status. */
+				user_id: string;
+				/** The login of the user losing VIP status. */
+				user_login: string;
+				/** The user name of the user losing VIP status. */
+				user_name: string;
+			}
+		}
+
+		/** The `channel.moderate` event information, happens when new blocked term was added to the AutoMod. */
+		export interface AddBlockedTerm extends Action<"add_blocked_term"> {
+			/** Metadata associated with new added blocked term. */
 			automod_terms: {
-				action: "add" | "remove";
-				list: "blocked" | "permitted";
-				/** Terms being added or removed. */
+				action: "add";
+				list: "blocked";
+				/** Terms being added. */
 				terms: string[];
 				/** Whether the terms were added due to an Automod message approve/deny action. */
 				from_automod: boolean;
 			};
 		}
-		export interface UnbanRequest extends Action<"approve_unban_request" | "deny_unban_request"> {
-			/** Metadata associated with an unban request. */
+		/** The `channel.moderate` event information, happens when new permitted term was added to the AutoMod. */
+		export interface AddPermittedTerm extends Action<"add_permitted_term"> {
+			/** Metadata associated with new added permitted term. */
+			automod_terms: {
+				action: "add";
+				list: "permitted";
+				/** Terms being added. */
+				terms: string[];
+				/** Whether the terms were added due to an Automod message approve/deny action. */
+				from_automod: boolean;
+			};
+		}
+		/** The `channel.moderate` event information, happens when new blocked term was removed from the AutoMod. */
+		export interface RemoveBlockedTerm extends Action<"add_blocked_term"> {
+			/** Metadata associated with new removed blocked term. */
+			automod_terms: {
+				action: "remove";
+				list: "blocked";
+				/** Terms being removed. */
+				terms: string[];
+				/** Whether the terms were added due to an Automod message approve/deny action. */
+				from_automod: boolean;
+			};
+		}
+		/** The `channel.moderate` event information, happens when new permitted term was removed from the AutoMod. */
+		export interface RemovePermittedTerm extends Action<"remove_permitted_term"> {
+			/** Metadata associated with new removed permitted term. */
+			automod_terms: {
+				action: "remove";
+				list: "permitted";
+				/** Terms being removed. */
+				terms: string[];
+				/** Whether the terms were added due to an Automod message approve/deny action. */
+				from_automod: boolean;
+			};
+		}
+
+		/** The `channel.moderate` event information, happens when new moderator was added to the channel. */
+		export interface Mod extends Action<"mod"> {
+			/** Metadata associated with the new moderator. */
+			mod: {
+				/** The ID of the user gaining mod status. */
+				user_id: string;
+				/** The login of the user gaining mod status. */
+				user_login: string;
+				/** The user name of the user gaining mod status. */
+				user_name: string;
+			};
+		}
+		/** The `channel.moderate` event information, happens when moderator was removed from the channel. */
+		export interface Unmod extends Action<"unmod"> {
+			/** Metadata associated with the moderator. */
+			unmod: {
+				/** The ID of the user losing mod status. */
+				user_id: string;
+				/** The login of the user losing mod status. */
+				user_login: string;
+				/** The user name of the user losing mod status. */
+				user_name: string;
+			};
+		}
+
+		/** The `channel.moderate` event information, happens when unban request was approved. */
+		export interface ApproveUnbanRequest extends Action<"approve_unban_request"> {
+			/** Metadata associated with the approved unban request. */
 			unban_request: {
-				/** Whether or not the unban request was approved or denied. */
-				is_approved: boolean;
+				/** Always `true` in `approve_unban_request` moderation action. */
+				is_approved: true;
 				/** The ID of the banned user. */
 				user_id: string;
 				/** The login of the user. */
 				user_login: string;
 				/** The user name of the user. */
 				user_name: string;
-				/** The message included by the moderator explaining their approval or denial. */
+				/** The message included by the moderator explaining their approval. */
 				moderator_message: string;
 			};
 		}
-		export interface SharedChatBan extends Omit<Ban, "action" | "ban"> {
-			/** The type of action. */
-			action: "shared_chat_ban";
-			/** Metadata associated with a ban command in shared chat. */
-			shared_chat_ban: Ban["ban"];
+		/** The `channel.moderate` event information, happens when unban request was denied. */
+		export interface DenyUnbanRequest extends Action<"deny_unban_request"> {
+			/** Metadata associated with the denied unban request. */
+			unban_request: {
+				/** Always `false` in `deny_unban_request` moderation action. */
+				is_approved: false;
+				/** The ID of the banned user. */
+				user_id: string;
+				/** The login of the user. */
+				user_login: string;
+				/** The user name of the user. */
+				user_name: string;
+				/** The message included by the moderator explaining their denial. */
+				moderator_message: string;
+			};
 		}
-		export interface SharedChatUnban extends Omit<Unban, "action" | "unban"> {
-			/** The type of action. */
-			action: "shared_chat_unban";
-			/** Metadata associated with an unban command in shared chat. */
-			shared_chat_ban: Unban["unban"];
-		}
-		export interface SharedChatTimeout extends Omit<Timeout, "action" | "timeout"> {
-			/** The type of action. */
-			action: "shared_chat_timeout";
-			/** Metadata associated with an timeout command in shared chat. */
-			shared_chat_ban: Timeout["timeout"];
-		}
-		export interface SharedChatUntimeout extends Omit<Untimeout, "action" | "untimeout"> {
-			/** The type of action. */
-			action: "shared_chat_untimeout";
-			/** Metadata associated with an untimeout command in shared chat. */
-			shared_chat_ban: Untimeout["untimeout"];
-		}
-		export interface SharedChatDelete extends Omit<Delete, "action" | "delete"> {
-			/** The type of action. */
-			action: "shared_chat_delete";
-			/** Metadata associated with an delete command in shared chat. */
-			shared_chat_ban: Delete["delete"];
-		}
-		export type Other = Action<"clear" | "emoteonly" | "emoteonlyoff" | "uniquechat" | "uniquechatoff" | "followersoff" | "slowoff" | "subscribers" | "subscribersoff">;
-	}
-	export interface ChannelModerateV2 extends Base<Subscription.ChannelModerateV2> {
-		/** The data of `channel.moderate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderate) */
-		event: 
-			| ChannelModerate.Followers | ChannelModerate.Slow | ChannelModerate.Vip | ChannelModerate.Unvip | ChannelModerate.Mod | ChannelModerate.Unmod
-			| ChannelModerate.Ban | ChannelModerate.Unban | ChannelModerate.Timeout | ChannelModerate.Untimeout | ChannelModerate.Raid | ChannelModerate.Unraid
-			| ChannelModerate.Delete | ChannelModerate.AutomodTerms | ChannelModerate.UnbanRequest | ChannelModerateV2.Warn | ChannelModerate.SharedChatBan
-			| ChannelModerate.SharedChatUnban | ChannelModerate.SharedChatTimeout | ChannelModerate.SharedChatUntimeout | ChannelModerate.SharedChatDelete | ChannelModerate.Other;
-	}
-	export namespace ChannelModerateV2 {
-		export interface Warn extends ChannelModerate.Action<"warn"> {
-			/** Metadata associated with the warn command. */
+		/**
+		 * The `channel.moderate` event information, happens when user being warned.
+		 * 
+		 * @since The second version of `channel.moderate` event
+		 */
+		export interface Warn extends Action<"warn"> {
+			/** Metadata associated with the `warn` moderation action. */
 			warn: {
 				/** The ID of the user being warned. */
 				user_id: string;
@@ -3822,9 +4493,55 @@ export namespace Payload {
 				chat_rules_cited: string[] | null;
 			};
 		}
+		/** The `channel.moderate` event information, happens when user was banned on other channel in a shared chat session. */
+		export interface SharedChatBan extends Action<"shared_chat_ban"> {
+			/** Metadata associated with the `ban` moderation action in shared chat. */
+			shared_chat_ban: Ban["ban"];
+		}
+		/** The `channel.moderate` event information, happens when user was unbanned on other channel in a shared chat session. */
+		export interface SharedChatUnban extends Action<"shared_chat_unban"> {
+			/** Metadata associated with an unban command in shared chat. */
+			shared_chat_unban: Unban["unban"];
+		}
+		/**
+		 * The `channel.moderate` event information, happens when user being timed out on other channel in a shared chat session.
+		 * 
+		 * This moderation action has same information as `timeout`, but for an action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition.
+		 */
+		export interface SharedChatTimeout extends Action<"shared_chat_timeout"> {
+			/** Metadata associated with an timeout command in shared chat. */
+			shared_chat_ban: Timeout["timeout"];
+		}
+		/**
+		 * The `channel.moderate` event information, happens when user being untimed out on other channel in a shared chat session.
+		 * 
+		 * This moderation action has same information as `untimeout`, but for an action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition.
+		 */
+		export interface SharedChatUntimeout extends Action<"shared_chat_untimeout"> {
+			/** Metadata associated with an untimeout command in shared chat. */
+			shared_chat_ban: Untimeout["untimeout"];
+		}
+		/**
+		 * The `channel.moderate` event information, happens when chat message was deleted on other channel in a shared chat session.
+		 * 
+		 * This moderation action has same information as `delete`, but for an action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition.
+		 */
+		export interface SharedChatDelete extends Action<"shared_chat_delete"> {
+			/** Metadata associated with an delete command in shared chat. */
+			shared_chat_ban: Delete["delete"];
+		}
 	}
+	/**
+	 * ### channel.moderator.add
+	 * The `channel.moderator.add` subscription type sends a notification when a user is given moderator privileges on a specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `moderation:read` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatoradd)
+	 */
 	export interface ChannelModeratorAdd extends Base<Subscription.ChannelModeratorAdd> {
-		/** The data of `channel.moderator.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatoradd) */
+		/** The event information. */
 		event: {
 			/** The requested broadcaster ID. */
 			broadcaster_user_id: string;
@@ -3840,8 +4557,17 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
+	/**
+	 * ### channel.moderator.remove
+	 * The `channel.moderator.remove` subscription type sends a notification when a user has moderator privileges removed on a specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `moderation:read` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatorremove)
+	 */
 	export interface ChannelModeratorRemove extends Base<Subscription.ChannelModeratorRemove> {
-		/** The data of `channel.moderator.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelmoderatorremove) */
+		/** The event information. */
 		event: {
 			/** The requested broadcaster ID. */
 			broadcaster_user_id: string;
@@ -3857,8 +4583,17 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
+	/**
+	 * ### channel.guest_star_session.begin **BETA**
+	 * The `channel.guest_star_session.begin` subscription type sends a notification when the host begins a new Guest Star session.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionbegin)
+	 */
 	export interface ChannelGuestStarSessionBegin extends Base<Subscription.ChannelGuestStarSessionBegin> {
-		/** The data of `channel.guest_star_session.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionbegin) */
+		/** The event information. */
 		event: {
 			/** The broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -3872,8 +4607,17 @@ export namespace Payload {
 			started_at:	string;
 		};
 	}
+	/**
+	 * ### channel.guest_star_session.end **BETA**
+	 * The `channel.guest_star_session.end` subscription type sends a notification when a running Guest Star session is ended by the host, or automatically by the system.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionend)
+	 */
 	export interface ChannelGuestStarSessionEnd extends Base<Subscription.ChannelGuestStarSessionEnd> {
-		/** The data of `channel.guest_star_session.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionend) */
+		/** The event information. */
 		event: {
 			/** The non-host broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -3895,8 +4639,17 @@ export namespace Payload {
 			host_user_login: string;
 		};
 	}
+	/**
+	 * ### channel.guest_star_guest.update **BETA**
+	 * The `channel.guest_star_guest.update` subscription type sends a notification when a guest or a slot is updated in an active Guest Star session.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_guestupdate)
+	 */
 	export interface ChannelGuestStarGuestUpdate extends Base<Subscription.ChannelGuestStarGuestUpdate> {
-		/** The data of `channel.guest_star_session.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_sessionupdate) */
+		/** The event information. */
 		event: {
 			/** The non-host broadcaster user ID. */
 			broadcaster_user_id: string;
@@ -3945,8 +4698,17 @@ export namespace Payload {
 			host_volume: number | null;
 		};
 	}
+	/**
+	 * ### channel.guest_star_settings.update **BETA**
+	 * The `channel.guest_star_settings.update` subscription type sends a notification when the host preferences for Guest Star have been updated.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_settingsupdate)
+	 */
 	export interface ChannelGuestStarSettingsUpdate extends Base<Subscription.ChannelGuestStarSettingsUpdate> {
-		/** The data of `channel.guest_star_settings.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_settingsupdate) */
+		/** The event information. */
 		event: {
 			/** User ID of the host channel. */
 			broadcaster_user_id: string;
@@ -4010,8 +4772,17 @@ export namespace Payload {
 			prompt: string;
 		}
 	}
+	/**
+	 * ### channel.channel_points_automatic_reward_redemption.add
+	 * The `channel.channel_points_automatic_reward_redemption.add` subscription type sends a notification when a viewer has redeemed an automatic channel points reward on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionadd)
+	 */
 	export interface ChannelPointsAutomaticRewardRedemptionAdd extends Base<Subscription.ChannelPointsAutomaticRewardRedemptionAdd> {
-		/** The data of `channel.channel_points_automatic_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionadd) */
+		/** The event information. */
 		event: {
 			/** The ID of the channel where the reward was redeemed. */
 			broadcaster_user_id: string;
@@ -4061,8 +4832,17 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
+	/**
+	 * ### channel.channel_points_automatic_reward_redemption.add V2
+	 * The `channel.channel_points_automatic_reward_redemption.add` subscription type sends a notification when a viewer has redeemed an automatic channel points reward on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionadd-v2)
+	 */
 	export interface ChannelPointsAutomaticRewardRedemptionAddV2 extends Base<Subscription.ChannelPointsAutomaticRewardRedemptionAddV2> {
-		/** The data of `channel.channel_points_automatic_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionaddv2) */
+		/** The event information. */
 		event: {
 			/** The ID of the channel where the reward was redeemed. */
 			broadcaster_user_id: string;
@@ -4119,8 +4899,17 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
+	/**
+	 * ### channel.channel_points_custom_reward.add
+	 * The `channel.channel_points_custom_reward.add` subscription type sends a notification when a custom channel points reward has been created for the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardadd)
+	 */
 	export interface ChannelPointsCustomRewardAdd extends Base<Subscription.ChannelPointsCustomRewardAdd> {
-		/** The data of `channel.channel_points_custom_reward.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardadd) */
+		/** The event information. */
 		event: {
 			/** The reward identifier. */
 			id: string;
@@ -4164,16 +4953,43 @@ export namespace Payload {
 			redemptions_redeemed_current_stream: number | null;
 		};
 	}
+	/**
+	 * ### channel.channel_points_custom_reward.update
+	 * The `channel.channel_points_custom_reward.update` subscription type sends a notification when a custom channel points reward has been updated for the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardupdate)
+	 */
 	export interface ChannelPointsCustomRewardUpdate extends Base<Subscription.ChannelPointsCustomRewardUpdate> {
-		/** The data of `channel.channel_points_custom_reward.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardupdate) */
+		/** The event information. */
 		event: ChannelPointsCustomRewardAdd["event"];
 	}
+	/**
+	 * ### channel.channel_points_custom_reward.remove
+	 * The `channel.channel_points_custom_reward.remove` subscription type sends a notification when a custom channel points reward has been removed from the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardremove)
+	 */
 	export interface ChannelPointsCustomRewardRemove extends Base<Subscription.ChannelPointsCustomRewardRemove> {
-		/** The data of `channel.channel_points_custom_reward.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_rewardremove) */
+		/** The event information. */
 		event: ChannelPointsCustomRewardAdd["event"];
 	}
+	/**
+	 * ### channel.channel_points_custom_reward_redemption.add
+	 * The `channel.channel_points_custom_reward_redemption.add` subscription type sends a notification when a viewer has redeemed a custom channel points reward on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionadd)
+	 */
 	export interface ChannelPointsCustomRewardRedemptionAdd extends Base<Subscription.ChannelPointsCustomRewardRedemptionAdd> {
-		/** The data of `channel.channel_points_custom_reward_redemption.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionadd) */
+		/** The event information. */
 		event: {
 			/** The redemption identifier. */
 			id: string;
@@ -4199,9 +5015,63 @@ export namespace Payload {
 			redeemed_at: string;
 		};
 	}
+	/**
+	 * ### channel.channel_points_custom_reward_redemption.update
+	 * The `channel.channel_points_custom_reward_redemption.update` subscription type sends a notification when a redemption of a channel points custom reward has been updated for the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:redemptions` or `channel:manage:redemptions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionupdate)
+	 */
 	export interface ChannelPointsCustomRewardRedemptionUpdate extends Base<Subscription.ChannelPointsCustomRewardRedemptionUpdate> {
-		/** The data of `channel.channel_points_custom_reward_redemption.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_custom_reward_redemptionupdate) */
+		/** The event information. */
 		event: ChannelPointsCustomRewardRedemptionAdd["event"];
+	}
+	/**
+	 * ### channel.custom_power_up_redemption.add
+	 * The `channel.custom_power_up_redemption.add` subscription type sends a notification when a viewer has redeemed a custom Power-up on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `bits:read` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcustom_power_up_redemptionadd)
+	 */
+	export interface ChannelCustomPowerupRedemptionAdd extends Base<Subscription.ChannelCustomPowerupRedemptionAdd> {
+		/** The event information. */
+		event: {
+			/** The redemption identifier. */
+			id: string;
+			/** The requested broadcaster ID. */
+			broadcaster_user_id: string;
+			/** The requested broadcaster login. */
+			broadcaster_user_login: string;
+			/** The requested broadcaster display name. */
+			broadcaster_user_name: string;
+			/** User ID of the user that redeemed the custom Power-up. */
+			user_id: string;
+			/** Login of the user that redeemed the custom Power-up. */
+			user_login: string;
+			/** Display name of the user that redeemed the custom Power-up. */
+			user_name: string;
+			/** The user input provided. Empty string if not provided. */
+			user_input: string;
+			/** Defaults to `unfulfilled`. Possible values are `unknown`, `unfulfilled`, `fulfilled`, and `canceled`. */
+			status: "unknown" | "unfulfilled" | "fulfilled" | "canceled";
+			/** Basic information about the custom Power-up that was redeemed, at the time it was redeemed. */
+			custom_power_up: {
+				/** The unique ID for this Custom Power-up. */
+				id: string;
+				/** The user-viewable name of this Custom Power-up. */
+				title: string;
+				/** The cost of the Custom Power-up to redeem. */
+				bits: number;
+				/** The creator-provided description for this Power-up. */
+				prompt: string;
+			};
+			/** RFC3339 timestamp of when the custom Power-up was redeemed. */
+			redeemed_at: string;
+		};
 	}
 	export namespace ChannelPoll {
 		/** Choice for a particular poll. Each poll’s event payload includes a choices array. The choices array contains an object that describes each choice and, if applicable, the votes for that choice. */
@@ -4228,8 +5098,17 @@ export namespace Payload {
 			amount_per_vote: number;
 		}
 	}
+	/**
+	 * ### channel.poll.begin
+	 * The `channel.poll.begin` subscription type sends a notification when a poll begins on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollbegin)
+	 */
 	export interface ChannelPollBegin extends Base<Subscription.ChannelPollBegin> {
-		/** The data of `channel.poll.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollbegin) */
+		/** The event information. */
 		event: {
 			/** ID of the poll. */
 			id: string;
@@ -4253,8 +5132,17 @@ export namespace Payload {
 			ends_at: string;
 		};
 	}
+	/**
+	 * ### channel.poll.progress
+	 * The `channel.poll.progress` subscription type sends a notification when users respond to a poll on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollprogress)
+	 */
 	export interface ChannelPollProgress extends Base<Subscription.ChannelPollProgress> {
-		/** The data of `channel.poll.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollprogress) */
+		/** The event information. */
 		event: {
 			/** ID of the poll. */
 			id: string;
@@ -4278,8 +5166,17 @@ export namespace Payload {
 			ends_at: string;
 		};
 	}
+	/**
+	 * ### channel.poll.end
+	 * The `channel.poll.end` subscription type sends a notification when a poll ends on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:polls` or `channel:manage:polls` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollend)
+	 */
 	export interface ChannelPollEnd extends Base<Subscription.ChannelPollEnd> {
-		/** The data of `channel.poll.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollend) */
+		/** The event information. */
 		event: {
 			/** ID of the poll. */
 			id: string;
@@ -4335,8 +5232,17 @@ export namespace Payload {
 			channel_points_used: number;
 		}
 	}
+	/**
+	 * ### channel.prediction.begin
+	 * The `channel.prediction.begin` subscription type sends a notification when a Prediction begins on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionbegin)
+	 */
 	export interface ChannelPredictionBegin extends Base<Subscription.ChannelPredictionBegin> {
-		/** The data of `channel.prediction.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionbegin) */
+		/** The event information. */
 		event: {
 			/** Channel Points Prediction ID. */
 			id: string;
@@ -4356,8 +5262,17 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
+	/**
+	 * ### channel.prediction.progress
+	 * The `channel.prediction.progress` subscription type sends a notification when users participate in a Prediction on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionprogress)
+	 */
 	export interface ChannelPredictionProgress extends Base<Subscription.ChannelPredictionProgress> {
-		/** The data of `channel.prediction.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionprogress) */
+		/** The event information. */
 		event: {
 			/** Channel Points Prediction ID. */
 			id: string;
@@ -4377,8 +5292,17 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
+	/**
+	 * ### channel.prediction.lock
+	 * The `channel.prediction.lock` subscription type sends a notification when a Prediction is locked on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionlock)
+	 */
 	export interface ChannelPredictionLock extends Base<Subscription.ChannelPredictionLock> {
-		/** The data of `channel.prediction.lock` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionlock) */
+		/** The event information. */
 		event: {
 			/** Channel Points Prediction ID. */
 			id: string;
@@ -4398,8 +5322,17 @@ export namespace Payload {
 			locks_at: string;
 		};
 	}
+	/**
+	 * ### channel.prediction.end
+	 * The `channel.prediction.end` subscription type sends a notification when a Prediction ends on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:predictions` or `channel:manage:predictions` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionend)
+	 */
 	export interface ChannelPredictionEnd extends Base<Subscription.ChannelPredictionEnd> {
-		/** The data of `channel.prediction.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpredictionend) */
+		/** The event information. */
 		event: {
 			/** Channel Points Prediction ID. */
 			id: string;
@@ -4423,8 +5356,21 @@ export namespace Payload {
 			ended_at: string;
 		};
 	}
+	/**
+	 * ### channel.suspicious_user.update
+	 * The `channel.suspicious_user.update` subscription type sends a notification when a suspicious user has been updated.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:suspicious_users` scope.
+	 * 
+	 * If you use webhooks, the user in `moderator_user_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the [Authentication section](https://dev.twitch.tv/docs/authentication/) of Create EventSub Subscription.
+	 * 
+	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_userupdate)
+	 */
 	export interface ChannelSuspiciousUserUpdate extends Base<Subscription.ChannelSuspiciousUserUpdate> {
-		/** The data of `channel.suspicious_user.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_userupdate) */
+		/** The event information. */
 		event: {
 			/** The ID of the channel where the treatment for a suspicious user was updated. */
 			broadcaster_user_id: string;
@@ -4448,8 +5394,21 @@ export namespace Payload {
 			low_trust_status: "none" | "active_monitoring" | "restricted";
 		};
 	}
+	/**
+	 * ### channel.suspicious_user.message
+	 * The `channel.suspicious_user.message` subscription type sends a notification when a chat message has been sent from a suspicious user.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:suspicious_users` scope.
+	 * 
+	 * If you use webhooks, the user in `moderator_user_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the [Authentication section](https://dev.twitch.tv/docs/authentication/) of Create EventSub Subscription.
+	 * 
+	 * If you use WebSockets, the ID in `moderator_user_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_usermessage)
+	 */
 	export interface ChannelSuspiciousUserMessage extends Base<Subscription.ChannelSuspiciousUserMessage> {
-		/** The data of `channel.suspicious_user.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelsuspicious_usermessage) */
+		/** The event information. */
 		event: {
 			/** The ID of the channel where the treatment for a suspicious user was updated. */
 			broadcaster_user_id: string;
@@ -4482,8 +5441,17 @@ export namespace Payload {
 			};
 		};
 	}
+	/**
+	 * ### channel.vip.add
+	 * The `channel.vip.add` subscription type sends a notification when a VIP is added to the channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipadd)
+	 */
 	export interface ChannelVipAdd extends Base<Subscription.ChannelVipAdd> {
-		/** The data of `channel.vip.add` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipadd) */
+		/** The event information. */
 		event: {
 			/** The ID of the user who was added as a VIP. */
 			user_id: string;
@@ -4499,8 +5467,17 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
+	/**
+	 * ### channel.vip.remove
+	 * The `channel.vip.remove` subscription type sends a notification when a VIP is removed from the channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:vips` or `channel:manage:vips` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipremove)
+	 */
 	export interface ChannelVipRemove extends Base<Subscription.ChannelVipRemove> {
-		/** The data of `channel.vip.remove` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelvipremove) */
+		/** The event information. */
 		event: {
 			/** The ID of the user who was removed as a VIP. */
 			user_id: string;
@@ -4516,8 +5493,17 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
+	/**
+	 * ### channel.warning.acknowledge
+	 * The `channel.warning.acknowledge` subscription type sends a notification when a warning is acknowledged by a user. Broadcasters and moderators can see the warning’s details.
+	 * 
+	 * ### Authorization
+	 * Must have `moderator:read:warnings` or `moderator:manage:warnings` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningacknowledge)
+	 */
 	export interface ChannelWarningAcknowledge extends Base<Subscription.ChannelWarningAcknowledge> {
-		/** The data of `channel.warning.acknowledge` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningacknowledge) */
+		/** The event information. */
 		event: {
 			/** The user ID of the broadcaster. */
 			broadcaster_user_id: string;
@@ -4533,8 +5519,17 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
+	/**
+	 * ### channel.warning.send
+	 * The `channel.warning.send` subscription type sends a notification when a warning is sent to a user. Broadcasters and moderators can see the warning’s details.
+	 * 
+	 * ### Authorization
+	 * Must have `moderator:read:warnings` or `moderator:manage:warnings` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningsend)
+	 */
 	export interface ChannelWarningSend extends Base<Subscription.ChannelWarningSend> {
-		/** The data of `channel.warning.send` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningsend) */
+		/** The event information. */
 		event: {
 			/** The user ID of the broadcaster. */
 			broadcaster_user_id: string;
@@ -4570,8 +5565,17 @@ export namespace Payload {
 			currency: string;
 		}
 	}
+	/**
+	 * ### channel.charity_campaign.donate
+	 * Sends a notification when a user donates to the broadcaster’s charity campaign.
+	 * 
+	 * ### Authorization
+	 * Requires the `channel:read:charity` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelwarningsend)
+	 */
 	export interface ChannelCharityCampaignDonate extends Base<Subscription.ChannelCharityCampaignDonate> {
-		/** The data of `channel.charity_campaign.donate` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaigndonate) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the donation. The ID is unique across campaigns. */
 			id: string;
@@ -4601,8 +5605,17 @@ export namespace Payload {
 			amount: ChannelCharity.Amount;
 		};
 	}
+	/**
+	 * ### channel.charity_campaign.start
+	 * Sends a notification when the broadcaster starts a charity campaign. It’s possible to receive this event after the {@link Payload.ChannelCharityCampaignProgress | Progress} event.
+	 * 
+	 * ### Authorization
+	 * Requires the `channel:read:charity` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstart)
+	 */
 	export interface ChannelCharityCampaignStart extends Base<Subscription.ChannelCharityCampaignStart> {
-		/** The data of `channel.charity_campaign.start` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstart) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the charity campaign. */
 			id: string;
@@ -4628,8 +5641,17 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
+	/**
+	 * ### channel.charity_campaign.progress
+	 * Sends notifications when progress is made towards the campaign’s goal or when the broadcaster changes the fundraising goal. It’s possible to receive this event before the {@link Payload.ChannelCharityCampaignStart | Start} event. To get donation information, subscribe to the {@link Payload.ChannelCharityCampaignDonate | channel.charity_campaign.donate} event.
+	 * 
+	 * ### Authorization
+	 * Requires the `channel:read:charity` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignprogress)
+	 */
 	export interface ChannelCharityCampaignProgress extends Base<Subscription.ChannelCharityCampaignProgress> {
-		/** The data of `channel.charity_campaign.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignprogress) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the charity campaign. */
 			id: string;
@@ -4653,8 +5675,17 @@ export namespace Payload {
 			target_amount: ChannelCharity.Amount;
 		};
 	}
+	/**
+	 * ### channel.charity_campaign.stop
+	 * Sends a notification when the broadcaster stops a charity campaign.
+	 * 
+	 * ### Authorization
+	 * Requires the `channel:read:charity` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstop)
+	 */
 	export interface ChannelCharityCampaignStop extends Base<Subscription.ChannelCharityCampaignStop> {
-		/** The data of `channel.charity_campaign.stop` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelcharity_campaignstop) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the charity campaign. */
 			id: string;
@@ -4680,8 +5711,17 @@ export namespace Payload {
 			stopped_at: string;
 		};
 	}
+	/**
+	 * ### conduit.shard.disabled
+	 * The `conduit.shard.disabled` subscription type sends a notification when EventSub disables a shard due to the status of the underlying transport changing.
+	 * 
+	 * ### Authorization
+	 * App access token where the client ID matches the client ID in the condition. If `conduit_id` is specified, the client must be the owner of the conduit.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#conduitsharddisabled)
+	 */
 	export interface ConduitShardDisabled extends Base<Subscription.ConduitShardDisabled> {
-		/** The data of `conduit.shard.disabled` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#conduitsharddisabled) */
+		/** The event information. */
 		event: {
 			/** The ID of the conduit. */
 			conduit_id: string;
@@ -4693,8 +5733,21 @@ export namespace Payload {
 			transport: Subscription.ConduitShardDisabled; // TODO
 		};
 	}
+	/**
+	 * ### drop.entitlement.grant
+	 * The `drop.entitlement.grant` subscription type sends a notification when an entitlement for a Drop is granted to a user.
+	 * 
+	 * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+	 * 
+	 * ### Authorization
+	 * App access token required. The client ID associated with the access token must be owned by a user who is part of the specified organization.
+	 * 
+	 * Note that the payload structure is different from other subscription types. Events bound for `drop.entitlement.grant` subscriptions are batched. Developers can expect to receive roughly 0-5 HTTP requests per second. HTTP request bodies will not exceed 250KB.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#dropentitlementgrant)
+	 */
 	export interface DropEntitlementGrant extends Base<Subscription.DropEntitlementGrant> {
-		/** The data of `drop.entitlement.grant` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#dropentitlementgrant) */
+		/** The event information. */
 		events: {
 			/** Individual event ID, as assigned by  Use this for de-duplicating messages. */
 			id: string;
@@ -4735,8 +5788,19 @@ export namespace Payload {
 			in_development: boolean;
 		};
 	}
+	/**
+	 * ### extension.bits_transaction.create
+	 * The `extension.bits_transaction.create` subscription type sends a notification when a new transaction is created for a Twitch Extension.
+	 * 
+	 * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+	 * 
+	 * ### Authorization
+	 * The OAuth token client ID must match the Extension client ID.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#extensionbits_transactioncreate)
+	 */
 	export interface ExtensionBitsTransactionCreate extends Base<Subscription.ExtensionBitsTransactionCreate> {
-		/** The data of `extension.bits_transaction.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#extensionbits_transactioncreate) */
+		/** The event information. */
 		event: {
 			/** Client ID of the extension. */
 			extension_client_id: string;
@@ -4759,7 +5823,7 @@ export namespace Payload {
 		};
 	}
 	export namespace ChannelGoal {
-		export interface Event {
+		export interface Unknown {
 			/** An ID that identifies this event. */
 			id: string;
 			/** An ID that uniquely identifies the broadcaster. */
@@ -4802,16 +5866,47 @@ export namespace Payload {
 			ended_at: string;
 		}
 	}
+	/**
+	 * ### channel.goal.begin
+	 * Notifies the subscriber when the specified broadcaster begins a goal.
+	 * 
+	 * **NOTE**: It’s possible to receive the Begin event after receiving {@link Payload.ChannelGoalProgress | Progress} events.
+	 * 
+	 * ### Authorization
+	 * Requires a user OAuth access token with scope set to `channel:read:goals`.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalbegin)
+	 */
 	export interface ChannelGoalBegin extends Base<Subscription.ChannelGoalBegin> {
-		/** The data of `channel.goal.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
-		event: ChannelGoal.Event;
+		/** The event information. */
+		event: ChannelGoal.Unknown;
 	}
+	/**
+	 * ### channel.goal.progress
+	 * Notifies the subscriber when progress is made towards the specified broadcaster’s goal. Progress could be positive (added followers) or negative (lost followers).
+	 * 
+	 * **NOTE**: It’s possible to receive Progress events before receiving the {@link Payload.ChannelGoalBegin | Begin} event.
+	 * 
+	 * ### Authorization
+	 * Requires a user OAuth access token with scope set to `channel:read:goals`.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalprogress)
+	 */
 	export interface ChannelGoalProgress extends Base<Subscription.ChannelGoalProgress> {
-		/** The data of `channel.goal.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
-		event: ChannelGoal.Event;
+		/** The event information. */
+		event: ChannelGoal.Unknown;
 	}
+	/**
+	 * ### channel.goal.end
+	 * Notifies the subscriber when the specified broadcaster ends a goal.
+	 * 
+	 * ### Authorization
+	 * Requires a user OAuth access token with scope set to `channel:read:goals`.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalend)
+	 */
 	export interface ChannelGoalEnd extends Base<Subscription.ChannelGoalEnd> {
-		/** The data of `channel.goal.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#goal-subscriptions) */
+		/** The event information. */
 		event: ChannelGoal.EventEnd;
 	}
 	export namespace ChannelHypeTrain {
@@ -4838,8 +5933,19 @@ export namespace Payload {
 			export type Other = Bits<"other", 500 | 1000 | 2500>;
 		}
 	}
+	/**
+	 * ### channel.hype_train.begin
+	 * The `channel.hype_train.begin` subscription type sends a notification when a Hype Train begins on the specified channel. In addition to a `channel.hype_train.begin` event, one `channel.hype_train.progress` event will be sent for each contribution that caused the Hype Train to begin. EventSub does not make strong assurances about the order of message delivery, so it is possible to receive `channel.hype_train.progress` notifications before you receive the corresponding `channel.hype_train.begin` notification.
+	 * 
+	 * After the Hype Train begins, any additional cheers or subscriptions on the channel will cause `channel.hype_train.progress` notifications to be sent. When the Hype Train is over, `channel.hype_train.end` is emitted.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:hype_train` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainbegin)
+	 */
 	export interface ChannelHypeTrainBegin extends Base<Subscription.ChannelHypeTrainBegin> {
-		/** The data of `channel.hype_train.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainbegin) */
+		/** The event information. */
 		event: {
 			/** The Hype Train ID. */
 			id: string;
@@ -4869,12 +5975,32 @@ export namespace Payload {
 			is_golden_kappa_train: boolean;
 		};
 	}
+	/**
+	 * ### channel.hype_train.progress
+	 * The `channel.hype_train.progress` subscription type sends a notification when a Hype Train makes progress on the specified channel. `channel.hype_train.progress` notifications are sent periodically while a Hype Train is making progress. EventSub does not make strong assurances about the order of message delivery, so it is possible to receive channel.hype_train.progress before you receive the corresponding `channel.hype_train.begin`.
+	 * 
+	 * When the Hype Train is over, `channel.hype_train.end` is emitted.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:hype_train` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainprogress)
+	 */
 	export interface ChannelHypeTrainProgress extends Base<Subscription.ChannelHypeTrainProgress> {
-		/** The data of `channel.hype_train.progress` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainbegin) */
+		/** The event information. */
 		event: ChannelHypeTrainBegin["event"];
 	}
+	/**
+	 * ### channel.hype_train.end
+	 * The `channel.hype_train.end` subscription type sends a notification when a Hype Train ends on the specified channel.
+	 * 
+	 * ### Authorization
+	 * Must have `channel:read:hype_train` scope.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainend)
+	 */
 	export interface ChannelHypeTrainEnd extends Base<Subscription.ChannelHypeTrainEnd> {
-		/** The data of `channel.hype_train.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainend) */
+		/** The event information. */
 		event: {
 			/** The Hype Train ID. */
 			id: string;
@@ -4900,8 +6026,21 @@ export namespace Payload {
 			is_golden_kappa_train: boolean;
 		};
 	}
+	/**
+	 * ### channel.shield_mode.begin
+	 * Sends a notification when the broadcaster activates Shield Mode. This event informs the subscriber that the broadcaster’s moderation settings were changed based on the broadcaster’s Shield Mode configuration settings.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:shield_mode` or `moderator:manage:shield_mode` scope.
+	 * 
+	 * If you use [webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the user in `moderator_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the Authorization section of [Create EventSub Subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+	 * 
+	 * If you use [WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modebegin)
+	 */
 	export interface ChannelShieldModeBegin extends Base<Subscription.ChannelShieldModeBegin> {
-		/** The data of `channel.shield_mode.begin` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modebegin) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the broadcaster whose Shield Mode status was updated. */
 			broadcaster_user_id: string;
@@ -4919,8 +6058,21 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
+	/**
+	 * ### channel.shield_mode.end
+	 * Sends a notification when the broadcaster deactivates Shield Mode. This event informs the subscriber that the broadcaster’s moderation settings were changed back to the broadcaster’s previous moderation settings.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:shield_mode` or `moderator:manage:shield_mode` scope.
+	 * 
+	 * If you use [webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the user in `moderator_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the Authorization section of [Create EventSub Subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+	 * 
+	 * If you use [WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modeend)
+	 */
 	export interface ChannelShieldModeEnd extends Base<Subscription.ChannelShieldModeEnd> {
-		/** The data of `channel.shield_mode.end` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshield_modeend) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the broadcaster whose Shield Mode status was updated. */
 			broadcaster_user_id: string;
@@ -4938,8 +6090,21 @@ export namespace Payload {
 			ended_at: string;
 		};
 	}
+	/**
+	 * ### channel.shoutout.create
+	 * Sends a notification when the specified broadcaster sends a Shoutout.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:shoutouts` or `moderator:manage:shoutouts` scope.
+	 * 
+	 * If you use [webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the user in `moderator_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the Authorization section of [Create EventSub Subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+	 * 
+	 * If you use [WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutcreate)
+	 */
 	export interface ChannelShoutoutCreate extends Base<Subscription.ChannelShoutoutCreate> {
-		/** The data of `channel.shoutout.create` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutcreate) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the broadcaster that sent the Shoutout. */
 			broadcaster_user_id: string;
@@ -4969,8 +6134,23 @@ export namespace Payload {
 			target_cooldown_ends_at: string;
 		};
 	}
+	/**
+	 * ### channel.shoutout.receive
+	 * Sends a notification when the specified broadcaster receives a Shoutout.
+	 * 
+	 * **NOTE**: Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
+	 * 
+	 * ### Authorization
+	 * Requires the `moderator:read:shoutouts` or `moderator:manage:shoutouts` scope.
+	 * 
+	 * If you use [webhooks](https://dev.twitch.tv/docs/eventsub/handling-webhook-events), the user in `moderator_id` must have granted your app (client ID) one of the above permissions prior to your app subscribing to this subscription type. To learn more, see the Authorization section of [Create EventSub Subscription](https://dev.twitch.tv/docs/api/reference#create-eventsub-subscription).
+	 * 
+	 * If you use [WebSockets](https://dev.twitch.tv/docs/eventsub/handling-websocket-events), the ID in `moderator_id` must match the user ID in the user access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutreceive)
+	 */
 	export interface ChannelShoutoutReceive extends Base<Subscription.ChannelShoutoutReceive> {
-		/** The data of `channel.shoutout.receive` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutreceive) */
+		/** The event information. */
 		event: {
 			/** An ID that identifies the broadcaster that received the Shoutout. */
 			broadcaster_user_id: string;
@@ -4990,8 +6170,17 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
+	/**
+	 * ### stream.online
+	 * The `stream.online` subscription type sends a notification when the specified broadcaster starts a stream.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamonline)
+	 */
 	export interface StreamOnline extends Base<Subscription.StreamOnline> {
-		/** The data of `stream.online` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamonline) */
+		/** The event information. */
 		event: {
 			/** The ID of the stream. */
 			id: string;
@@ -5007,9 +6196,20 @@ export namespace Payload {
 			started_at: string;
 		};
 	}
+	/**
+	 * ### stream.offline
+	 * The `stream.offline` subscription type sends a notification when the specified broadcaster stops a stream.
+	 * 
+	 * ### Authorization
+	 * No authorization required.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamoffline)
+	 */
 	export interface StreamOffline extends Base<Subscription.StreamOffline> {
-		/** The data of `stream.offline` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamoffline) */
+		/** The event information. */
 		event: {
+			/** The ID of the stream. */
+			id: string;
 			/** The broadcaster’s user ID. */
 			broadcaster_user_id: string;
 			/** The broadcaster’s user login. */
@@ -5018,8 +6218,19 @@ export namespace Payload {
 			broadcaster_user_name: string;
 		};
 	}
+	/**
+	 * ### user.authorization.grant
+	 * The `user.authorization.grant` subscription type sends a notification when a user’s authorization has been granted to your client id.
+	 * 
+	 * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+	 * 
+	 * ### Authorization
+	 * Provided `client_id` must match the client id in the application access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamoffline)
+	 */
 	export interface UserAuthorizationGrant extends Base<Subscription.UserAuthorizationGrant> {
-		/** The data of `user.authorization.grant` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationgrant) */
+		/** The event information. */
 		event: {
 			/** The client_id of the application that was granted user access. */
 			client_id: string;
@@ -5031,8 +6242,19 @@ export namespace Payload {
 			user_name: string;
 		};
 	}
+	/**
+	 * ### user.authorization.revoke
+	 * The `user.authorization.revoke` subscription type sends a notification when a user’s authorization has been revoked for your client id. Use this webhook to meet government requirements for handling user data, such as GDPR, LGPD, or CCPA.
+	 * 
+	 * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+	 * 
+	 * ### Authorization
+	 * Provided `client_id` must match the client id in the application access token.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke)
+	 */
 	export interface UserAuthorizationRevoke extends Base<Subscription.UserAuthorizationRevoke> {
-		/** The data of `user.authorization.revoke` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke) */
+		/** The event information. */
 		event: {
 			/** The client_id of the application with revoked user access. */
 			client_id: string;
@@ -5044,8 +6266,17 @@ export namespace Payload {
 			user_name: string | null;
 		};
 	}
+	/**
+	 * ### user.update
+	 * The `user.update` subscription type sends a notification when user updates their account.
+	 * 
+	 * ### Authorization
+	 * No authorization required. If you have the `user:read:email` scope, the notification will include `email` field.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke)
+	 */
 	export interface UserUpdate extends Base<Subscription.UserUpdate> {
-		/** The data of `user.update` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userupdate) */
+		/** The event information. */
 		event: {
 			/** The user’s user ID. */
 			user_id: string;
@@ -5061,8 +6292,17 @@ export namespace Payload {
 			description: string;
 		};
 	}
+	/**
+	 * ### user.whisper.message
+	 * The `user.whisper.message` subscription type sends a notification when a user receives a whisper. Event Triggers - Anyone whispers the specified user.
+	 * 
+	 * ### Authorization
+	 * Must have oauth scope `user:read:whispers` or `user:manage:whispers`.
+	 * 
+	 * [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userwhispermessage)
+	 */
 	export interface UserWhisperMessage extends Base<Subscription.UserWhisperMessage> {
-		/** The data of `user.whisper.message` event. [Read More](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userwhispermessage) */
+		/** The event information. */
 		event: {
 			/** The ID of the user sending the message. */
 			from_user_id: string;
@@ -5209,6 +6449,7 @@ export namespace Message {
 		export function isChannelPointsCustomRewardRemove(data: Message.Notification): data is Notification<Payload.ChannelPointsCustomRewardRemove> { return data.metadata.subscription_type === "channel.channel_points_custom_reward.remove" && data.metadata.subscription_version === "1" }
 		export function isChannelPointsCustomRewardRedemptionAdd(data: Message.Notification): data is Notification<Payload.ChannelPointsCustomRewardRedemptionAdd> { return data.metadata.subscription_type === "channel.channel_points_custom_reward_redemption.add" && data.metadata.subscription_version === "1" }
 		export function isChannelPointsCustomRewardRedemptionUpdate(data: Message.Notification): data is Notification<Payload.ChannelPointsCustomRewardRedemptionUpdate> { return data.metadata.subscription_type === "channel.channel_points_custom_reward_redemption.update" && data.metadata.subscription_version === "1" }
+		export function isChannelCustomPowerupRedemptionAdd(data: Message.Notification): data is Notification<Payload.ChannelCustomPowerupRedemptionAdd> { return data.metadata.subscription_type === "channel.custom_power_up_redemption.add" && data.metadata.subscription_version === "1" }
 		export function isChannelPollBegin(data: Message.Notification): data is Notification<Payload.ChannelPollBegin> { return data.metadata.subscription_type === "channel.poll.begin" && data.metadata.subscription_version === "1" }
 		export function isChannelPollProgress(data: Message.Notification): data is Notification<Payload.ChannelPollProgress> { return data.metadata.subscription_type === "channel.poll.progress" && data.metadata.subscription_version === "1" }
 		export function isChannelPollEnd(data: Message.Notification): data is Notification<Payload.ChannelPollEnd> { return data.metadata.subscription_type === "channel.poll.end" && data.metadata.subscription_version === "1" }
