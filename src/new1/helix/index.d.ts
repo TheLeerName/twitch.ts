@@ -145,3 +145,4 @@ export * as AddSuspiciousStatusToChatUser from "./moderation/suspicious_users/po
 export * as RemoveSuspiciousStatusFromChatUser from "./moderation/suspicious_users/delete";
 export * as GetPolls from "./polls/get";
 export * as CreatePoll from "./polls/post";
+export * as EndPoll from "./polls/patch";
