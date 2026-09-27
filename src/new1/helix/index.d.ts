@@ -178,3 +178,4 @@ export * as GetUserExtensions from "./users/extensions/list/get";
 export * as GetUserActiveExtensions from "./users/extensions/get";
 export * as UpdateUserExtensions from "./users/extensions/put";
 export * as GetVideos from "./videos/get";
+export * as DeleteVideos from "./videos/delete";
