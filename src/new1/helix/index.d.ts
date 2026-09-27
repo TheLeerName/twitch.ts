@@ -179,3 +179,4 @@ export * as GetUserActiveExtensions from "./users/extensions/get";
 export * as UpdateUserExtensions from "./users/extensions/put";
 export * as GetVideos from "./videos/get";
 export * as DeleteVideos from "./videos/delete";
+export * as SendWhisper from "./whispers/post";
