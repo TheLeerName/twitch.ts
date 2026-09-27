@@ -38,5 +38,6 @@ export interface RequestQueryParameters {
 	signal?: AbortSignal;
 }
 
+export * as OAuth2 from "./oauth2";
 export * as Helix from "./helix";
 export { URL, URLSearchParams, Response } from "./url";
