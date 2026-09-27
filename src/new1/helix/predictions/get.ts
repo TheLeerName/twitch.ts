@@ -31,73 +31,75 @@ export type RequestParameters = Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The broadcaster’s list of Channel Points Predictions. The list is sorted in descending ordered by when the prediction began (the most recent prediction is first). The list is empty if the broadcaster hasn’t created predictions. */
-	data: {
-		/** An ID that identifies this prediction. */
-		id: string;
-		/** An ID that identifies the broadcaster that created the prediction. */
-		broadcaster_id: string;
-		/** The broadcaster’s display name. */
-		broadcaster_name: string;
-		/** The broadcaster’s login name. */
-		broadcaster_login: string;
-		/** The question that the prediction asks. For example, `Will I finish this entire pizza?` */
-		title: string;
-		/** The ID of the winning outcome. Is **null** unless `status` is RESOLVED. */
-		winning_outcome_id: string | null;
-		/** The list of possible outcomes for the prediction. */
-		outcomes: {
-			/** An ID that identifies this outcome. */
-			id: string;
-			/** The outcome’s text. */
-			title: string;
-			/** **Integer**. The number of unique viewers that chose this outcome. */
-			users: number;
-			/** **Integer**. The number of Channel Points spent by viewers on this outcome. */
-			channel_points: number;
-			/** A list of viewers who were the top predictors; otherwise, **null** if none. */
-			top_predictors: {
-				/** An ID that identifies the viewer. */
-				user_id: string;
-				/** The viewer’s display name. */
-				user_name: string;
-				/** The viewer’s login name. */
-				user_login: string;
-				/** **Integer**. The number of Channel Points the viewer spent. */
-				channel_points_used: number;
-				/** **Integer**. The number of Channel Points distributed to the viewer. */
-				channel_points_won: number;
-			}[] | null;
-		}[];
-		/**
-		 * The color that visually identifies this outcome in the UX. Possible values are:
-		 * - BLUE
-		 * - PINK
-
-		 * If the number of outcomes is two, the color is BLUE for the first outcome and PINK for the second outcome. If there are more than two outcomes, the color is BLUE for all outcomes.
-		 */
-		color: "BLUE" | "PINK";
-		/** **Integer**. The length of time (in seconds) that the prediction will run for. */
-		prediction_window: number;
-		/**
-		 * The prediction’s status. Valid values are:
-		 * - ACTIVE — The Prediction is running and viewers can make predictions.
-		 * - CANCELED — The broadcaster canceled the Prediction and refunded the Channel Points to the participants.
-		 * - LOCKED — The broadcaster locked the Prediction, which means viewers can no longer make predictions.
-		 * - RESOLVED — The winning outcome was determined and the Channel Points were distributed to the viewers who predicted the correct outcome.
-		 */
-		status: "ACTIVE" | "CANCELED" | "LOCKED" | "RESOLVED";
-		/** The UTC date and time of when the Prediction began. */
-		created_at: string;
-		/** The UTC date and time of when the Prediction ended. If `status` is ACTIVE, this is set to **null**. */
-		ended_at: string | null;
-		/** The UTC date and time of when the Prediction was locked. If `status` is not LOCKED, this is set to **null**. */
-		locked_at: string | null;
-	}[];
+	data: Prediction[];
 	/** Contains the information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 	pagination?: {
 		/** The cursor used to get the next page of results. Use the cursor to set the request’s `after` query parameter. */
 		cursor?: string;
 	};
+}
+
+export interface Prediction {
+	/** An ID that identifies this prediction. */
+	id: string;
+	/** An ID that identifies the broadcaster that created the prediction. */
+	broadcaster_id: string;
+	/** The broadcaster’s display name. */
+	broadcaster_name: string;
+	/** The broadcaster’s login name. */
+	broadcaster_login: string;
+	/** The question that the prediction asks. For example, `Will I finish this entire pizza?` */
+	title: string;
+	/** The ID of the winning outcome. Is **null** unless `status` is RESOLVED. */
+	winning_outcome_id: string | null;
+	/** The list of possible outcomes for the prediction. */
+	outcomes: {
+		/** An ID that identifies this outcome. */
+		id: string;
+		/** The outcome’s text. */
+		title: string;
+		/** **Integer**. The number of unique viewers that chose this outcome. */
+		users: number;
+		/** **Integer**. The number of Channel Points spent by viewers on this outcome. */
+		channel_points: number;
+		/** A list of viewers who were the top predictors; otherwise, **null** if none. */
+		top_predictors: {
+			/** An ID that identifies the viewer. */
+			user_id: string;
+			/** The viewer’s display name. */
+			user_name: string;
+			/** The viewer’s login name. */
+			user_login: string;
+			/** **Integer**. The number of Channel Points the viewer spent. */
+			channel_points_used: number;
+			/** **Integer**. The number of Channel Points distributed to the viewer. */
+			channel_points_won: number;
+		}[] | null;
+	}[];
+	/**
+	 * The color that visually identifies this outcome in the UX. Possible values are:
+	 * - BLUE
+	 * - PINK
+
+		* If the number of outcomes is two, the color is BLUE for the first outcome and PINK for the second outcome. If there are more than two outcomes, the color is BLUE for all outcomes.
+		*/
+	color: "BLUE" | "PINK";
+	/** **Integer**. The length of time (in seconds) that the prediction will run for. */
+	prediction_window: number;
+	/**
+	 * The prediction’s status. Valid values are:
+	 * - ACTIVE — The Prediction is running and viewers can make predictions.
+	 * - CANCELED — The broadcaster canceled the Prediction and refunded the Channel Points to the participants.
+	 * - LOCKED — The broadcaster locked the Prediction, which means viewers can no longer make predictions.
+	 * - RESOLVED — The winning outcome was determined and the Channel Points were distributed to the viewers who predicted the correct outcome.
+	 */
+	status: "ACTIVE" | "CANCELED" | "LOCKED" | "RESOLVED";
+	/** The UTC date and time of when the Prediction began. */
+	created_at: string;
+	/** The UTC date and time of when the Prediction ended. If `status` is ACTIVE, this is set to **null**. */
+	ended_at: string | null;
+	/** The UTC date and time of when the Prediction was locked. If `status` is not LOCKED, this is set to **null**. */
+	locked_at: string | null;
 }
 
 /**

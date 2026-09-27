@@ -148,3 +148,4 @@ export * as CreatePoll from "./polls/post";
 export * as EndPoll from "./polls/patch";
 export * as GetPredictions from "./predictions/get";
 export * as CreatePrediction from "./predictions/post";
+export * as EndPrediction from "./predictions/patch";
