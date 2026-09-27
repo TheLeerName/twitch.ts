@@ -162,3 +162,4 @@ export * as SearchChannels from "./search/channels/get";
 export * as GetStreamKey from "./streams/key/get";
 export * as GetStreams from "./streams/get";
 export * as GetFollowedStreams from "./streams/followed/get";
+export * as CreateStreamMarker from "./streams/markers/post";
