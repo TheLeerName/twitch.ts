@@ -2,6 +2,20 @@ import fs from "fs";
 import readline from "readline/promises";
 import { JSDOM } from "jsdom";
 
+/*
+
+cd doc-maker
+node index.js
+1. copypaste endpoint name
+2. copypaste <p>'s after name and until authorization or smth else
+3. check requiring tokens and scopes
+4. insert request query table if any
+5. insert request body table if any
+6. insert response body table if any
+7. insert response codes table if any
+
+*/
+
 const scriptFileNameWithoutExt = (() => {
 	let filename = import.meta.filename.replaceAll("\\", "/");
 	filename = filename.substring(filename.lastIndexOf("/") + 1);
