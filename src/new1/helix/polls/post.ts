@@ -1,4 +1,5 @@
 import { Options, Helix } from "../..";
+import { Poll } from "./get";
 
 export interface Authentication {
 	/**
@@ -38,55 +39,7 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
 
 export interface ResponseBody {
 	/** A list that contains the single poll that you created. */
-	data: [{
-		/** An ID that identifies the poll. */
-		id: string;
-		/** An ID that identifies the broadcaster that created the poll. */
-		broadcaster_id: string;
-		/** The broadcaster’s display name. */
-		broadcaster_name: string;
-		/** The broadcaster’s login name. */
-		broadcaster_login: string;
-		/** The question that viewers are voting on. For example, `What game should I play next?` The title may contain a maximum of 60 characters. */
-		title: string;
-		/** A list of choices that viewers can choose from. The list will contain a minimum of two choices and up to a maximum of five choices. */
-		choices: {
-			/** An ID that identifies this choice. */
-			id: string;
-			/** The choice’s title. The title may contain a maximum of 25 characters. */
-			title: string;
-		}[];
-		/** **Integer**. The total number of votes cast for this choice. */
-		votes: number;
-		/** **Integer**. The number of votes cast using Channel Points. */
-		channel_points_votes: number;
-		/** **Integer**. Not used; will be set to 0. */
-		bits_votes: 0;
-		/** Not used; will be set to **false**. */
-		bits_voting_enabled: false;
-		/** **Integer**. Not used; will be set to 0. */
-		bits_per_vote: 0;
-		/** A Boolean value that indicates whether viewers may cast additional votes using Channel Points. For information about Channel Points, see [Channel Points Guide](https://help.twitch.tv/s/article/channel-points-guide). */
-		channel_points_voting_enabled: boolean;
-		/** **Integer**. The number of points the viewer must spend to cast one additional vote. */
-		channel_points_per_vote: number;
-		/**
-		 * The poll’s status. Valid values are:
-		 * - ACTIVE — The poll is running.
-		 * - COMPLETED — The poll ended on schedule (see the `duration` field).
-		 * - TERMINATED — The poll was terminated before its scheduled end.
-		 * - ARCHIVED — The poll has been archived and is no longer visible on the channel.
-		 * - MODERATED — The poll was deleted.
-		 * - INVALID — Something went wrong while determining the state.
-		 */
-		status: "ACTIVE" | "COMPLETED" | "TERMINATED" | "ARCHIVED" | "MODERATED" | "INVALID";
-		/** **Integer**. The length of time (in seconds) that the poll will run for. */
-		duration: number;
-		/** The UTC date and time (in RFC3339 format) of when the poll began. */
-		started_at: string;
-		/** The UTC date and time (in RFC3339 format) of when the poll ended. If `status` is ACTIVE, this field is set to **null**. */
-		ended_at: string | null;
-	}];
+	data: [Poll];
 }
 
 /**
