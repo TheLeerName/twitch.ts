@@ -151,3 +151,4 @@ export * as CreatePrediction from "./predictions/post";
 export * as EndPrediction from "./predictions/patch";
 export * as StartRaid from "./raids/post";
 export * as CancelRaid from "./raids/delete";
+export * as GetChannelStreamSchedule from "./schedule/get";
