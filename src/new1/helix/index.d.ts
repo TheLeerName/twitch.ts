@@ -139,3 +139,4 @@ export * as GetVIPs from "./channels/vips/get";
 export * as AddVIP from "./channels/vips/post";
 export * as RemoveVIP from "./channels/vips/delete";
 export * as UpdateShieldModeStatus from "./moderation/shield_mode/put";
+export * as GetShieldModeStatus from "./moderation/shield_mode/get";
