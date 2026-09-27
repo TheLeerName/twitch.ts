@@ -168,3 +168,4 @@ export * as GetBroadcasterSubscriptions from "./subscriptions/get";
 export * as CheckUserSubscription from "./subscriptions/user/get";
 export * as GetChannelTeams from "./teams/channel/get";
 export * as GetTeams from "./teams/get";
+export * as GetUsers from "./users/get";
