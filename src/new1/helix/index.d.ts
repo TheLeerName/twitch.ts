@@ -170,3 +170,4 @@ export * as GetChannelTeams from "./teams/channel/get";
 export * as GetTeams from "./teams/get";
 export * as GetUsers from "./users/get";
 export * as UpdateUser from "./users/put";
+export * as GetAuthorizationByUser from "./authorization/users/get";
