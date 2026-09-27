@@ -19,13 +19,6 @@ export declare class URL extends global.URL {
 	constructor(url: string | this, base?: string | this);
 }
 
-export interface RequestQueryParameters {
-	/** If specified, API endpoint path will be changed to this value */
-	apiPath?: string;
-	/** An AbortSignal to set request's signal. */
-	signal?: AbortSignal;
-}
-
 export interface Response<ResponseJson> extends globalThis.Response {
 	json(): Promise<ResponseJson>;
 }

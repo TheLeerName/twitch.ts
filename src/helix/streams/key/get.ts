@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that owns the channel. The ID must match the user ID in the access token. */
 	broadcaster_id: string;
 }
@@ -48,8 +48,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header must match the client ID specified in the access token.
  * 403 Forbidden|The user must complete additional steps in order to stream. Present the user with the returned error message.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "streams/key", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "streams/key", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

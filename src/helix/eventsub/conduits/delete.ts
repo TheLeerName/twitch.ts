@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** Conduit ID. */
 	id: string;
 }
@@ -36,8 +36,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|Conduit not found.
  * ㅤ|Conduit’s owner must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "eventsub/conduits", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 	});

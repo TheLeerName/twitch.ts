@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster running the Guest Star session. */
 	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
@@ -65,8 +65,8 @@ export interface ResponseBody {
  * 403 Forbidden|The user specified in the `moderator_id` is not permitted to view the broadcaster’s invites.
  * 404 Not Found|Invalid `session_id`
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "guest_star/invites", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

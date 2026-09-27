@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the category or game to get. You may specify a maximum of 100 IDs. The endpoint ignores duplicate and invalid IDs or IDs that weren’t found. */
 	id?: string | string[];
 	/** The name of the category or game to get. The name must exactly match the category’s or game’s title. You may specify a maximum of 100 names. The endpoint ignores duplicate names and names that weren’t found. */
@@ -59,8 +59,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "games", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "games", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 		name: params.name,

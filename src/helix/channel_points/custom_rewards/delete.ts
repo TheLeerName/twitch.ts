@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that created the custom reward. This ID must match the user ID found in the OAuth token. */
 	broadcaster_id: string;
 	/** The ID of the custom reward to delete. */
@@ -46,8 +46,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The custom reward specified in the `id` query parameter was not found.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "channel_points/custom_rewards", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "channel_points/custom_rewards", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		id: params.id,

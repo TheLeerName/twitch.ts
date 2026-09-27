@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user sending the whisper. This user must have a verified phone number. This ID must match the user ID in the user access token. */
 	from_user_id: string;
 	/** The ID of the user to receive the whisper. */
@@ -67,8 +67,8 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 404 Not Found|The ID in `to_user_id` was not found.
  * 429 Too Many Requests|The sending user exceeded the number of whisper requests that they may make. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "whispers", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		from_user_id: params.from_user_id,
 		to_user_id: params.to_user_id,

@@ -22,7 +22,7 @@ const scriptFileNameWithoutExt = (() => {
 	filename = filename.substring(0, filename.indexOf("."));
 	return filename;
 })();
-let outputFileNameWithoutExt = "../src/new1/helix/";
+let outputFileNameWithoutExt = "../src/helix/";
 
 /**
  * 
@@ -193,7 +193,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 		return params;
 
 	addTextToOutput(``);
-	addTextToOutput(`export interface RequestQueryParameters extends Helix.RequestQueryParameters {`);
+	addTextToOutput(`export interface RequestQueryParameters extends Main.RequestQueryParameters {`);
 
 	const dom = new JSDOM(requestQueryParametersHTML, "application/xhtml+xml");
 	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
@@ -439,8 +439,8 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 
 	addTextToOutput(` */`);
 
-	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Helix.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
-	addTextToOutput(`\tconst url = new Helix.URL(params.apiPath ?? "${url}", Options.apiHelixPath);`);
+	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
+	addTextToOutput(`\tconst url = new Main.Helix.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
 	if (requestQueryParameters.length > 0) {
 		addTextToOutput(`\turl.searchParams.appendMany({`);
 		for (const param of requestQueryParameters)
@@ -503,7 +503,7 @@ async function main() {
 		fs.mkdirSync(outputFileNameWithoutExt, {recursive: true});
 	outputFileNameWithoutExt += "/" + method.toLowerCase();
 
-	fs.writeFileSync(outputFileNameWithoutExt + ".ts", `import { Options, Helix } from "../${url.replaceAll(/[\w_]+/g, "..")}";`);
+	fs.writeFileSync(outputFileNameWithoutExt + ".ts", `import * as Main from "../${url.replaceAll(/[\w_]+/g, "..")}";`);
 	makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText);
 	const requestQueryParameters = makeRequestQueryParameters(requestQueryParametersHTML);
 	const requestBody = makeRequestBody(requestBodyHTML);
@@ -512,8 +512,8 @@ async function main() {
 	makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody);
 
 	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
-	const content = fs.readFileSync("../src/new1/helix/index.d.ts").toString();
+	const content = fs.readFileSync("../src/helix/index.d.ts").toString();
 	if (content.substring(content.lastIndexOf("\n")) !== newString)
-		fs.writeFileSync("../src/new1/helix/index.d.ts", content + newString);
+		fs.writeFileSync("../src/helix/index.d.ts", content + newString);
 }
 main().catch(console.error);

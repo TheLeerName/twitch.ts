@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster you want to update Guest Star settings for. */
 	broadcaster_id: string;
 }
@@ -54,8 +54,8 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * ㅤ|Invalid `slot_count` 
  * ㅤ| Invalid `group_layout`
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "guest_star/channel_settings", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "guest_star/channel_settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

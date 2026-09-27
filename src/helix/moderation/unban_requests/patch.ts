@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster whose channel is approving or denying the unban request. */
 	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s unban requests. This ID must match the user ID in the user access token. */
@@ -96,8 +96,8 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 404 Not Found|The unban request ID was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "moderation/unban_requests", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "moderation/unban_requests", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		moderator_id: params.moderator_id,

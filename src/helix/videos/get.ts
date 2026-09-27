@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/**
 	 * A list of IDs that identify the videos you want to get. You may specify a maximum of 100 IDs. The endpoint ignores duplicate IDs and IDs that weren't found (if there's at least one valid ID).
 
@@ -178,8 +178,8 @@ export interface ResponseBody {
  * 404 Not Found|The ID in the `game_id` query parameter was not found.
  * ㅤ|The ID in the `id` query parameter was not found. Returned only if all the IDs were not found; otherwise, the ID is ignored.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "videos", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "videos", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 		user_id: params.user_id,

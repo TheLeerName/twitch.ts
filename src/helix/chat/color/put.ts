@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user whose chat color you want to update. This ID must match the user ID in the access token. */
 	user_id: string;
 	/**
@@ -62,8 +62,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID in the `user_id` query parameter must match the user ID in the access token.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/color", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "chat/color", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		color: params.color,

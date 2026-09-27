@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that owns the custom reward. This ID must match the user ID found in the user OAuth token. */
 	broadcaster_id: string;
 	/** The ID that identifies the custom reward whose redemptions you want to get. */
@@ -122,8 +122,8 @@ export interface ResponseBody {
  * 404 Not Found|All of the redemptions specified using the `id` query parameter were not found.
  * 500 Internal Server Error| 
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		reward_id: params.reward_id,

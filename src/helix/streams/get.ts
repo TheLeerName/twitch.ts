@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** A user ID used to filter the list of streams. Returns only the streams of those users that are broadcasting. You may specify a maximum of 100 IDs. */
 	user_id?: string | string[];
 	/** A user login name used to filter the list of streams. Returns only the streams of those users that are broadcasting. You may specify a maximum of 100 login names. */
@@ -114,8 +114,8 @@ export interface Stream {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "streams", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "streams", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		user_login: params.user_login,

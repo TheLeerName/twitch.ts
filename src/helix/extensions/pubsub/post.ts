@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -54,8 +54,8 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
  * ㅤ|JWT could not be verified
  * 422 Unprocessable Entity|The message is too large.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "extensions/pubsub", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "extensions/pubsub", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "POST",
 		headers: {

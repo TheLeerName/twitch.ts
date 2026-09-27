@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that owns the chat room. This ID must match the user ID in the access token. */
 	broadcaster_id: string;
 	/** The ID of the user to add as a moderator in the broadcaster’s chat room. */
@@ -47,8 +47,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 422 Unprocessable Entity|The user in `user_id` is a VIP. To make them a moderator, you must first remove them as a VIP (see {@link Helix.RemoveVIP | Remove VIP}).
  * 429 Too Many Requests|The broadcaster has exceeded the number of requests allowed within a 10-second window. See this endpoint's rate limits.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "moderation/moderators", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "moderation/moderators", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 		user_id: params.user_id,

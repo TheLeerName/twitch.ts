@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The URI-encoded search string. For example, encode search strings like `angel of death` as `angel%20of%20death`. */
 	query: string;
 	/** A Boolean value that determines whether the response includes only channels that are currently streaming live. Set to **true** to get only channels that are streaming live; otherwise, **false** to get live and offline channels. The default is **false**. */
@@ -89,8 +89,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "search/channels", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "search/channels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		query: params.query,
 		live_only: params.live_only,

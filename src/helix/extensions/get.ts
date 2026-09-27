@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the extension to get. */
 	extension_id: string;
 	/** The version of the extension to get. If not specified, it returns the latest, released version. If you don’t have a released version, you must specify a version; otherwise, the list is empty. */
@@ -171,8 +171,8 @@ export interface ResponseBody {
  * ㅤ|The request must specify the Client-Id header.
  * 404 Not Found|The extension in the `extension_id` query parameter was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "extensions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "extensions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		extension_id: params.extension_id,
 		extension_version: params.extension_version,

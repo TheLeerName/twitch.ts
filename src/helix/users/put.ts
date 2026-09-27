@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 import { User } from "./get";
 
 export interface Authentication {
@@ -17,7 +17,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/**
 	 * The string to update the channel’s description to. The description is limited to a maximum of 300 characters.
 
@@ -50,8 +50,8 @@ export interface ResponseBody {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 429 Too Many Requests|The app exceeded the number of requests that it may make. 
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "users", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "users", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		description: params.description,
 	});

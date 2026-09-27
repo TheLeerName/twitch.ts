@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -38,8 +38,8 @@ export interface ResponseBody {
  * 200 OK|Successfully retrieved conduits.
  * 401 Unauthenticated|Authorization header required with an app access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "eventsub/conduits", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "GET",
 		headers: {

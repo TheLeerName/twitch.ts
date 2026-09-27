@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 import { Prediction } from "./get";
 
 export interface Authentication {
@@ -67,8 +67,8 @@ export interface ResponseBody {
  * 404 Not Found|The prediction in the `id` field was not found.
  * ㅤ|The outcome in the `winning_outcome_id` field was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "predictions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "PATCH",
 		headers: {

@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -64,8 +64,8 @@ export interface ResponseBody {
  * 404 Not Found|The ID in `broadcaster_id` was not found.
  * 429 Too Many Requests|The broadcaster may not run another commercial until the cooldown period expires. The `retry_after` field in the previous start commercial response specifies the amount of time the broadcaster must wait between running commercials.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "channels/commercial", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "channels/commercial", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "POST",
 		headers: {

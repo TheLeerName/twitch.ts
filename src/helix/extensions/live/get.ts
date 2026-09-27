@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the extension to get. Returns the list of broadcasters that are live and that have installed or activated this extension. */
 	extension_id: string;
 	/** **Integer**. The specific maximum number of items per page in the response. The actual number returned may be less than this limit. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
@@ -64,8 +64,8 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 404 Not Found|The extension specified in the `extension_id` query parameter was not found or it's not being used in a live stream.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "extensions/live", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "extensions/live", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		extension_id: params.extension_id,
 		first: params.first,

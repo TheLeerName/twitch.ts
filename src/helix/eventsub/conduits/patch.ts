@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -48,8 +48,8 @@ export interface ResponseBody {
  * 404 Not Found|Conduit not found.
  * ㅤ|Conduit’s owner must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "eventsub/conduits", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "PATCH",
 		headers: {

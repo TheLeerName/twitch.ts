@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user. This ID must match the user ID in the user access token. */
 	user_id: string;
 	/** The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value. */
@@ -112,8 +112,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/emotes/user", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "chat/emotes/user", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		after: params.after,

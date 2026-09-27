@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that’s sending the Shoutout. */
 	from_broadcaster_id: string;
 	/** The ID of the broadcaster that’s receiving the Shoutout. */
@@ -59,8 +59,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 429 Too Many Requests|The broadcaster exceeded the number of Shoutouts they may send within a given window. See the endpoint's Rate Limits.
  * ㅤ|The broadcaster exceeded the number of Shoutouts they may send the same broadcaster within a given window. See the endpoint's Rate Limits.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/shoutouts", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "chat/shoutouts", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		from_broadcaster_id: params.from_broadcaster_id,
 		to_broadcaster_id: params.to_broadcaster_id,

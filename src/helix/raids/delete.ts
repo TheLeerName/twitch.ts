@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that initiated the raid. This ID must match the user ID in the user access token. */
 	broadcaster_id: string;
 }
@@ -44,8 +44,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The broadcaster doesn't have a pending raid to cancel.
  * 429 Too Many Requests|The broadcaster exceeded the number of raid requests that they may make. The limit is 10 requests within a 10-minute window.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "raids", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

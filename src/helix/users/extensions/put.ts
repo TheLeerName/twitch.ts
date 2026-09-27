@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 import { ComponentExtensionType, ExtensionType } from "./get";
 
 export interface Authentication {
@@ -57,8 +57,8 @@ export interface ResponseBody {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 404 Not Found|An extension with the specified `id` and `version` values was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "users/extensions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "users/extensions", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "PUT",
 		headers: {

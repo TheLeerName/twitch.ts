@@ -1,6 +1,6 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster that owns the streaming schedule you want to get. */
 	broadcaster_id: string;
 }
@@ -23,8 +23,8 @@ export type RequestParameters = RequestQueryParameters;
  * 400 Bad Request|The `broadcaster_id` query parameter is required.
  * ㅤ|The ID in the `broadcaster_id` query parameter is not valid.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "schedule/icalendar", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

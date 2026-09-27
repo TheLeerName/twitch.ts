@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user to give VIP status to. */
 	user_id: string;
 	/** The ID of the broadcaster that’s adding the user as a VIP. This ID must match the user ID in the access token. */
@@ -51,8 +51,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 425 Too Early|The broadcaster must complete the Build a Community requirement before they may assign VIPs.
  * 429 Too Many Requests|The broadcaster exceeded the number of VIP that they may add within a 10-second window. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "channels/vips", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		broadcaster_id: params.broadcaster_id,

@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/**
 	 * An ID that identifies the emote set to get. You may specify a maximum of 25 IDs. The response contains only the IDs that were found and ignores duplicate IDs.
 
@@ -102,8 +102,8 @@ export interface ResponseBody {
  * ㅤ|The OAuth token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/emotes/set", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "chat/emotes/set", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		emote_set_id: params.emote_set_id,
 	});

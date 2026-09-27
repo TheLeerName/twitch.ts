@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The user ID of the editor for the channel you want to create a clip for. If using the broadcaster’s auth token, this is the same as broadcaster_id. This must match the user_id in the user access token. */
 	editor_id: string;
 	/** The user ID for the channel you want to create a clip for. */
@@ -77,8 +77,8 @@ export interface ResponseBody {
  * ㅤ|The VOD is not found..
  * ㅤ|The `broadcaster_id` or the `editor_id` does not exist.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "videos/clips", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		editor_id: params.editor_id,
 		broadcaster_id: params.broadcaster_id,

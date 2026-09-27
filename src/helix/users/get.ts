@@ -1,4 +1,4 @@
-import { Options, Helix } from "../..";
+import * as Main from "../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user to get. The maximum number of IDs you may specify is 100. */
 	id?: string | string[];
 	/** The login name of the user to get. The maximum number of login names you may specify is 100. */
@@ -96,8 +96,8 @@ export interface User {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "users", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "users", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 		login: params.login,

@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -19,7 +19,7 @@ export interface Authentication {
 }
 
 /** Use the `status`, `type`, `user_id`, `subscription_id`, and `conduit_id` query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter. */
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/**
 	 * Filter subscriptions by its status. Possible values are:
 	 * - enabled — The subscription is enabled.
@@ -176,8 +176,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "eventsub/subscriptions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		status: params.status,
 		type: params.type,

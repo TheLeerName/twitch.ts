@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -51,8 +51,8 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
  * ㅤ|The JWT token is not valid.
  * ㅤ|The Client-Id header is required.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "extensions/configurations", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "PUT",
 		headers: {

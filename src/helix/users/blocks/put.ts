@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the user to block. The API ignores the request if the broadcaster has already blocked the user. */
 	target_user_id: string;
 	/**
@@ -55,8 +55,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "users/blocks", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		target_user_id: params.target_user_id,
 		source_context: params.source_context,

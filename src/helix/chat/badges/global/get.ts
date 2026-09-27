@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -59,8 +59,8 @@ export interface ResponseBody {
  * ㅤ|The OAuth token is not valid.
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "chat/badges/global", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "chat/badges/global", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "GET",
 		headers: {

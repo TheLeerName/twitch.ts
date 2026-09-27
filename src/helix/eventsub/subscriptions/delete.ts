@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the subscription to delete. */
 	id: string;
 }
@@ -39,8 +39,8 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 404 Not Found|The subscription was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<undefined>> {
-	const url = new Helix.URL(params.apiPath ?? "eventsub/subscriptions", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<undefined>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		id: params.id,
 	});

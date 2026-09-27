@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** The ID of the broadcaster whose AutoMod settings and list of blocked terms are used to check the message. This ID must match the user ID in the access token. */
 	broadcaster_id: string;
 }
@@ -75,8 +75,8 @@ export interface ResponseBody {
  * 403 Forbidden|The ID in `broadcaster_id` must match the user ID in the user access token.
  * 429 Too Many Requests|The broadcaster exceeded the number of chat message checks that they may make. See the endpoint's rate limits.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "moderation/enforcements/status", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "moderation/enforcements/status", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});

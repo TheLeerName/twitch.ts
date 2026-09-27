@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../..";
+import * as Main from "../../..";
 
 export interface Authentication {
 	/**
@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Helix.RequestQueryParameters {
+export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** A user’s ID. Returns the list of channels that this user has moderator privileges in. This ID must match the user ID in the user OAuth token */
 	user_id: string;
 	/** The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value. */
@@ -54,8 +54,8 @@ export interface ResponseBody {
  * ## [Get Moderated Channels](https://dev.twitch.tv/docs/api/reference/#get-moderated-channels)
  * Gets a list of channels that the specified user has moderator privileges in.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "moderation/channels", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "moderation/channels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		after: params.after,

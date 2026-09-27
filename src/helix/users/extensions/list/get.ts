@@ -1,4 +1,4 @@
-import { Options, Helix } from "../../../..";
+import * as Main from "../../../..";
 
 export interface Authentication {
 	/**
@@ -53,8 +53,8 @@ export interface ResponseBody {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Helix.Response<ResponseBody>> {
-	const url = new Helix.URL(params.apiPath ?? "users/extensions/list", Options.apiHelixPath);
+export async function fetch(params: RequestParameters): Promise<Main.Helix.Response<ResponseBody>> {
+	const url = new Main.Helix.URL(params.apiPath ?? "users/extensions/list", Main.Options.apiHelixPath);
 	return global.fetch(url as any, {
 		method: "GET",
 		headers: {

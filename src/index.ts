@@ -31,4 +31,11 @@ export namespace Options {
 	}
 }
 
+export interface RequestQueryParameters {
+	/** If specified, API endpoint path will be changed to this value */
+	apiPath?: string;
+	/** An AbortSignal to set request's signal. */
+	signal?: AbortSignal;
+}
+
 export * as Helix from "./helix";
