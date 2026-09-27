@@ -159,3 +159,4 @@ export * as UpdateChannelStreamScheduleSegment from "./schedule/segment/patch";
 export * as DeleteChannelStreamScheduleSegment from "./schedule/segment/delete";
 export * as SearchCategories from "./search/categories/get";
 export * as SearchChannels from "./search/channels/get";
+export * as GetStreamKey from "./streams/key/get";
