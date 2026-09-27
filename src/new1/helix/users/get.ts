@@ -29,49 +29,51 @@ export type RequestParameters = Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of users. */
-	data: {
-		/** An ID that identifies the user. */
-		id: string;
-		/** The user’s login name. */
-		login: string;
-		/** The user’s display name. */
-		display_name: string;
-		/**
-		 * The type of user. Possible values are: 
-		 * - admin — Twitch administrator 
-		 * - global_mod
-		 * - staff — Twitch staff
-		 * - "" — Normal user
-		 */
-		type: "admin" | "global_mod" | "staff" | "";
-		/**
-		 * The type of broadcaster. Possible values are: 
-		 * - affiliate — An affiliate broadcaster [affiliate broadcaster](https://help.twitch.tv/s/article/joining-the-affiliate-program%20target=)
-		 * - partner — A partner broadcaster [partner broadcaster](https://help.twitch.tv/s/article/partner-program-overview)
-		 * - "" — A normal broadcaster
-		 */
-		broadcaster_type: "affiliate" | "partner" | "";
-		/** The user’s description of their channel. */
-		description: string;
-		/** A URL to the user’s profile image. */
-		profile_image_url: string;
-		/** A URL to the user’s offline image. */
-		offline_image_url: string;
-		/**
-		 * **Integer**. The number of times the user’s channel has been viewed.
+	data: User[];
+}
 
-		 *  **NOTE**: This field has been deprecated (see [Get Users API endpoint – “view_count” deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
-		 */
-		view_count: number;
-		/**
-		 * The user’s verified email address. The object includes this field only if the user access token includes the **user:read:email** scope.
+export interface User {
+	/** An ID that identifies the user. */
+	id: string;
+	/** The user’s login name. */
+	login: string;
+	/** The user’s display name. */
+	display_name: string;
+	/**
+	 * The type of user. Possible values are: 
+	 * - admin — Twitch administrator 
+	 * - global_mod
+	 * - staff — Twitch staff
+	 * - "" — Normal user
+	 */
+	type: "admin" | "global_mod" | "staff" | "";
+	/**
+	 * The type of broadcaster. Possible values are: 
+	 * - affiliate — An affiliate broadcaster [affiliate broadcaster](https://help.twitch.tv/s/article/joining-the-affiliate-program%20target=)
+	 * - partner — A partner broadcaster [partner broadcaster](https://help.twitch.tv/s/article/partner-program-overview)
+	 * - "" — A normal broadcaster
+	 */
+	broadcaster_type: "affiliate" | "partner" | "";
+	/** The user’s description of their channel. */
+	description: string;
+	/** A URL to the user’s profile image. */
+	profile_image_url: string;
+	/** A URL to the user’s offline image. */
+	offline_image_url: string;
+	/**
+	 * **Integer**. The number of times the user’s channel has been viewed.
 
-		 * If the request contains more than one user, only the user associated with the access token that provided consent will include an email address — the email address for all other users will be empty.
-		 */
-		email?: string;
-		/** The UTC date and time that the user’s account was created. The timestamp is in RFC3339 format. */
-		created_at: string;
-	}[];
+		*  **NOTE**: This field has been deprecated (see [Get Users API endpoint – “view_count” deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
+		*/
+	view_count: number;
+	/**
+	 * The user’s verified email address. The object includes this field only if the user access token includes the **user:read:email** scope.
+
+		* If the request contains more than one user, only the user associated with the access token that provided consent will include an email address — the email address for all other users will be empty.
+		*/
+	email?: string;
+	/** The UTC date and time that the user’s account was created. The timestamp is in RFC3339 format. */
+	created_at: string;
 }
 
 /**
