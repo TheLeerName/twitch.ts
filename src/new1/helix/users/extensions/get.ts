@@ -33,43 +33,38 @@ export interface ResponseBody {
 	/** The active extensions that the broadcaster has installed. */
 	data: {
 		/** A dictionary that contains the data for a panel extension. The dictionary’s key is a sequential number beginning with 1. The following fields contain the panel’s data for each key. */
-		panel: Record<string, {
-			/** A Boolean value that determines the extension’s activation state. If **false**, the user has not configured this panel extension. */
-			active: boolean;
-			/** An ID that identifies the extension. */
-			id: string;
-			/** The extension’s version. */
-			version: string;
-			/** The extension’s name. */
-			name: string;
-		}>;
+		panel: Record<string, ExtensionType>;
 		/** A dictionary that contains the data for a video-overlay extension. The dictionary’s key is a sequential number beginning with 1. The following fields contain the overlay’s data for each key. */
-		overlay: Record<string, {
-			/** A Boolean value that determines the extension’s activation state. If **false**, the user has not configured this overlay extension. */
-			active: boolean;
-			/** An ID that identifies the extension. */
-			id: string;
-			/** The extension’s version. */
-			version: string;
-			/** The extension’s name. */
-			name: string;
-		}>;
+		overlay: Record<string, ExtensionType>;
 		/** A dictionary that contains the data for a video-component extension. The dictionary’s key is a sequential number beginning with 1. The following fields contain the component’s data for each key. */
-		component: Record<string, {
-			/** A Boolean value that determines the extension’s activation state. If **false**, the user has not configured this component extension. */
-			active: boolean;
-			/** An ID that identifies the extension. */
-			id: string;
-			/** The extension’s version. */
-			version: string;
-			/** The extension’s name. */
-			name: string;
-			/** **Integer**. The x-coordinate where the extension is placed. */
-			x: number;
-			/** **Integer**. The y-coordinate where the extension is placed. */
-			y: number;
-		}>;
+		component: Record<string, ComponentExtensionType>;
 	};
+}
+
+export interface ExtensionType {
+	/** A Boolean value that determines the extension’s activation state. If **false**, the user has not configured this type of extension. */
+	active: boolean;
+	/** An ID that identifies the extension. */
+	id: string;
+	/** The extension’s version. */
+	version: string;
+	/** The extension’s name. */
+	name: string;
+}
+
+export interface ComponentExtensionType {
+	/** A Boolean value that determines the extension’s activation state. If **false**, the user has not configured this component extension. */
+	active: boolean;
+	/** An ID that identifies the extension. */
+	id: string;
+	/** The extension’s version. */
+	version: string;
+	/** The extension’s name. */
+	name: string;
+	/** **Integer**. The x-coordinate where the extension is placed. */
+	x: number;
+	/** **Integer**. The y-coordinate where the extension is placed. */
+	y: number;
 }
 
 /**
