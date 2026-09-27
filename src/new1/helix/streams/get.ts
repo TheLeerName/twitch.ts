@@ -47,56 +47,58 @@ export type RequestParameters = Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of streams. */
-	data: {
-		/** An ID that identifies the stream. You can use this ID later to look up the video on demand (VOD). */
-		id: string;
-		/** The ID of the user that’s broadcasting the stream. */
-		user_id: string;
-		/** The user’s login name. */
-		user_login: string;
-		/** The user’s display name. */
-		user_name: string;
-		/** The ID of the category or game being streamed. If no category is set on the channel, this will be set to an empty string. */
-		game_id: string;
-		/** The name of the category or game being streamed. If no category is set on the channel, this will be set to an empty string. */
-		game_name: string;
-		/**
-		 * The type of stream. Possible values are:
-		 * - live
-
-		 * If an error occurs, this field is set to an empty string.
-		 */
-		type: "live" | "";
-		/** The stream’s title. Is an empty string if not set. */
-		title: string;
-		/** The tags applied to the stream. */
-		tags: string[];
-		/** **Integer**. The number of users watching the stream. */
-		viewer_count: number;
-		/** The UTC date and time (in RFC3339 format) of when the broadcast began. */
-		started_at: string;
-		/** The language that the stream uses. This is an ISO 639-1 two-letter language code or `other` if the stream uses a language not in the list of [supported stream languages](https://help.twitch.tv/s/article/languages-on-twitch#streamlang). */
-		language: string;
-		/** A URL to an image of a frame from the last 5 minutes of the stream. Replace the width and height placeholders in the URL (`{width}x{height}`) with the size of the image you want, in pixels. */
-		thumbnail_url: string;
-		/**
-		 * **IMPORTANT** As of February 28, 2023, this field is deprecated and returns only an empty array. If you use this field, please update your code to use the `tags` field.
-
-		 * The list of tags that apply to the stream. The list contains IDs only when the channel is steaming live. For a list of possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). The list doesn’t include Category Tags.
-		 */
-		tag_ids: [];
-		/**
-		 * **IMPORTANT** This field is deprecated and returns only `false`.
-
-		 * A Boolean value that indicates whether the stream is meant for mature audiences.
-		 */
-		is_mature: false;
-	}[];
+	data: Stream[];
 	/** The information used to page through the list of results. The object is empty if there are no more pages left to page through. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 	pagination?: {
 		/** The cursor used to get the next page of results. Set the request’s `after` or `before` query parameter to this value depending on whether you’re paging forwards or backwards. */
 		cursor?: string;
 	};
+}
+
+export interface Stream {
+	/** An ID that identifies the stream. You can use this ID later to look up the video on demand (VOD). */
+	id: string;
+	/** The ID of the user that’s broadcasting the stream. */
+	user_id: string;
+	/** The user’s login name. */
+	user_login: string;
+	/** The user’s display name. */
+	user_name: string;
+	/** The ID of the category or game being streamed. If no category is set on the channel, this will be set to an empty string. */
+	game_id: string;
+	/** The name of the category or game being streamed. If no category is set on the channel, this will be set to an empty string. */
+	game_name: string;
+	/**
+	 * The type of stream. Possible values are:
+	 * - live
+
+		* If an error occurs, this field is set to an empty string.
+		*/
+	type: "live" | "";
+	/** The stream’s title. Is an empty string if not set. */
+	title: string;
+	/** The tags applied to the stream. */
+	tags: string[];
+	/** **Integer**. The number of users watching the stream. */
+	viewer_count: number;
+	/** The UTC date and time (in RFC3339 format) of when the broadcast began. */
+	started_at: string;
+	/** The language that the stream uses. This is an ISO 639-1 two-letter language code or `other` if the stream uses a language not in the list of [supported stream languages](https://help.twitch.tv/s/article/languages-on-twitch#streamlang). */
+	language: string;
+	/** A URL to an image of a frame from the last 5 minutes of the stream. Replace the width and height placeholders in the URL (`{width}x{height}`) with the size of the image you want, in pixels. */
+	thumbnail_url: string;
+	/**
+	 * **IMPORTANT** As of February 28, 2023, this field is deprecated and returns only an empty array. If you use this field, please update your code to use the `tags` field.
+
+		* The list of tags that apply to the stream. The list contains IDs only when the channel is steaming live. For a list of possible tags, see [List of All Tags](https://www.twitch.tv/directory/all/tags). The list doesn’t include Category Tags.
+		*/
+	tag_ids: [];
+	/**
+	 * **IMPORTANT** This field is deprecated and returns only `false`.
+
+		* A Boolean value that indicates whether the stream is meant for mature audiences.
+		*/
+	is_mature: false;
 }
 
 /**
