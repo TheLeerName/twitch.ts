@@ -175,3 +175,4 @@ export * as GetUserBlockList from "./users/blocks/get";
 export * as BlockUser from "./users/blocks/put";
 export * as UnblockUser from "./users/blocks/delete";
 export * as GetUserExtensions from "./users/extensions/list/get";
+export * as GetUserActiveExtensions from "./users/extensions/get";
