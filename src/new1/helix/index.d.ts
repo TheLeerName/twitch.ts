@@ -134,3 +134,4 @@ export * as DeleteChatMessages from "./moderation/chat/delete";
 export * as GetModeratedChannels from "./moderation/channels/get";
 export * as GetModerators from "./moderation/moderators/get";
 export * as AddModerator from "./moderation/moderators/post";
+export * as RemoveModerator from "./moderation/moderators/delete";
