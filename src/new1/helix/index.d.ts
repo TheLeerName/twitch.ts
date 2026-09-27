@@ -32,7 +32,6 @@ export interface Response<ResponseJson> extends globalThis.Response {
 
 //export declare function fetch<ResponseJson>(input: URL | string, init?: RequestInit): Promise<Response<ResponseJson>>;
 
-
 export * as StartCommercial from "./channels/commercial/post";
 export * as GetAdSchedule from "./channels/ads/get";
 export * as SnoozeNextAd from "./channels/ads/schedule/snooze/post";
