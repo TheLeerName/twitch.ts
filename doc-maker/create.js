@@ -5,7 +5,7 @@ import { JSDOM } from "jsdom";
 /*
 
 cd doc-maker
-node index.js
+node create.js
 1. copypaste endpoint name
 2. copypaste <p>'s after name and until authorization or smth else
 3. check requiring tokens and scopes
@@ -15,13 +15,14 @@ node index.js
 7. insert response codes table if any
 
 */
-
+/*
 const scriptFileNameWithoutExt = (() => {
 	let filename = import.meta.filename.replaceAll("\\", "/");
 	filename = filename.substring(filename.lastIndexOf("/") + 1);
 	filename = filename.substring(0, filename.indexOf("."));
 	return filename;
-})();
+})();*/
+const dataFileNameWithoutExt = "data";
 let outputFileNameWithoutExt = "../src/helix/";
 
 /**
@@ -40,7 +41,7 @@ function addTextToOutput(text) {
  * @returns {string}
  */
 function getFieldFromJSON(endpointName, fieldName) {
-	const content = fs.existsSync(scriptFileNameWithoutExt + ".json") ? fs.readFileSync(scriptFileNameWithoutExt + ".json").toString() : "{}";
+	const content = fs.existsSync(dataFileNameWithoutExt + ".json") ? fs.readFileSync(dataFileNameWithoutExt + ".json").toString() : "{}";
 	const json = JSON.parse(content);
 	return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
 }
@@ -52,7 +53,7 @@ function getFieldFromJSON(endpointName, fieldName) {
  * @param {string} value 
  */
 function saveFieldFromJSON(endpointName, fieldName, value) {
-	const content = fs.existsSync(scriptFileNameWithoutExt + ".json") ? fs.readFileSync(scriptFileNameWithoutExt + ".json").toString() : "{}";
+	const content = fs.existsSync(dataFileNameWithoutExt + ".json") ? fs.readFileSync(dataFileNameWithoutExt + ".json").toString() : "{}";
 	const json = JSON.parse(content);
 	value = value.replaceAll(/> +</g, "><");
 	if (endpointName != null) {
@@ -61,7 +62,7 @@ function saveFieldFromJSON(endpointName, fieldName, value) {
 	}
 	else
 		json[fieldName] = value;
-	fs.writeFileSync(scriptFileNameWithoutExt + ".json", JSON.stringify(json));
+	fs.writeFileSync(dataFileNameWithoutExt + ".json", JSON.stringify(json));
 }
 
 /**
@@ -403,6 +404,34 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	const apiDocsURL = `https://dev.twitch.tv/docs/api/reference/#${endpointName.toLowerCase().replaceAll(" ", "-")}`;
 
 	addTextToOutput(``);
+	addTextToOutput(`export function makeURL(params: RequestParameters) {`);
+	if (requestQueryParameters.length > 0) {
+		addTextToOutput(`\tconst url = new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
+		addTextToOutput(`\turl.searchParams.appendMany({`);
+		for (const param of requestQueryParameters)
+			addTextToOutput(`\t\t${param}: params.${param},`);
+		addTextToOutput(`\t});`);
+		addTextToOutput(`\treturn url;`);
+	}
+	else
+		addTextToOutput(`\treturn new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
+	addTextToOutput(`}`);
+
+	addTextToOutput(``);
+	addTextToOutput(`export function makeFetchRequestInit(params: RequestParameters): RequestInit {`);
+	addTextToOutput(`\treturn {`);
+	addTextToOutput(`\t\tmethod: "${method}",`);
+	addTextToOutput(`\t\theaders: {`);
+	addTextToOutput(`\t\t\t"client-id": params.client_id,`);
+	addTextToOutput(`\t\t\tauthorization: params.authorization,`);
+	if (requestBody.length > 0)
+		addTextToOutput(`\t\t\t"content-type": "application/json",`);
+	addTextToOutput(`\t\t},`);
+	addTextToOutput(`\t\tsignal: params.signal,`);
+	addTextToOutput(`\t};`);
+	addTextToOutput(`}`);
+
+	addTextToOutput(``);
 	addTextToOutput(`/**`);
 	addTextToOutput(` * ## [${endpointName}](${apiDocsURL})`);
 
@@ -440,29 +469,7 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	addTextToOutput(` */`);
 
 	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Main.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
-	addTextToOutput(`\tconst url = new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
-	if (requestQueryParameters.length > 0) {
-		addTextToOutput(`\turl.searchParams.appendMany({`);
-		for (const param of requestQueryParameters)
-			addTextToOutput(`\t\t${param}: params.${param},`);
-		addTextToOutput(`\t});`);
-	}
-	addTextToOutput(`\treturn global.fetch(url as any, {`);
-	addTextToOutput(`\t\tmethod: "${method}",`);
-	addTextToOutput(`\t\theaders: {`);
-	addTextToOutput(`\t\t\t"client-id": params.client_id,`);
-	addTextToOutput(`\t\t\tauthorization: params.authorization,`);
-	if (requestBody.length > 0)
-		addTextToOutput(`\t\t\t"content-type": "application/json",`);
-	addTextToOutput(`\t\t},`);
-	addTextToOutput(`\t\tsignal: params.signal,`);
-	if (requestBody.length > 0) {
-		addTextToOutput(`\t\tbody: JSON.stringify({`);
-		for (const param of requestBody)
-			addTextToOutput(`\t\t\t${param}: params.${param},`);
-		addTextToOutput(`\t\t}),`);
-	}
-	addTextToOutput(`\t});`);
+	addTextToOutput(`\treturn global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));`);
 	addTextToOutput(`}`);
 }
 
@@ -512,8 +519,8 @@ async function main() {
 	makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody);
 
 	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
-	const content = fs.readFileSync("../src/helix/index.d.ts").toString();
-	if (content.substring(content.lastIndexOf("\n")) !== newString)
-		fs.writeFileSync("../src/helix/index.d.ts", content + newString);
+	const content = fs.readFileSync("../src/helix/index.ts").toString();
+	if (!content.includes(newString))
+		fs.writeFileSync("../src/helix/index.ts", content + newString);
 }
 main().catch(console.error);
