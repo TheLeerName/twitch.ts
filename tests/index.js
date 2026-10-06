@@ -6,7 +6,8 @@ const { z } = require("zod");
 function getEnvVariables() {
 	const envSchema = z.object({
 		CLIENT_ID: z.string().nonempty(),
-		CLIENT_SECRET: z.string().nonempty()
+		CLIENT_SECRET: z.string().nonempty(),
+		REDIRECT_URI: z.string().nonempty()
 	});
 
 	dotenv.config({quiet: true});
