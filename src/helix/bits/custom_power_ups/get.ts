@@ -104,6 +104,26 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "bits/custom_power_ups", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		id: params.id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Custom Power-up](https://dev.twitch.tv/docs/api/reference/#get-custom-power-up)
  * Gets a list of custom Power-ups that the specified broadcaster created.
@@ -125,17 +145,5 @@ export interface ResponseBody {
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "bits/custom_power_ups", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		id: params.id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

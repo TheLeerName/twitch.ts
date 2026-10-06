@@ -29,6 +29,28 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		session_id: params.session_id,
+		guest_id: params.guest_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Send Guest Star Invite](https://dev.twitch.tv/docs/api/reference/#send-guest-star-invite)
  * Sends an invite to a specified guest on behalf of the broadcaster for a Guest Star session in progress.
@@ -46,19 +68,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|Guest already invited
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		session_id: params.session_id,
-		guest_id: params.guest_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

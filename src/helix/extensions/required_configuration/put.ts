@@ -32,6 +32,31 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "extensions/required_configuration", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			extension_id: params.extension_id,
+			extension_version: params.extension_version,
+			required_configuration: params.required_configuration,
+		}),
+	};
+}
+
 /**
  * ## [Set Extension Required Configuration](https://dev.twitch.tv/docs/api/reference/#set-extension-required-configuration)
  * Updates the extension’s required_configuration string. Use this endpoint if your extension requires the broadcaster to configure the extension before activating it (to require configuration, you must select **Custom/My Own Service** in Extension [Capabilities](https://dev.twitch.tv/docs/extensions/life-cycle/#capabilities)). For more information, see [Required Configurations](https://dev.twitch.tv/docs/extensions/building#required-configurations) and [Setting Required Configuration](https://dev.twitch.tv/docs/extensions/building#setting-required-configuration-with-the-configuration-service-optional).
@@ -49,22 +74,5 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * ㅤ|The Client-Id header is required.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "extensions/required_configuration", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			extension_id: params.extension_id,
-			extension_version: params.extension_version,
-			required_configuration: params.required_configuration,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

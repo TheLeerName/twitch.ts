@@ -158,6 +158,30 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		status: params.status,
+		type: params.type,
+		user_id: params.user_id,
+		subscription_id: params.subscription_id,
+		conduit_id: params.conduit_id,
+		after: params.after,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get EventSub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions)
  * Gets a list of EventSub subscriptions that the client in the access token created.
@@ -177,21 +201,5 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		status: params.status,
-		type: params.type,
-		user_id: params.user_id,
-		subscription_id: params.subscription_id,
-		conduit_id: params.conduit_id,
-		after: params.after,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

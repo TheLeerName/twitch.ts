@@ -32,6 +32,26 @@ export interface ResponseBody {
 		shard_count: number;
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			shard_count: params.shard_count,
+		}),
+	};
+}
+
 /**
  * ## [Create Conduits](https://dev.twitch.tv/docs/api/reference/#create-conduits)
  * Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
@@ -45,17 +65,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|Conduit limit reached.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			shard_count: params.shard_count,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

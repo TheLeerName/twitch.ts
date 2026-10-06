@@ -74,6 +74,26 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		session_id: params.session_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "DELETE",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [End Guest Star Session](https://dev.twitch.tv/docs/api/reference/#end-guest-star-session)
  * Programmatically ends a Guest Star session on behalf of the broadcaster. Performs the same action as if the host clicked the “End Call” button in the Guest Star UI.
@@ -88,17 +108,5 @@ export interface ResponseBody {
  * 403 Forbidden|Insufficient authorization for ending session
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "guest_star/session", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		session_id: params.session_id,
-	});
-	return global.fetch(url as any, {
-		method: "DELETE",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

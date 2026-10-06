@@ -29,6 +29,27 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "moderation/blocked_terms", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		id: params.id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "DELETE",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Remove Blocked Term](https://dev.twitch.tv/docs/api/reference/#remove-blocked-term)
  * Removes the word or phrase from the broadcaster’s list of blocked terms.
@@ -48,18 +69,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 403 Forbidden|The user in `moderator_id` is not one of the broadcaster's moderators.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "moderation/blocked_terms", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		id: params.id,
-	});
-	return global.fetch(url as any, {
-		method: "DELETE",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

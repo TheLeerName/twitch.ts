@@ -42,24 +42,16 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
 
-/**
- * ## [Update Channel Guest Star Settings](https://dev.twitch.tv/docs/api/reference/#update-channel-guest-star-settings)
- * Mutates the channel settings for configuration of the Guest Star feature for a particular host.
-
- * ### Response Codes
- * Code|Meaning
- * -|-
- * 204 No Content|Successfully updated channel settings
- * 400 Bad Request|Missing `broadcaster_id` 
- * ㅤ|Invalid `slot_count` 
- * ㅤ| Invalid `group_layout`
- */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "guest_star/channel_settings", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		broadcaster_id: params.broadcaster_id,
 	});
-	return global.fetch(url as any, {
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
@@ -74,5 +66,21 @@ export async function fetch(params: RequestParameters): Promise<Main.Response<un
 			group_layout: params.group_layout,
 			regenerate_browser_sources: params.regenerate_browser_sources,
 		}),
-	});
+	};
+}
+
+/**
+ * ## [Update Channel Guest Star Settings](https://dev.twitch.tv/docs/api/reference/#update-channel-guest-star-settings)
+ * Mutates the channel settings for configuration of the Guest Star feature for a particular host.
+
+ * ### Response Codes
+ * Code|Meaning
+ * -|-
+ * 204 No Content|Successfully updated channel settings
+ * 400 Bad Request|Missing `broadcaster_id` 
+ * ㅤ|Invalid `slot_count` 
+ * ㅤ| Invalid `group_layout`
+ */
+export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

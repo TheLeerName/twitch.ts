@@ -23,6 +23,25 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		target_user_id: params.target_user_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "DELETE",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Unblock User](https://dev.twitch.tv/docs/api/reference/#unblock-user)
  * Removes the user from the broadcaster’s list of blocked users. The user ID in the OAuth token identifies the broadcaster who’s removing the block.
@@ -38,16 +57,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		target_user_id: params.target_user_id,
-	});
-	return global.fetch(url as any, {
-		method: "DELETE",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

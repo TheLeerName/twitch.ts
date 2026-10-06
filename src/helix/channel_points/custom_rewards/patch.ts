@@ -132,6 +132,43 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		id: params.id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			title: params.title,
+			prompt: params.prompt,
+			cost: params.cost,
+			background_color: params.background_color,
+			is_enabled: params.is_enabled,
+			is_user_input_required: params.is_user_input_required,
+			is_max_per_stream_enabled: params.is_max_per_stream_enabled,
+			max_per_stream: params.max_per_stream,
+			is_max_per_user_per_stream_enabled: params.is_max_per_user_per_stream_enabled,
+			max_per_user_per_stream: params.max_per_user_per_stream,
+			is_global_cooldown_enabled: params.is_global_cooldown_enabled,
+			global_cooldown_seconds: params.global_cooldown_seconds,
+			is_paused: params.is_paused,
+			should_redemptions_skip_request_queue: params.should_redemptions_skip_request_queue,
+		}),
+	};
+}
+
 /**
  * ## [Update Custom Reward](https://dev.twitch.tv/docs/api/reference/#update-custom-reward)
  * Updates a custom reward. The app used to create the reward is the only app that may update the reward.
@@ -162,34 +199,5 @@ export interface ResponseBody {
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		id: params.id,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			title: params.title,
-			prompt: params.prompt,
-			cost: params.cost,
-			background_color: params.background_color,
-			is_enabled: params.is_enabled,
-			is_user_input_required: params.is_user_input_required,
-			is_max_per_stream_enabled: params.is_max_per_stream_enabled,
-			max_per_stream: params.max_per_stream,
-			is_max_per_user_per_stream_enabled: params.is_max_per_user_per_stream_enabled,
-			max_per_user_per_stream: params.max_per_user_per_stream,
-			is_global_cooldown_enabled: params.is_global_cooldown_enabled,
-			global_cooldown_seconds: params.global_cooldown_seconds,
-			is_paused: params.is_paused,
-			should_redemptions_skip_request_queue: params.should_redemptions_skip_request_queue,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

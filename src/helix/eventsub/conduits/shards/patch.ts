@@ -112,6 +112,27 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "eventsub/conduits/shards", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			conduit_id: params.conduit_id,
+			shards: params.shards
+		}),
+	};
+}
+
 /**
  * ## [Update Conduit Shards](https://dev.twitch.tv/docs/api/reference/#update-conduit-shards)
  * Updates shard(s) for a [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/). You can update up to 100 shards in a single request.
@@ -128,18 +149,5 @@ export interface ResponseBody {
  * ㅤ|Conduit's owner must match the Client ID in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "eventsub/conduits/shards", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			conduit_id: params.conduit_id,
-			shards: params.shards
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

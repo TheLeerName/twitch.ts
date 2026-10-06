@@ -34,6 +34,27 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "moderation/chat", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		message_id: params.message_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "DELETE",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Delete Chat Messages](https://dev.twitch.tv/docs/api/reference/#delete-chat-messages)
  * Removes a single chat message or all chat messages from the broadcaster’s chat room.
@@ -53,18 +74,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The specified message was created more than 6 hours ago.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "moderation/chat", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		message_id: params.message_id,
-	});
-	return global.fetch(url as any, {
-		method: "DELETE",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

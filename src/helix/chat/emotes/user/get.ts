@@ -96,6 +96,27 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/emotes/user", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		user_id: params.user_id,
+		after: params.after,
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get User Emotes](https://dev.twitch.tv/docs/api/reference/#get-user-emotes)
  * Retrieves emotes available to the user across all channels.
@@ -113,18 +134,5 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "chat/emotes/user", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		after: params.after,
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

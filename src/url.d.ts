@@ -17,6 +17,8 @@ export declare class URL extends global.URL {
 	searchParams: URLSearchParams;
 
 	constructor(url: string | this, base?: string | this);
+
+	castToDefaultURL(): global.URL;
 }
 
 export interface Response<ResponseJson> extends globalThis.Response {

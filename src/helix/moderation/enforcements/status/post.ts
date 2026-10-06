@@ -45,6 +45,29 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "moderation/enforcements/status", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			data: params.data,
+		}),
+	};
+}
+
 /**
  * ## [Check AutoMod Status](https://dev.twitch.tv/docs/api/reference/#check-automod-status)
  * Checks whether AutoMod would flag the specified message for review.
@@ -76,20 +99,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|The broadcaster exceeded the number of chat message checks that they may make. See the endpoint's rate limits.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "moderation/enforcements/status", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			data: params.data,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

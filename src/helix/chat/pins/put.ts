@@ -31,6 +31,28 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/pins", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		message_id: params.message_id,
+		duration_seconds: params.duration_seconds,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Pin Chat Message](https://dev.twitch.tv/docs/api/reference/#pin-chat-message)
  * Pins a chat message to the top of the specified broadcaster’s chat room. Only one mod-pinned message can be active per channel at a time. If a mod-pinned message already exists, it is automatically replaced.
@@ -49,19 +71,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 429 Too Many Requests|The rate limit for pinning messages has been exceeded.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "chat/pins", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		message_id: params.message_id,
-		duration_seconds: params.duration_seconds,
-	});
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

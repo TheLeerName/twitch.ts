@@ -67,21 +67,29 @@ export interface ResponseBody {
 	}[];
 }
 
-/**
- * ## [Get Content Classification Labels](https://dev.twitch.tv/docs/api/reference/#get-content-classification-labels)
- * Gets information about Twitch content classification labels.
- */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "content_classification_labels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		locale: params.locale,
 	});
-	return global.fetch(url as any, {
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
 		signal: params.signal,
-	});
+	};
+}
+
+/**
+ * ## [Get Content Classification Labels](https://dev.twitch.tv/docs/api/reference/#get-content-classification-labels)
+ * Gets information about Twitch content classification labels.
+ */
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

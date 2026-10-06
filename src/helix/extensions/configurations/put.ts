@@ -36,6 +36,30 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			extension_id: params.extension_id,
+			segment: params.segment,
+			broadcaster_id: params.broadcaster_id,
+			content: params.content,
+			version: params.version,
+		}),
+	};
+}
+
 /**
  * ## [Set Extension Configuration Segment](https://dev.twitch.tv/docs/api/reference/#set-extension-configuration-segment)
  * Updates a configuration segment. The segment is limited to 5 KB. Extensions that are active on a channel do not receive the updated configuration.
@@ -52,21 +76,5 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
  * ㅤ|The Client-Id header is required.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			extension_id: params.extension_id,
-			segment: params.segment,
-			broadcaster_id: params.broadcaster_id,
-			content: params.content,
-			version: params.version,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

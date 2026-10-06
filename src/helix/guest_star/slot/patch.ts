@@ -31,6 +31,29 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		session_id: params.session_id,
+		source_slot_id: params.source_slot_id,
+		destination_slot_id: params.destination_slot_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Update Guest Star Slot](https://dev.twitch.tv/docs/api/reference/#update-guest-star-slot)
  * Allows a user to update the assigned slot for a particular user within the active Guest Star session.
@@ -44,20 +67,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|Missing or invalid `slot_id`
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "guest_star/slot", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		session_id: params.session_id,
-		source_slot_id: params.source_slot_id,
-		destination_slot_id: params.destination_slot_id,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

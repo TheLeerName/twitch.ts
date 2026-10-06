@@ -146,6 +146,38 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/settings", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			emote_mode: params.emote_mode,
+			follower_mode: params.follower_mode,
+			follower_mode_duration: params.follower_mode_duration,
+			non_moderator_chat_delay: params.non_moderator_chat_delay,
+			non_moderator_chat_delay_duration: params.non_moderator_chat_delay_duration,
+			slow_mode: params.slow_mode,
+			slow_mode_wait_time: params.slow_mode_wait_time,
+			subscriber_mode: params.subscriber_mode,
+			unique_chat_mode: params.unique_chat_mode,
+		}),
+	};
+}
+
 /**
  * ## [Update Chat Settings](https://dev.twitch.tv/docs/api/reference/#update-chat-settings)
  * Updates the broadcaster’s chat settings.
@@ -176,29 +208,5 @@ export interface ResponseBody {
  * 403 Forbidden|The user in the `moderator_id` query parameter must have moderator privileges in the broadcaster's channel.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "chat/settings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			emote_mode: params.emote_mode,
-			follower_mode: params.follower_mode,
-			follower_mode_duration: params.follower_mode_duration,
-			non_moderator_chat_delay: params.non_moderator_chat_delay,
-			non_moderator_chat_delay_duration: params.non_moderator_chat_delay_duration,
-			slow_mode: params.slow_mode,
-			slow_mode_wait_time: params.slow_mode_wait_time,
-			subscriber_mode: params.subscriber_mode,
-			unique_chat_mode: params.unique_chat_mode,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

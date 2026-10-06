@@ -74,6 +74,29 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "moderation/unban_requests", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+		unban_request_id: params.unban_request_id,
+		status: params.status,
+		resolution_text: params.resolution_text,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Resolve Unban Requests](https://dev.twitch.tv/docs/api/reference/#resolve-unban-requests)
  * Resolves an unban request by approving or denying it.
@@ -97,20 +120,5 @@ export interface ResponseBody {
  * 404 Not Found|The unban request ID was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "moderation/unban_requests", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		unban_request_id: params.unban_request_id,
-		status: params.status,
-		resolution_text: params.resolution_text,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

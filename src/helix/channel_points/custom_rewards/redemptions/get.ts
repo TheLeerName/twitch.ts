@@ -100,6 +100,31 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		reward_id: params.reward_id,
+		status: params.status,
+		id: params.id,
+		sort: params.sort,
+		after: params.after,
+		first: params.first,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Custom Reward Redemption](https://dev.twitch.tv/docs/api/reference/#get-custom-reward-redemption)
  * Gets a list of redemptions for the specified custom reward. The app used to create the reward is the only app that may get the redemptions.
@@ -123,22 +148,5 @@ export interface ResponseBody {
  * 500 Internal Server Error| 
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		reward_id: params.reward_id,
-		status: params.status,
-		id: params.id,
-		sort: params.sort,
-		after: params.after,
-		first: params.first,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

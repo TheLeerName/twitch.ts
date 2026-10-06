@@ -61,6 +61,35 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "channels", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			game_id: params.game_id,
+			broadcaster_language: params.broadcaster_language,
+			title: params.title,
+			delay: params.delay,
+			tags: params.tags,
+			content_classification_labels: params.content_classification_labels,
+			is_branded_content: params.is_branded_content,
+		}),
+	};
+}
+
 /**
  * ## [Modify Channel Information](https://dev.twitch.tv/docs/api/reference/#modify-channel-information)
  * Updates a channel’s properties.
@@ -95,26 +124,5 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 500 Internal server error| 
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "channels", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			game_id: params.game_id,
-			broadcaster_language: params.broadcaster_language,
-			title: params.title,
-			delay: params.delay,
-			tags: params.tags,
-			content_classification_labels: params.content_classification_labels,
-			is_branded_content: params.is_branded_content,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

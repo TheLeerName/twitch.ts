@@ -48,6 +48,27 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			entitlement_ids: params.entitlement_ids,
+			fulfillment_status: params.fulfillment_status,
+		}),
+	};
+}
+
 /**
  * ## [Update Drops Entitlements](https://dev.twitch.tv/docs/api/reference/#update-drops-entitlements)
  * Updates the Drop entitlement’s fulfillment status.
@@ -71,18 +92,5 @@ export interface ResponseBody {
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			entitlement_ids: params.entitlement_ids,
-			fulfillment_status: params.fulfillment_status,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

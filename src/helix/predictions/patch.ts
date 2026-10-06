@@ -44,6 +44,29 @@ export interface ResponseBody {
 	data: [Prediction];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			broadcaster_id: params.broadcaster_id,
+			id: params.id,
+			status: params.status,
+			winning_outcome_id: params.winning_outcome_id,
+		}),
+	};
+}
+
 /**
  * ## [End Prediction](https://dev.twitch.tv/docs/api/reference/#end-prediction)
  * Locks, resolves, or cancels a Channel Points Prediction.
@@ -68,20 +91,5 @@ export interface ResponseBody {
  * ㅤ|The outcome in the `winning_outcome_id` field was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			broadcaster_id: params.broadcaster_id,
-			id: params.id,
-			status: params.status,
-			winning_outcome_id: params.winning_outcome_id,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -49,6 +49,32 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/announcements", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			message: params.message,
+			color: params.color,
+			for_source_only: params.for_source_only,
+		}),
+	};
+}
+
 /**
  * ## [Send Chat Announcement](https://dev.twitch.tv/docs/api/reference/#send-chat-announcement)
  * Sends an announcement to the broadcaster’s chat room.
@@ -77,23 +103,5 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 429 Too Many Requests|The sender has exceeded the number of announcements they may send to this **broadcaster_id** within a given window.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "chat/announcements", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			message: params.message,
-			color: params.color,
-			for_source_only: params.for_source_only,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

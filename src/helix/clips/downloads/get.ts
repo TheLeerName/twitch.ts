@@ -41,6 +41,27 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "clips/downloads", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		editor_id: params.editor_id,
+		broadcaster_id: params.broadcaster_id,
+		clip_id: params.clip_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Clips Download](https://dev.twitch.tv/docs/api/reference/#get-clips-download)
  * Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips). These links are temporary and should have a long-term expectation to expire.
@@ -62,18 +83,5 @@ export interface ResponseBody {
  * 500 Internal Error|Internal Server Error.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "clips/downloads", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		editor_id: params.editor_id,
-		broadcaster_id: params.broadcaster_id,
-		clip_id: params.clip_id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

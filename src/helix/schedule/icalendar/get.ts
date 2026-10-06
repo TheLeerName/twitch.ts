@@ -7,6 +7,21 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Channel iCalendar](https://dev.twitch.tv/docs/api/reference/#get-channel-icalendar)
  * Gets the broadcaster’s streaming schedule as an [iCalendar](https://datatracker.ietf.org/doc/html/rfc5545).
@@ -24,12 +39,5 @@ export type RequestParameters = RequestQueryParameters;
  * ㅤ|The ID in the `broadcaster_id` query parameter is not valid.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -40,6 +40,30 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "users/extensions", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			data: {
+				panel: params.panel,
+				overlay: params.overlay,
+				component: params.component,
+			},
+		}),
+	};
+}
+
 /**
  * ## [Update User Extensions](https://dev.twitch.tv/docs/api/reference/#update-user-extensions)
  * Updates an installed extension’s information. You can update the extension’s activation state, ID, and version number. The user ID in the access token identifies the broadcaster whose extensions you’re updating.
@@ -58,21 +82,5 @@ export interface ResponseBody {
  * 404 Not Found|An extension with the specified `id` and `version` values was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "users/extensions", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			data: {
-				panel: params.panel,
-				overlay: params.overlay,
-				component: params.component,
-			},
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

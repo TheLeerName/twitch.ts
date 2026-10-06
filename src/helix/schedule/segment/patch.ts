@@ -65,6 +65,35 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "schedule/segment", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		id: params.id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			start_time: params.start_time,
+			duration: params.duration,
+			category_id: params.category_id,
+			title: params.title,
+			is_canceled: params.is_canceled,
+			timezone: params.timezone,
+		}),
+	};
+}
+
 /**
  * ## [Update Channel Stream Schedule Segment](https://dev.twitch.tv/docs/api/reference/#update-channel-stream-schedule-segment)
  * Updates a scheduled broadcast segment.
@@ -92,26 +121,5 @@ export interface ResponseBody {
  * 404 Not Found|The specified broadcast segment was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "schedule/segment", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		id: params.id,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			start_time: params.start_time,
-			duration: params.duration,
-			category_id: params.category_id,
-			title: params.title,
-			is_canceled: params.is_canceled,
-			timezone: params.timezone,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -86,6 +86,28 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "extensions/transactions", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		extension_id: params.extension_id,
+		id: params.id,
+		first: params.first,
+		after: params.after,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Extension Transactions](https://dev.twitch.tv/docs/api/reference/#get-extension-transactions)
  * Gets an extension’s list of transactions. A transaction records the exchange of a currency (for example, Bits) for a digital product.
@@ -104,19 +126,5 @@ export interface ResponseBody {
  * 404 Not Found|One or more of the transaction IDs specified using the `id` query parameter were not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "extensions/transactions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		extension_id: params.extension_id,
-		id: params.id,
-		first: params.first,
-		after: params.after,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

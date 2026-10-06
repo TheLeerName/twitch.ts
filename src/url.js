@@ -1,17 +1,18 @@
 export class URL extends global.URL {
 	constructor(url, base) {
 		super(url, base);
+		this.searchParams._append = this.searchParams.append;
 		this.searchParams.append = (name, value) => {
 			if (value == null) return this.searchParams;
 
 			if (Array.isArray(value)) {
 				for (const v of value) {
 					if (v != null)
-						this.searchParams.append(name, `${encodeURIComponent(v)}`);
+						this.searchParams._append(name, `${encodeURIComponent(v)}`);
 				}
 			}
 			else
-				this.searchParams.append(name, `${encodeURIComponent(value)}`);
+				this.searchParams._append(name, `${encodeURIComponent(value)}`);
 
 			return this.searchParams;
 		};
@@ -31,5 +32,9 @@ export class URL extends global.URL {
 
 			return this.searchParams;
 		};
+	}
+
+	castToDefaultURL() {
+		return this;
 	}
 }

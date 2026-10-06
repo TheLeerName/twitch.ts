@@ -45,6 +45,30 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		editor_id: params.editor_id,
+		broadcaster_id: params.broadcaster_id,
+		vod_id: params.vod_id,
+		vod_offset: params.vod_offset,
+		duration: params.duration,
+		title: params.title,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Create Clip From VOD](https://dev.twitch.tv/docs/api/reference/#create-clip-from-vod)
  * Creates a clip from a broadcaster’s VOD on behalf of the broadcaster or an editor of the channel. Since a live stream is actively creating a VOD, this endpoint can also be used to create a clip from earlier in the current stream.
@@ -78,21 +102,5 @@ export interface ResponseBody {
  * ㅤ|The `broadcaster_id` or the `editor_id` does not exist.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		editor_id: params.editor_id,
-		broadcaster_id: params.broadcaster_id,
-		vod_id: params.vod_id,
-		vod_offset: params.vod_offset,
-		duration: params.duration,
-		title: params.title,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

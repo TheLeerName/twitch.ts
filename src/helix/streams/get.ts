@@ -101,6 +101,32 @@ export interface Stream {
 	is_mature: false;
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "streams", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		user_id: params.user_id,
+		user_login: params.user_login,
+		game_id: params.game_id,
+		type: params.type,
+		language: params.language,
+		first: params.first,
+		before: params.before,
+		after: params.after,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Streams](https://dev.twitch.tv/docs/api/reference/#get-streams)
  * Gets a list of all streams. The list is in descending order by the number of viewers watching the stream. Because viewers come and go during a stream, it’s possible to find duplicate or missing streams in the list as you page through the results.
@@ -115,23 +141,5 @@ export interface Stream {
  * ㅤ|The ID in the Client-Id header must match the Client ID in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "streams", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		user_login: params.user_login,
-		game_id: params.game_id,
-		type: params.type,
-		language: params.language,
-		first: params.first,
-		before: params.before,
-		after: params.after,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

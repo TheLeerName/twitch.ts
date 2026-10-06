@@ -59,6 +59,26 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "teams", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		name: params.name,
+		id: params.id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Teams](https://dev.twitch.tv/docs/api/reference/#get-teams)
  * Gets information about the specified Twitch team. [Read More](https://help.twitch.tv/s/article/twitch-teams)
@@ -76,17 +96,5 @@ export interface ResponseBody {
  * 404 Not Found|The specified team was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "teams", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		name: params.name,
-		id: params.id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -44,6 +44,26 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/color", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		user_id: params.user_id,
+		color: params.color,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Update User Chat Color](https://dev.twitch.tv/docs/api/reference/#update-user-chat-color)
  * Updates the color used for the user’s name in chat.
@@ -63,17 +83,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "chat/color", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		color: params.color,
-	});
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

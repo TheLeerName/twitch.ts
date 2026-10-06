@@ -36,6 +36,30 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		from_user_id: params.from_user_id,
+		to_user_id: params.to_user_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			message: params.message,
+		}),
+	};
+}
+
 /**
  * ## [Send Whisper](https://dev.twitch.tv/docs/api/reference/#send-whisper)
  * Sends a whisper message to the specified user.
@@ -68,21 +92,5 @@ export type RequestParameters = Authentication & RequestQueryParameters & Reques
  * 429 Too Many Requests|The sending user exceeded the number of whisper requests that they may make. See Rate Limits for this endpoint above.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		from_user_id: params.from_user_id,
-		to_user_id: params.to_user_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			message: params.message,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

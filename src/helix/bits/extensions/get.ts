@@ -49,6 +49,25 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "bits/extensions", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		should_include_all: params.should_include_all,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Extension Bits Products](https://dev.twitch.tv/docs/api/reference/#get-extension-bits-products)
  * Gets the list of Bits products that belongs to the extension. The client ID in the app access token identifies the extension.
@@ -63,16 +82,5 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "bits/extensions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		should_include_all: params.should_include_all,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

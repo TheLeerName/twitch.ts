@@ -15,18 +15,26 @@ export interface ResponseBody {
 	token_type: "bearer";
 }
 
-/**
- * ## [Client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
- * The [client credentials grant flow](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4) is meant only for server-to-server API requests that use an app access token.
- */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "token", Main.Options.idOAuth2Path);
 	url.searchParams.appendMany({
 		client_id: params.client_id,
 		client_secret: params.client_secret,
 	});
-	return global.fetch(url as any, {
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
 		method: "POST",
 		signal: params.signal,
-	});
+	};
+}
+
+/**
+ * ## [Client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
+ * The [client credentials grant flow](https://datatracker.ietf.org/doc/html/rfc6749#section-1.3.4) is meant only for server-to-server API requests that use an app access token.
+ */
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

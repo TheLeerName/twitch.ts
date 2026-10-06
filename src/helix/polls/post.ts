@@ -42,6 +42,31 @@ export interface ResponseBody {
 	data: [Poll];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "polls", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			broadcaster_id: params.broadcaster_id,
+			title: params.title,
+			choices: params.choices,
+			duration: params.duration,
+			channel_points_voting_enabled: params.channel_points_voting_enabled,
+			channel_points_per_vote: params.channel_points_per_vote,
+		}),
+	};
+}
+
 /**
  * ## [Create Poll](https://dev.twitch.tv/docs/api/reference/#create-poll)
  * Creates a poll that viewers in the broadcaster’s channel can vote on.
@@ -71,22 +96,5 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "polls", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			broadcaster_id: params.broadcaster_id,
-			title: params.title,
-			choices: params.choices,
-			duration: params.duration,
-			channel_points_voting_enabled: params.channel_points_voting_enabled,
-			channel_points_per_vote: params.channel_points_per_vote,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

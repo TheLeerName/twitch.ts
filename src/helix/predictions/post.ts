@@ -38,6 +38,29 @@ export interface ResponseBody {
 	data: [Prediction];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			broadcaster_id: params.broadcaster_id,
+			title: params.title,
+			outcomes: params.outcomes,
+			prediction_window: params.prediction_window,
+		}),
+	};
+}
+
 /**
  * ## [Create Prediction](https://dev.twitch.tv/docs/api/reference/#create-prediction)
  * Creates a Channel Points Prediction.
@@ -66,20 +89,5 @@ export interface ResponseBody {
  * 429 Too Many Requests| 
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			broadcaster_id: params.broadcaster_id,
-			title: params.title,
-			outcomes: params.outcomes,
-			prediction_window: params.prediction_window,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

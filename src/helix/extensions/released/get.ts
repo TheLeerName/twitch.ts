@@ -158,6 +158,26 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "extensions/released", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		extension_id: params.extension_id,
+		extension_version: params.extension_version,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Released Extensions](https://dev.twitch.tv/docs/api/reference/#get-released-extensions)
  * Gets information about a released extension. Returns the extension if its `state` is Released.
@@ -173,17 +193,5 @@ export interface ResponseBody {
  * 404 Not Found|The extension specified in the `extension_id` query parameter was not found or is not released.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "extensions/released", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		extension_id: params.extension_id,
-		extension_version: params.extension_version,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

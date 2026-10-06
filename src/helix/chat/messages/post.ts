@@ -57,6 +57,31 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/messages", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			broadcaster_id: params.broadcaster_id,
+			sender_id: params.sender_id,
+			message: params.message,
+			reply_parent_message_id: params.reply_parent_message_id,
+			for_source_only: params.for_source_only,
+			pin: params.pin,
+		}),
+	};
+}
+
 /**
  * ## [Send Chat Message](https://dev.twitch.tv/docs/api/reference/#send-chat-message)
  * Sends a message to the broadcaster’s chat room.
@@ -89,22 +114,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|The rate limit has been exceeded.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "chat/messages", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			broadcaster_id: params.broadcaster_id,
-			sender_id: params.sender_id,
-			message: params.message,
-			reply_parent_message_id: params.reply_parent_message_id,
-			for_source_only: params.for_source_only,
-			pin: params.pin,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

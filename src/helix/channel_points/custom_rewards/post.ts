@@ -127,6 +127,41 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			title: params.title,
+			cost: params.cost,
+			prompt: params.prompt,
+			is_enabled: params.is_enabled,
+			background_color: params.background_color,
+			is_user_input_required: params.is_user_input_required,
+			is_max_per_stream_enabled: params.is_max_per_stream_enabled,
+			max_per_stream: params.max_per_stream,
+			is_max_per_user_per_stream_enabled: params.is_max_per_user_per_stream_enabled,
+			max_per_user_per_stream: params.max_per_user_per_stream,
+			is_global_cooldown_enabled: params.is_global_cooldown_enabled,
+			global_cooldown_seconds: params.global_cooldown_seconds,
+			should_redemptions_skip_request_queue: params.should_redemptions_skip_request_queue,
+		}),
+	};
+}
+
 /**
  * ## [Create Custom Rewards](https://dev.twitch.tv/docs/api/reference/#create-custom-rewards)
  * Creates a Custom Reward in the broadcaster’s channel. The maximum number of custom rewards per channel is 50, which includes both enabled and disabled rewards.
@@ -154,32 +189,5 @@ export interface ResponseBody {
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			title: params.title,
-			cost: params.cost,
-			prompt: params.prompt,
-			is_enabled: params.is_enabled,
-			background_color: params.background_color,
-			is_user_input_required: params.is_user_input_required,
-			is_max_per_stream_enabled: params.is_max_per_stream_enabled,
-			max_per_stream: params.max_per_stream,
-			is_max_per_user_per_stream_enabled: params.is_max_per_user_per_stream_enabled,
-			max_per_user_per_stream: params.max_per_user_per_stream,
-			is_global_cooldown_enabled: params.is_global_cooldown_enabled,
-			global_cooldown_seconds: params.global_cooldown_seconds,
-			should_redemptions_skip_request_queue: params.should_redemptions_skip_request_queue,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

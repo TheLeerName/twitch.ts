@@ -37,6 +37,28 @@ export interface ResponseBody {
 	data: [Poll];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "polls", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			broadcaster_id: params.broadcaster_id,
+			id: params.id,
+			status: params.status,
+		}),
+	};
+}
+
 /**
  * ## [End Poll](https://dev.twitch.tv/docs/api/reference/#end-poll)
  * Ends an active poll. You have the option to end it or end it and archive it.
@@ -57,19 +79,5 @@ export interface ResponseBody {
  * ㅤ|The client ID specified in the Client-Id header must match the client ID specified in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "polls", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			broadcaster_id: params.broadcaster_id,
-			id: params.id,
-			status: params.status,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

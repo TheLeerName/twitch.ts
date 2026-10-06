@@ -22,16 +22,18 @@ const scriptFileNameWithoutExt = (() => {
 	filename = filename.substring(0, filename.indexOf("."));
 	return filename;
 })();*/
-const dataFileNameWithoutExt = "data";
-let outputFileNameWithoutExt = "../src/helix/";
+export const filePaths = {
+	data: "data.json",
+	output: "../src/helix/"
+};
 
 /**
  * 
  * @param {string} text 
  */
-function addTextToOutput(text) {
-	const content = fs.existsSync(outputFileNameWithoutExt + ".ts") ? fs.readFileSync(outputFileNameWithoutExt + ".ts").toString() : "";
-	fs.writeFileSync(outputFileNameWithoutExt + ".ts", content + "\n" + text);
+export function addTextToOutput(text) {
+	const content = fs.existsSync(filePaths.output) ? fs.readFileSync(filePaths.output).toString() : "";
+	fs.writeFileSync(filePaths.output, content + "\n" + text);
 }
 
 /**
@@ -40,8 +42,8 @@ function addTextToOutput(text) {
  * @param {string} fieldName 
  * @returns {string}
  */
-function getFieldFromJSON(endpointName, fieldName) {
-	const content = fs.existsSync(dataFileNameWithoutExt + ".json") ? fs.readFileSync(dataFileNameWithoutExt + ".json").toString() : "{}";
+export function getFieldFromJSON(endpointName, fieldName) {
+	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
 	return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
 }
@@ -52,8 +54,8 @@ function getFieldFromJSON(endpointName, fieldName) {
  * @param {string} fieldName 
  * @param {string} value 
  */
-function saveFieldFromJSON(endpointName, fieldName, value) {
-	const content = fs.existsSync(dataFileNameWithoutExt + ".json") ? fs.readFileSync(dataFileNameWithoutExt + ".json").toString() : "{}";
+export function saveFieldFromJSON(endpointName, fieldName, value) {
+	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
 	value = value.replaceAll(/> +</g, "><");
 	if (endpointName != null) {
@@ -62,7 +64,7 @@ function saveFieldFromJSON(endpointName, fieldName, value) {
 	}
 	else
 		json[fieldName] = value;
-	fs.writeFileSync(dataFileNameWithoutExt + ".json", JSON.stringify(json));
+	fs.writeFileSync(filePaths.data, JSON.stringify(json));
 }
 
 /**
@@ -73,7 +75,7 @@ function saveFieldFromJSON(endpointName, fieldName, value) {
  * @param {string} text 
  * @returns {Promise<string>}
  */
-async function readlineQuestion(rl, endpointName, fieldName, text) {
+export async function readlineQuestion(rl, endpointName, fieldName, text) {
 	const useValues = endpointName != null && fieldName != null;
 	if (useValues) {
 		const fieldValue = getFieldFromJSON(endpointName, fieldName);
@@ -92,7 +94,7 @@ async function readlineQuestion(rl, endpointName, fieldName, text) {
  * @param {boolean} userAccessTokenRequired 
  * @param {string} scopesText 
  */
-function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
+export function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
 	if (scopesText.length > 0)
 		scopesText = ` that includes scope${scopesText.includes(" ") ? "s" : ""} ${scopesText}`;
 
@@ -113,7 +115,7 @@ function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, app
  * @param {boolean} appAccessTokenRequired 
  * @param {string} scopesText 
  */
-function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
+export function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
 	addTextToOutput(``);
 	addTextToOutput(`export interface Authentication {`);
 	addTextToOutput(`\t/**`);
@@ -141,7 +143,7 @@ function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, sco
  * @param {string[]} descriptionLines 
  * @param {number} i 
  */
-function addDescriptionLines(cell, descriptionLines, i) {
+export function addDescriptionLines(cell, descriptionLines, i) {
 	if (cell.childNodes == null) {
 		if (!descriptionLines[i])
 			descriptionLines[i] = "";
@@ -188,7 +190,7 @@ function addDescriptionLines(cell, descriptionLines, i) {
  * @param {string} requestQueryParametersHTML 
  * @returns {string[]}
  */
-function makeRequestQueryParameters(requestQueryParametersHTML) {
+export function makeRequestQueryParameters(requestQueryParametersHTML) {
 	const params = [];
 	if (requestQueryParametersHTML.length < 1)
 		return params;
@@ -253,7 +255,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
  * @param {string} requestBodyHTML 
  * @returns {string[]}
  */
-function makeRequestBody(requestBodyHTML) {
+export function makeRequestBody(requestBodyHTML) {
 	const params = [];
 	if (requestBodyHTML.length < 1)
 		return params;
@@ -323,7 +325,7 @@ function makeRequestBody(requestBodyHTML) {
  * @param {string[]} requestQueryParameters 
  * @param {string[]} requestBody 
  */
-function makeRequestParameters(requestQueryParameters, requestBody) {
+export function makeRequestParameters(requestQueryParameters, requestBody) {
 	addTextToOutput(``);
 	addTextToOutput(`export type RequestParameters = Authentication & ${requestQueryParameters.length > 0 ? "RequestQueryParameters" : "Helix.RequestQueryParameters"}${requestBody.length > 0 ? " & RequestBody" : ""};`);
 }
@@ -332,7 +334,7 @@ function makeRequestParameters(requestQueryParameters, requestBody) {
  * 
  * @param {string} responseBodyHTML 
  */
- function makeResponseBody(responseBodyHTML) {
+export function makeResponseBody(responseBodyHTML) {
 	if (responseBodyHTML.length < 1)
 		return false;
 
@@ -400,7 +402,7 @@ function makeRequestParameters(requestQueryParameters, requestBody) {
  * @param {string} method 
  * @param {string[]} requestBody 
  */
-function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
+export function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
 	const apiDocsURL = `https://dev.twitch.tv/docs/api/reference/#${endpointName.toLowerCase().replaceAll(" ", "-")}`;
 
 	addTextToOutput(``);
@@ -436,6 +438,7 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	addTextToOutput(` * ## [${endpointName}](${apiDocsURL})`);
 
 	for (const pText of pTexts) {
+		if (pText.length < 1) break;
 		const p = new JSDOM(pText, "application/xhtml+xml").window.document.querySelector("p");
 		const descriptionLines = [];
 		addDescriptionLines(p, descriptionLines, descriptionLines.length);
@@ -473,6 +476,31 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	addTextToOutput(`}`);
 }
 
+/**
+ * 
+ * @param {{endpointName: string, pTexts: string[], userAccessTokenRequired: boolean, appAccessTokenRequired: boolean, scopesText: string, method: string, url: string, requestQueryParametersHTML: string, requestBodyHTML: string, responseBodyHTML: string, responseCodesHTML: string}} params
+ */
+export function create(params) {
+	fs.writeFileSync(filePaths.output, `import * as Main from "../${params.url.replaceAll(/[\w_]+/g, "..")}";`);
+	makeAuthentication(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopesText);
+	const requestQueryParameters = makeRequestQueryParameters(params.requestQueryParametersHTML);
+	const requestBody = makeRequestBody(params.requestBodyHTML);
+	makeRequestParameters(requestQueryParameters, requestBody);
+	const isResponseBody = makeResponseBody(params.responseBodyHTML);
+	makeFetch(params.endpointName, params.pTexts, params.responseCodesHTML, isResponseBody, params.url, requestQueryParameters, params.method, requestBody);
+}
+
+/**
+ * 
+ * @param {string} method_and_url 
+ * @returns {[string, string]}
+ */
+export function makeMethodAndURL(method_and_url) {
+	const array = method_and_url.split(" ");
+	array[1] = array[1].substring(28);
+	return array;
+}
+
 async function main() {
 	const rl = readline.createInterface({input: process.stdin, output: process.stdout});
 	const endpointName = await readlineQuestion(rl, null, null, "endpointName: ");
@@ -488,8 +516,8 @@ async function main() {
 		}
 		return pTexts;
 	})();
-	const userAccessTokenRequired = await readlineQuestion(rl, endpointName, "userAccessTokenRequired", "userAccessTokenRequired (y/n): ");
-	const appAccessTokenRequired = await readlineQuestion(rl, endpointName, "appAccessTokenRequired", "appAccessTokenRequired (y/n): ");
+	const userAccessTokenRequired = (await readlineQuestion(rl, endpointName, "userAccessTokenRequired", "userAccessTokenRequired (y/n): ")) === "y ";
+	const appAccessTokenRequired = (await readlineQuestion(rl, endpointName, "appAccessTokenRequired", "appAccessTokenRequired (y/n): ")) === "y";
 	const scopesText = await (async() => {
 		const text = await readlineQuestion(rl, endpointName, "scopes", "scopes: ");
 		return (text.length > 0 ? text.split(" ") : []).map(scopeOrSeparator => scopeOrSeparator.includes(":") ? `\`${scopeOrSeparator}\`` : scopeOrSeparator).join(" ");
@@ -505,22 +533,17 @@ async function main() {
 	const responseCodesHTML = await readlineQuestion(rl, endpointName, "responseCodesHTML", "responseCodesHTML (leave empty to not add it): ");
 	rl.close();
 
-	outputFileNameWithoutExt += url;
-	if (!fs.existsSync(outputFileNameWithoutExt))
-		fs.mkdirSync(outputFileNameWithoutExt, {recursive: true});
-	outputFileNameWithoutExt += "/" + method.toLowerCase();
+	filePaths.output += url;
+	if (!fs.existsSync(filePaths.output))
+		fs.mkdirSync(filePaths.output, {recursive: true});
+	filePaths.output += "/" + method.toLowerCase() + ".ts";
 
-	fs.writeFileSync(outputFileNameWithoutExt + ".ts", `import * as Main from "../${url.replaceAll(/[\w_]+/g, "..")}";`);
-	makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText);
-	const requestQueryParameters = makeRequestQueryParameters(requestQueryParametersHTML);
-	const requestBody = makeRequestBody(requestBodyHTML);
-	makeRequestParameters(requestQueryParameters, requestBody);
-	const isResponseBody = makeResponseBody(responseBodyHTML);
-	makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody);
+	create({pTexts, userAccessTokenRequired, appAccessTokenRequired, scopesText, method, url, requestQueryParametersHTML, requestBodyHTML, responseBodyHTML, responseCodesHTML});
 
 	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
 	const content = fs.readFileSync("../src/helix/index.ts").toString();
 	if (!content.includes(newString))
 		fs.writeFileSync("../src/helix/index.ts", content + newString);
 }
-main().catch(console.error);
+if (process.argv[1] === import.meta.filename)
+	main().catch(console.error);

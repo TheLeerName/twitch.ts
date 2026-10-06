@@ -31,6 +31,29 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "schedule/settings", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		is_vacation_enabled: params.is_vacation_enabled,
+		vacation_start_time: params.vacation_start_time,
+		vacation_end_time: params.vacation_end_time,
+		timezone: params.timezone,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PATCH",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Update Channel Stream Schedule](https://dev.twitch.tv/docs/api/reference/#update-channel-stream-schedule)
  * Updates the broadcaster’s schedule settings, such as scheduling a vacation.
@@ -52,20 +75,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * 404 Not Found|The broadcaster's schedule was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "schedule/settings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		is_vacation_enabled: params.is_vacation_enabled,
-		vacation_start_time: params.vacation_start_time,
-		vacation_end_time: params.vacation_end_time,
-		timezone: params.timezone,
-	});
-	return global.fetch(url as any, {
-		method: "PATCH",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

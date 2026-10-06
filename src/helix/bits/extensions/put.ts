@@ -67,6 +67,31 @@ export interface ResponseBody {
 	}[];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "bits/extensions", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			sku: params.sku,
+			cost: params.cost,
+			display_name: params.display_name,
+			in_development: params.in_development,
+			expiration: params.expiration,
+			is_broadcast: params.is_broadcast,
+		}),
+	};
+}
+
 /**
  * ## [Update Extension Bits Product](https://dev.twitch.tv/docs/api/reference/#update-extension-bits-product)
  * Adds or updates a Bits product that the extension created. If the SKU doesn’t exist, the product is added. You may update all fields except the `sku` field.
@@ -88,22 +113,5 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "bits/extensions", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			sku: params.sku,
-			cost: params.cost,
-			display_name: params.display_name,
-			in_development: params.in_development,
-			expiration: params.expiration,
-			is_broadcast: params.is_broadcast,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

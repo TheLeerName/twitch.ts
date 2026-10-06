@@ -96,6 +96,29 @@ export interface ResponseBody {
 	max_total_cost: number;
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			type: params.type,
+			version: params.version,
+			condition: params.condition,
+			transport: params.transport,
+		}),
+	};
+}
+
 /**
  * ## [Create EventSub Subscription](https://dev.twitch.tv/docs/api/reference/#create-eventsub-subscription)
  * Creates an EventSub subscription.
@@ -125,20 +148,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			type: params.type,
-			version: params.version,
-			condition: params.condition,
-			transport: params.transport,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -36,6 +36,29 @@ export interface RequestBody {
 
 export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "extensions/pubsub", Main.Options.apiHelixPath);
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			target: params.target,
+			broadcaster_id: params.broadcaster_id,
+			is_global_broadcast: params.is_global_broadcast,
+			message: params.message,
+		}),
+	};
+}
+
 /**
  * ## [Send Extension PubSub Message](https://dev.twitch.tv/docs/api/reference/#send-extension-pubsub-message)
  * Sends a message to one or more viewers. You can send messages to a specific channel or to all channels where your extension is active. This endpoint uses the same mechanism as the [send](https://dev.twitch.tv/docs/extensions/reference#send) JavaScript helper function used to send messages.
@@ -55,20 +78,5 @@ export type RequestParameters = Authentication & Helix.RequestQueryParameters & 
  * 422 Unprocessable Entity|The message is too large.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "extensions/pubsub", Main.Options.apiHelixPath);
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			target: params.target,
-			broadcaster_id: params.broadcaster_id,
-			is_global_broadcast: params.is_global_broadcast,
-			message: params.message,
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

@@ -67,6 +67,28 @@ export interface ResponseBody {
 	total: number;
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "bits/leaderboard", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		count: params.count,
+		period: params.period,
+		started_at: params.started_at,
+		user_id: params.user_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Bits Leaderboard](https://dev.twitch.tv/docs/api/reference/#get-bits-leaderboard)
  * Gets the Bits leaderboard for the authenticated broadcaster.
@@ -84,19 +106,5 @@ export interface ResponseBody {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "bits/leaderboard", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		count: params.count,
-		period: params.period,
-		started_at: params.started_at,
-		user_id: params.user_id,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

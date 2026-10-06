@@ -58,6 +58,34 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "moderation/bans", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		broadcaster_id: params.broadcaster_id,
+		moderator_id: params.moderator_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+			"content-type": "application/json",
+		},
+		signal: params.signal,
+		body: JSON.stringify({
+			data: {
+				user_id: params.user_id,
+				duration: params.duration,
+				reason: params.reason,
+			},
+		}),
+	};
+}
+
 /**
  * ## [Ban User](https://dev.twitch.tv/docs/api/reference/#ban-user)
  * Bans a user from participating in the specified broadcaster’s chat room or puts them in a timeout.
@@ -90,25 +118,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|The app has exceeded the number of requests it may make per minute for this broadcaster.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "moderation/bans", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-			"content-type": "application/json",
-		},
-		signal: params.signal,
-		body: JSON.stringify({
-			data: {
-				user_id: params.user_id,
-				duration: params.duration,
-				reason: params.reason,
-			},
-		}),
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

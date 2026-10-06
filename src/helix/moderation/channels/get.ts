@@ -50,23 +50,31 @@ export interface ResponseBody {
 	};
 }
 
-/**
- * ## [Get Moderated Channels](https://dev.twitch.tv/docs/api/reference/#get-moderated-channels)
- * Gets a list of channels that the specified user has moderator privileges in.
- */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "moderation/channels", Main.Options.apiHelixPath);
 	url.searchParams.appendMany({
 		user_id: params.user_id,
 		after: params.after,
 		first: params.first,
 	});
-	return global.fetch(url as any, {
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
 		signal: params.signal,
-	});
+	};
+}
+
+/**
+ * ## [Get Moderated Channels](https://dev.twitch.tv/docs/api/reference/#get-moderated-channels)
+ * Gets a list of channels that the specified user has moderator privileges in.
+ */
+export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

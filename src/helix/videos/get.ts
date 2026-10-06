@@ -155,6 +155,34 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "videos", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		id: params.id,
+		user_id: params.user_id,
+		game_id: params.game_id,
+		language: params.language,
+		period: params.period,
+		sort: params.sort,
+		type: params.type,
+		first: params.first,
+		after: params.after,
+		before: params.before,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Videos](https://dev.twitch.tv/docs/api/reference/#get-videos)
  * Gets information about one or more published videos. You may get videos by ID, by user, or by game/category.
@@ -179,25 +207,5 @@ export interface ResponseBody {
  * ㅤ|The ID in the `id` query parameter was not found. Returned only if all the IDs were not found; otherwise, the ID is ignored.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "videos", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		id: params.id,
-		user_id: params.user_id,
-		game_id: params.game_id,
-		language: params.language,
-		period: params.period,
-		sort: params.sort,
-		type: params.type,
-		first: params.first,
-		after: params.after,
-		before: params.before,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

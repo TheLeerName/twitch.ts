@@ -39,6 +39,26 @@ export interface ResponseBody {
 	}];
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		from_broadcaster_id: params.from_broadcaster_id,
+		to_broadcaster_id: params.to_broadcaster_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Start Raid](https://dev.twitch.tv/docs/api/reference/#start-a-raid)
  * Raid another channel by sending the broadcaster’s viewers to the targeted channel.
@@ -71,17 +91,5 @@ export interface ResponseBody {
  * 429 Too Many Requests|The broadcaster exceeded the number of raid requests that they may make. The limit is 10 requests within a 10-minute window.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		from_broadcaster_id: params.from_broadcaster_id,
-		to_broadcaster_id: params.to_broadcaster_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

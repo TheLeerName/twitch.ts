@@ -68,6 +68,30 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		id: params.id,
+		user_id: params.user_id,
+		game_id: params.game_id,
+		fulfillment_status: params.fulfillment_status,
+		after: params.after,
+		first: params.first,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Drops Entitlements](https://dev.twitch.tv/docs/api/reference/#get-drops-entitlements)
  * Gets an organization’s list of entitlements that have been granted to a game, a user, or both.
@@ -102,21 +126,5 @@ export interface ResponseBody {
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		id: params.id,
-		user_id: params.user_id,
-		game_id: params.game_id,
-		fulfillment_status: params.fulfillment_status,
-		after: params.after,
-		first: params.first,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

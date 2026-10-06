@@ -29,6 +29,27 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "chat/shoutouts", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		from_broadcaster_id: params.from_broadcaster_id,
+		to_broadcaster_id: params.to_broadcaster_id,
+		moderator_id: params.moderator_id,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Send Shoutout](https://dev.twitch.tv/docs/api/reference/#send-a-shoutout)
  * Sends a Shoutout to the specified broadcaster. Typically, you send Shoutouts when you or one of your moderators notice another broadcaster in your chat, the other broadcaster is coming up in conversation, or after they raid your broadcast.
@@ -60,18 +81,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The broadcaster exceeded the number of Shoutouts they may send the same broadcaster within a given window. See the endpoint's Rate Limits.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "chat/shoutouts", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		from_broadcaster_id: params.from_broadcaster_id,
-		to_broadcaster_id: params.to_broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return global.fetch(url as any, {
-		method: "POST",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

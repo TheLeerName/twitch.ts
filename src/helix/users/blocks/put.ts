@@ -36,6 +36,27 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 
 export type RequestParameters = Authentication & RequestQueryParameters;
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		target_user_id: params.target_user_id,
+		source_context: params.source_context,
+		reason: params.reason,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "PUT",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Block User](https://dev.twitch.tv/docs/api/reference/#block-user)
  * Blocks the specified user from interacting with or having contact with the broadcaster. The user ID in the OAuth token identifies the broadcaster who is blocking the user.
@@ -56,18 +77,5 @@ export type RequestParameters = Authentication & RequestQueryParameters;
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		target_user_id: params.target_user_id,
-		source_context: params.source_context,
-		reason: params.reason,
-	});
-	return global.fetch(url as any, {
-		method: "PUT",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }

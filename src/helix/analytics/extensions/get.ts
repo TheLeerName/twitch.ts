@@ -78,6 +78,30 @@ export interface ResponseBody {
 	};
 }
 
+export function makeURL(params: RequestParameters) {
+	const url = new Main.URL(params.apiPath ?? "analytics/extensions", Main.Options.apiHelixPath);
+	url.searchParams.appendMany({
+		extension_id: params.extension_id,
+		type: params.type,
+		started_at: params.started_at,
+		ended_at: params.ended_at,
+		first: params.first,
+		after: params.after,
+	});
+	return url;
+}
+
+export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+	return {
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: params.authorization,
+		},
+		signal: params.signal,
+	};
+}
+
 /**
  * ## [Get Extension Analytics](https://dev.twitch.tv/docs/api/reference/#get-extension-analytics)
  * Gets an analytics report for one or more extensions. The response contains the URLs used to download the reports (CSV files). [Learn More](https://dev.twitch.tv/docs/insights)
@@ -99,21 +123,5 @@ export interface ResponseBody {
  * 404 Not Found|The extension specified in the `extension_id` query parameter was not found.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	const url = new Main.URL(params.apiPath ?? "analytics/extensions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		extension_id: params.extension_id,
-		type: params.type,
-		started_at: params.started_at,
-		ended_at: params.ended_at,
-		first: params.first,
-		after: params.after,
-	});
-	return global.fetch(url as any, {
-		method: "GET",
-		headers: {
-			"client-id": params.client_id,
-			authorization: params.authorization,
-		},
-		signal: params.signal,
-	});
+	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
 }
