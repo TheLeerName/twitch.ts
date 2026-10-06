@@ -1,1 +1,1 @@
-export * as ClientCredentialsGrantFlow from "./token/post";
+export * as GetAppAccessTokenWithClientCredentials from "./token/post/client_credentials";
