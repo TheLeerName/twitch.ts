@@ -4,6 +4,7 @@
 
 /dist/
 /data.json
+/tests/.env
 
 /doc-maker/node_modules/
 /doc-maker/package-lock.json
