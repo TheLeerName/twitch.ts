@@ -1,6 +1,6 @@
-import fs from "fs";
-import readline from "readline/promises";
-import { JSDOM } from "jsdom";
+const fs = require("fs");
+const readline = require("readline/promises");
+const { JSDOM } = require("jsdom");
 
 /*
 
@@ -22,7 +22,7 @@ const scriptFileNameWithoutExt = (() => {
 	filename = filename.substring(0, filename.indexOf("."));
 	return filename;
 })();*/
-export const filePaths = {
+const filePaths = {
 	data: "data.json",
 	output: "../src/helix/"
 };
@@ -31,7 +31,7 @@ export const filePaths = {
  * 
  * @param {string} text 
  */
-export function addTextToOutput(text) {
+function addTextToOutput(text) {
 	const content = fs.existsSync(filePaths.output) ? fs.readFileSync(filePaths.output).toString() : "";
 	fs.writeFileSync(filePaths.output, content + "\n" + text);
 }
@@ -42,7 +42,7 @@ export function addTextToOutput(text) {
  * @param {string} fieldName 
  * @returns {string}
  */
-export function getFieldFromJSON(endpointName, fieldName) {
+function getFieldFromJSON(endpointName, fieldName) {
 	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
 	return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
@@ -54,7 +54,7 @@ export function getFieldFromJSON(endpointName, fieldName) {
  * @param {string} fieldName 
  * @param {string} value 
  */
-export function saveFieldFromJSON(endpointName, fieldName, value) {
+function saveFieldFromJSON(endpointName, fieldName, value) {
 	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
 	value = value.replaceAll(/> +</g, "><");
@@ -75,7 +75,7 @@ export function saveFieldFromJSON(endpointName, fieldName, value) {
  * @param {string} text 
  * @returns {Promise<string>}
  */
-export async function readlineQuestion(rl, endpointName, fieldName, text) {
+async function readlineQuestion(rl, endpointName, fieldName, text) {
 	const useValues = endpointName != null && fieldName != null;
 	if (useValues) {
 		const fieldValue = getFieldFromJSON(endpointName, fieldName);
@@ -94,7 +94,7 @@ export async function readlineQuestion(rl, endpointName, fieldName, text) {
  * @param {boolean} userAccessTokenRequired 
  * @param {string} scopesText 
  */
-export function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
+function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
 	if (scopesText.length > 0)
 		scopesText = ` that includes scope${scopesText.includes(" ") ? "s" : ""} ${scopesText}`;
 
@@ -115,7 +115,7 @@ export function makeAuthenticationAuthorizationDescription(userAccessTokenRequir
  * @param {boolean} appAccessTokenRequired 
  * @param {string} scopesText 
  */
-export function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
+function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
 	addTextToOutput(``);
 	addTextToOutput(`export interface Authentication {`);
 	addTextToOutput(`\t/**`);
@@ -143,7 +143,7 @@ export function makeAuthentication(userAccessTokenRequired, appAccessTokenRequir
  * @param {string[]} descriptionLines 
  * @param {number} i 
  */
-export function addDescriptionLines(cell, descriptionLines, i) {
+function addDescriptionLines(cell, descriptionLines, i) {
 	if (cell.childNodes == null) {
 		if (!descriptionLines[i])
 			descriptionLines[i] = "";
@@ -190,7 +190,7 @@ export function addDescriptionLines(cell, descriptionLines, i) {
  * @param {string} requestQueryParametersHTML 
  * @returns {string[]}
  */
-export function makeRequestQueryParameters(requestQueryParametersHTML) {
+function makeRequestQueryParameters(requestQueryParametersHTML) {
 	const params = [];
 	if (requestQueryParametersHTML.length < 1)
 		return params;
@@ -255,7 +255,7 @@ export function makeRequestQueryParameters(requestQueryParametersHTML) {
  * @param {string} requestBodyHTML 
  * @returns {string[]}
  */
-export function makeRequestBody(requestBodyHTML) {
+function makeRequestBody(requestBodyHTML) {
 	const params = [];
 	if (requestBodyHTML.length < 1)
 		return params;
@@ -325,7 +325,7 @@ export function makeRequestBody(requestBodyHTML) {
  * @param {string[]} requestQueryParameters 
  * @param {string[]} requestBody 
  */
-export function makeRequestParameters(requestQueryParameters, requestBody) {
+function makeRequestParameters(requestQueryParameters, requestBody) {
 	addTextToOutput(``);
 	addTextToOutput(`export type RequestParameters = Authentication & ${requestQueryParameters.length > 0 ? "RequestQueryParameters" : "Helix.RequestQueryParameters"}${requestBody.length > 0 ? " & RequestBody" : ""};`);
 }
@@ -334,7 +334,7 @@ export function makeRequestParameters(requestQueryParameters, requestBody) {
  * 
  * @param {string} responseBodyHTML 
  */
-export function makeResponseBody(responseBodyHTML) {
+function makeResponseBody(responseBodyHTML) {
 	if (responseBodyHTML.length < 1)
 		return false;
 
@@ -402,7 +402,7 @@ export function makeResponseBody(responseBodyHTML) {
  * @param {string} method 
  * @param {string[]} requestBody 
  */
-export function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
+function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
 	const apiDocsURL = `https://dev.twitch.tv/docs/api/reference/#${endpointName.toLowerCase().replaceAll(" ", "-")}`;
 
 	addTextToOutput(``);
@@ -480,7 +480,7 @@ export function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBod
  * 
  * @param {{endpointName: string, pTexts: string[], userAccessTokenRequired: boolean, appAccessTokenRequired: boolean, scopesText: string, method: string, url: string, requestQueryParametersHTML: string, requestBodyHTML: string, responseBodyHTML: string, responseCodesHTML: string}} params
  */
-export function create(params) {
+function create(params) {
 	fs.writeFileSync(filePaths.output, `import * as Main from "../${params.url.replaceAll(/[\w_]+/g, "..")}";`);
 	makeAuthentication(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopesText);
 	const requestQueryParameters = makeRequestQueryParameters(params.requestQueryParametersHTML);
@@ -495,7 +495,7 @@ export function create(params) {
  * @param {string} method_and_url 
  * @returns {[string, string]}
  */
-export function makeMethodAndURL(method_and_url) {
+function makeMethodAndURL(method_and_url) {
 	const array = method_and_url.split(" ");
 	array[1] = array[1].substring(28);
 	return array;
@@ -545,5 +545,24 @@ async function main() {
 	if (!content.includes(newString))
 		fs.writeFileSync("../src/helix/index.ts", content + newString);
 }
-if (process.argv[1] === import.meta.filename)
+
+if (process.argv[1] === __filename)
 	main().catch(console.error);
+
+module.exports = {
+	filePaths,
+	addTextToOutput,
+	getFieldFromJSON,
+	saveFieldFromJSON,
+	readlineQuestion,
+	makeAuthenticationAuthorizationDescription,
+	makeAuthentication,
+	addDescriptionLines,
+	makeRequestQueryParameters,
+	makeRequestBody,
+	makeRequestParameters,
+	makeResponseBody,
+	makeFetch,
+	create,
+	makeMethodAndURL,
+};

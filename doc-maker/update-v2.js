@@ -1,13 +1,13 @@
-import fs from "fs";
+const fs = require("fs");
 
-import * as Create from "./create.js";
+const Create = require("./create.js");
 
 /**
  * 
  * @param {string} name 
  * @param {Record<string, string> | undefined} params 
  */
-export function updateV2(name, params) {
+function updateV2(name, params) {
 	params ??= JSON.parse(fs.readFileSync(Create.filePaths.data).toString())[name];
 
 	const [method, url] = Create.makeMethodAndURL(params.method_and_url);
@@ -42,7 +42,7 @@ export function updateV2(name, params) {
 	}
 }
 
-if (process.argv[1] === import.meta.filename) {
+if (process.argv[1] === __filename) {
 	const name = process.argv.slice(2).join(" ");
 	if (name.length > 1)
 		updateV2(name);
