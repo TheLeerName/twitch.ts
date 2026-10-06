@@ -29,7 +29,7 @@ export interface RequestBody {
 	fulfillment_status?: "CLAIMED" | "FULFILLED";
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that indicates which entitlements were successfully updated and those that weren’t. */

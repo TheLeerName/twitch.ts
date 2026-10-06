@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters;
+export type RequestParameters = Authentication & Main.RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of chat badges. The list is sorted in ascending order by `set_id`, and within a set, the list is sorted in ascending order by `id`. */

@@ -34,7 +34,7 @@ export interface RequestBody {
 	version?: string;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);

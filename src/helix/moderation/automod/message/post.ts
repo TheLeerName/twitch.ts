@@ -31,7 +31,7 @@ export interface RequestBody {
 	action: "ALLOW" | "DENY";
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "moderation/automod/message", Main.Options.apiHelixPath);

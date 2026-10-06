@@ -30,7 +30,7 @@ export interface RequestBody {
 	status: "TERMINATED" | "ARCHIVED";
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the poll that you ended. */

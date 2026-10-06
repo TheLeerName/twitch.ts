@@ -39,7 +39,7 @@ export interface RequestBody {
 	pin?: boolean;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	data: [{

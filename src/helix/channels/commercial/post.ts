@@ -25,7 +25,7 @@ export interface RequestBody {
 	length: number;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** An array that contains a single object with the status of your start commercial request. */

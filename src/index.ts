@@ -1,14 +1,3 @@
-import * as Helix from "./helix";
-/*
-Helix.WarnChatUser.fetch({
-	client_id: "",
-	authorization: "Bearer jlkkl;sxdfgjk;dflsjkl;fsdgjkl;sdfg",
-	broadcaster_id: "2123",
-	moderator_id: "21312",
-	user_id: "3123",
-	reason: "213"
-}).then(r => r.json()).then(r => r.data[0].);*/
-
 export namespace Options {
 	export let apiHelixPath = "https://api.twitch.tv/helix/";
 	export let idOAuth2Path = "https://id.twitch.tv/oauth2/";

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters;
+export type RequestParameters = Authentication & Main.RequestQueryParameters;
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */

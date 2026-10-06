@@ -10,7 +10,6 @@
 		"types": ["node"],
 		"rootDir": "./src",
 		"outDir": "./dist",
-		"declarationDir": "./dist/types",
 		"emitDeclarationOnly": false,
 		"strict": true,
 		"esModuleInterop": true,
@@ -19,8 +18,14 @@
 
 		"allowJs": true
 	},
-	"include": ["src/**/*.ts"],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"src/**/*.js",
+	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		"src/old",
+		""
 	]
 }

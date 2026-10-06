@@ -2,8 +2,7 @@
 /node_modules/
 /package-lock.json
 
-/dist/types/
-/dist/*.js
+/dist/
 /data.json
 
 /doc-maker/node_modules/

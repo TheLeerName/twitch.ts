@@ -46,7 +46,7 @@ export interface RequestBody {
 	};
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single subscription that you created. */

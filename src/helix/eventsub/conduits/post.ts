@@ -21,7 +21,7 @@ export interface RequestBody {
 	shard_count: number;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */

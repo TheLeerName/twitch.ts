@@ -37,7 +37,7 @@ export interface RequestBody {
 	winning_outcome_id?: string;
 }
 
-export type RequestParameters = Authentication & Helix.RequestQueryParameters & RequestBody;
+export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single prediction that you updated. */
