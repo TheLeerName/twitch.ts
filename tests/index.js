@@ -46,9 +46,10 @@ async function main(env) {
 	console.log("0. Exit");
 	console.log("1. Get app access token");
 	console.log("2. Get user access token");
-	console.log("3. Revoke access token");
+	console.log("3. Refresh user access token");
+	console.log("4. Revoke access token");
 	const rl = readline.createInterface({input: process.stdin, output: process.stdout});
-	const answer = await rl.question("Choose (0-3): ");
+	const answer = await rl.question("Choose (0-4): ");
 	rl.close();
 
 	if (answer === "0")
@@ -58,7 +59,8 @@ async function main(env) {
 	switch(answer) {
 		case "1": await require("./getappaccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
 		case "2": await require("./getuseraccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET, env.REDIRECT_URI); console.log(""); break;
-		case "3": await require("./revokeaccesstoken").main(env.CLIENT_ID); console.log(""); break;
+		case "3": await require("./refreshuseraccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
+		case "4": await require("./revokeaccesstoken").main(env.CLIENT_ID); console.log(""); break;
 	}
 	return main(env);
 }
