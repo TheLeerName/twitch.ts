@@ -25,11 +25,11 @@ export class URL extends globalThis.URL {
 			if (Array.isArray(value)) {
 				for (const v of value) {
 					if (v != null)
-						(this.searchParams as any)._append(name, `${encodeURIComponent(v)}`);
+						(this.searchParams as any)._append(name, `${v}`);
 				}
 			}
 			else
-				(this.searchParams as any)._append(name, `${encodeURIComponent(value)}`);
+				(this.searchParams as any)._append(name, `${value}`);
 
 			return this.searchParams;
 		};
@@ -38,11 +38,11 @@ export class URL extends globalThis.URL {
 				if (Array.isArray(value)) {
 					for (const v of value) {
 						if (v != null)
-							this.searchParams.append(name, `${encodeURIComponent(v)}`);
+							this.searchParams.append(name, v);
 					}
 				}
 				else if (value != null)
-					this.searchParams.append(name, `${encodeURIComponent(value)}`);
+					this.searchParams.append(name, value);
 			}
 
 			return this.searchParams;
