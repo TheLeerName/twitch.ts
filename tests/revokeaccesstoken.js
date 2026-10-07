@@ -22,19 +22,12 @@ async function main(client_id, token) {
 	process.stdout.write("Revoking access token... ");
 	const counter = new Counter();
 
-	/** @type {Twitch.Response<undefined, Twitch.OAuth2.RevokeAccessToken.ResponseBodyError>} */
-	let request;
-	try {
-		request = await Twitch.OAuth2.RevokeAccessToken.fetch({client_id, token});
-		if (!request.ok) {
-			const response = await request.json();
-			if (response.message === "token Invalid token")
-				return console.error(`Token is not valid!`);
-
-			throw new Error(`${request.status} ${request.statusText} - ${response.message}`);
-		}
-	} catch(e) {
-		console.error(e);
+	const result = await Twitch.OAuth2.RevokeAccessToken.axiosRequest({client_id, token});
+	if (!result.ok) {
+		if (result.message === "token Invalid token")
+			console.error(`Token is not valid!`);
+		else
+			console.error(`${result.status} - ${result.message}`);
 		return;
 	}
 

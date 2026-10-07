@@ -1,3 +1,5 @@
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+
 export namespace Options {
 	export let apiHelixPath = "https://api.twitch.tv/helix/";
 	export let idOAuth2Path = "https://id.twitch.tv/oauth2/";
@@ -20,13 +22,35 @@ export namespace Options {
 	}
 }
 
-export interface RequestQueryParameters {
-	/** If specified, API endpoint path will be changed to this value */
-	apiPath?: string;
-	/** An AbortSignal to set request's signal. */
-	signal?: AbortSignal;
+export interface RequestParameters {
+	config?: AxiosRequestConfig;
+}
+
+export interface ResponseBodyError {
+	/** HTTP error status code. */
+	status: number;
+	/** HTTP error message. */
+	message: string;
+}
+
+export type Response<TData, TError extends ResponseBodyError> = 
+| (TData &  {ok: true;  status: number;})
+| (TError & {ok: false; status: number;});
+export async function axiosRequest<TData, TError extends ResponseBodyError>(config: AxiosRequestConfig): Promise<Response<TData, TError>> {
+	try {
+		const response = await axios<TData>(config);
+		return {ok: true, status: response.status, ...response.data};
+	}
+	catch(error) {
+		if (axios.isAxiosError(error)) {
+			const axiosError = error as AxiosError<TError>;
+			return {ok: false, ...axiosError.response?.data ?? {status: axiosError.response?.status ?? 500, message: axiosError.message}};
+		}
+		throw error;
+	}
 }
 
 export * as OAuth2 from "./oauth2";
-export * as Helix from "./helix";
-export { URL, URLSearchParams, Response } from "./url";
+export { AxiosRequestConfig } from "axios";
+//export * as Helix from "./helix";
+//export { URL, URLSearchParams, Response } from "./url";

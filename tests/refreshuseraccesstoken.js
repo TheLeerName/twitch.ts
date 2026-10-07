@@ -23,32 +23,22 @@ async function main(client_id, client_secret, refresh_token) {
 	process.stdout.write("Refreshing user access token... ");
 	const counter = new Counter();
 
-	/** @type {Twitch.Response<Twitch.OAuth2.RefreshUserAccessToken.ResponseBody, Twitch.OAuth2.RefreshUserAccessToken.ResponseBodyError>} */
-	let request;
-	/** @type {Twitch.OAuth2.RefreshUserAccessToken.ResponseBody} */
-	let response;
-	try {
-		request = await Twitch.OAuth2.RefreshUserAccessToken.fetch({client_id, client_secret, refresh_token});
-		if (!request.ok) {
-			const response = await request.json();
-			if (response.message === "Invalid refresh token")
-				return console.error(`Token is not valid!`);
-
-			throw new Error(`${request.status} ${request.statusText} - ${response.message}`);
-		}
-		response = await request.json();
-	} catch(e) {
-		console.error(e);
+	const result = await Twitch.OAuth2.RefreshUserAccessToken.axiosRequest({client_id, client_secret, refresh_token});
+	if (!result.ok) {
+		if (result.message === "Invalid refresh token")
+			console.error(`Token is not valid!`);
+		else
+			console.error(`${result.status} - ${result.message}`);
 		return;
 	}
 
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	console.log(`USER_ACCESS_TOKEN: ${response.access_token}`);
-	console.log(`REFRESH_TOKEN: ${response.refresh_token}`);
-	if (response.scope != null)
-		console.log(`SCOPES: ${response.scope.join(", ")}`);
-	console.log(`EXPIRES_IN: ${response.expires_in}s - ${new Date(Date.now() + response.expires_in * 1000).toString()}`);
-	console.log(`TOKEN_TYPE: ${response.token_type}`);
+	console.log(`USER_ACCESS_TOKEN: ${result.access_token}`);
+	console.log(`REFRESH_TOKEN: ${result.refresh_token}`);
+	if (result.scope != null)
+		console.log(`SCOPES: ${result.scope.join(", ")}`);
+	console.log(`EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
+	console.log(`TOKEN_TYPE: ${result.token_type}`);
 }
 
 module.exports = {

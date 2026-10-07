@@ -21,34 +21,24 @@ async function main(token) {
 	process.stdout.write("Validating access token... ");
 	const counter = new Counter();
 
-	/** @type {Twitch.Response<Twitch.OAuth2.ValidateAccessToken.ResponseBody, Twitch.OAuth2.ValidateAccessToken.ResponseBodyError>} */
-	let request;
-	/** @type {Twitch.OAuth2.ValidateAccessToken.ResponseBody} */
-	let response;
-	try {
-		request = await Twitch.OAuth2.ValidateAccessToken.fetch({token});
-		if (!request.ok) {
-			const response = await request.json();
-			if (response.message === "invalid access token")
-				return console.error(`Token is not valid!`);
-
-			throw new Error(`${request.status} ${request.statusText} - ${response.message}`);
-		}
-		response = await request.json();
-	} catch(e) {
-		console.error(e);
+	const result = await Twitch.OAuth2.ValidateAccessToken.axiosRequest({token});
+	if (!result.ok) {
+		if (result.message === "invalid access token")
+			console.error(`Token is not valid!`);
+		else
+			console.error(`${result.status} - ${result.message}`);
 		return;
 	}
 
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	console.log(`CLIENT_ID: ${response.client_id}`);
-	if (response.scopes != null)
-		console.log(`SCOPES: ${response.scopes.join(", ")}`);
-	console.log(`EXPIRES_IN: ${response.expires_in}s - ${new Date(Date.now() + response.expires_in * 1000).toString()}`);
-	if (response.login != null) {
+	console.log(`CLIENT_ID: ${result.client_id}`);
+	if (result.scopes != null)
+		console.log(`SCOPES: ${result.scopes.join(", ")}`);
+	console.log(`EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
+	if (result.login != null) {
 		console.log(`IS_USER_ACCESS_TOKEN: true`);
-		console.log(`USER_ID: ${response.user_id}`);
-		console.log(`LOGIN: ${response.login}`);
+		console.log(`USER_ID: ${result.user_id}`);
+		console.log(`LOGIN: ${result.login}`);
 	}
 	else
 		console.log(`IS_USER_ACCESS_TOKEN: false`);

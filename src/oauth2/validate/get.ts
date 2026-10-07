@@ -1,11 +1,11 @@
 import * as Main from "../..";
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** App or user access token to validate. */
 	token: string;
 }
 
-export type RequestParameters = RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
 export type ResponseBody = ResponseBody.AppAccessToken | ResponseBody.UserAccessToken;
 export namespace ResponseBody {
@@ -32,9 +32,7 @@ export namespace ResponseBody {
 	}
 }
 
-export interface ResponseBodyError {
-	/** HTTP error status code. */
-	status: number;
+export interface ResponseBodyError extends Main.ResponseBodyError {
 	/**
 	 * HTTP error message. Can be:
 	 * Value|Reason
@@ -42,21 +40,20 @@ export interface ResponseBodyError {
 	 * `missing authorization token`|`token` is empty string
 	 * `invalid access token`|`token` is not valid
 	 */
-	message: string;
+	message:
+	| "missing authorization token"
+	| "invalid access token";
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "validate", Main.Options.idOAuth2Path);
-	return url;
-}
-
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.idOAuth2Path,
+		url: "validate",
 		method: "GET",
 		headers: {
-			authorization: `Bearer ${params.token}`
+			authorization: `Bearer ${params.token}`,
 		},
-		signal: params.signal,
+		...params.config,
 	};
 }
 
@@ -64,6 +61,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ## [Validating Tokens](https://dev.twitch.tv/docs/authentication/validate-tokens/)
  * The Twitch authorization service provides this endpoint that you can use to validate your OAuth access token or discover information about the token, such as when it expires, its scopes, and the user that authorized the client to access their resources.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

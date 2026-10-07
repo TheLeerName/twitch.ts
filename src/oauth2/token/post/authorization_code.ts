@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID. */
 	client_id: string;
 	/** Your app’s registered client secret. */
@@ -11,7 +11,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	redirect_uri: string;
 }
 
-export type RequestParameters = RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
 export interface ResponseBody {
 	access_token: string;
@@ -31,9 +31,7 @@ export interface ResponseBody {
 	token_type: "bearer";
 }
 
-export interface ResponseBodyError {
-	/** HTTP error status code. */
-	status: number;
+export interface ResponseBodyError extends Main.ResponseBodyError {
 	/**
 	 * HTTP error message. Can be:
 	 * Value|Reason
@@ -47,28 +45,33 @@ export interface ResponseBodyError {
 	 * `missing redirect uri`|`redirect_uri` is empty string
 	 * `invalid redirect uri`|`redirect_uri` is not valid
 	 */
-	message: string;
+	message:
+	| "missing client id"
+	| "invalid client"
+	| "missing client secret"
+	| "invalid client secret"
+	| "missing code"
+	| "Invalid authorization code"
+	| "missing redirect uri"
+	| "invalid redirect uri";
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "token", Main.Options.idOAuth2Path);
-	url.searchParams.appendMany({
-		client_id: params.client_id,
-		client_secret: params.client_secret,
-		code: params.code,
-		grant_type: "authorization_code",
-		redirect_uri: params.redirect_uri,
-	});
-	return url;
-}
-
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.idOAuth2Path,
+		url: "token",
 		method: "POST",
 		headers: {
 			"content-type": "application/x-www-form-urlencoded",
 		},
-		signal: params.signal,
+		params: {
+			client_id: params.client_id,
+			client_secret: params.client_secret,
+			code: params.code,
+			grant_type: "authorization_code",
+			redirect_uri: params.redirect_uri,
+		},
+		...params.config,
 	};
 }
 
@@ -76,6 +79,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ## [Authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
  * Gets user access token and refresh token, this is meant for apps that use a server, can securely store a client secret, and can make server-to-server requests to the Twitch API.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

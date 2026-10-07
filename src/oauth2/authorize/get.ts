@@ -1,6 +1,6 @@
 import * as Main from "../..";
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID. */
 	client_id: string;
 	/** Set to **true** to force the user to re-authorize your app’s access to their resources. The default is **false**. */
@@ -13,7 +13,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	state?: string;
 }
 
-export type RequestParameters = RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
 export type ResponseBody = ResponseBody.OK | ResponseBody.NotOK;
 export namespace ResponseBody {
@@ -36,15 +36,16 @@ export namespace ResponseBody {
 }
 
 export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "authorize", Main.Options.idOAuth2Path);
-	url.searchParams.appendMany({
-		client_id: params.client_id,
-		force_verify: params.force_verify,
-		redirect_uri: params.redirect_uri,
-		response_type: "code",
-		scope: params.scope != null ? params.scope.join(" ") : undefined,
-		state: params.state,
-	});
+	const url = new URL(params.config?.url ?? "authorize", params.config?.baseURL ?? Main.Options.idOAuth2Path);
+	url.searchParams.set("client_id", params.client_id);
+	if (params.force_verify != null)
+		url.searchParams.set("force_verify", `${params.force_verify}`);
+	url.searchParams.set("redirect_uri", params.redirect_uri);
+	url.searchParams.set("response_type", "code");
+	if (params.scope != null)
+		url.searchParams.set("scope", params.scope.join(" "));
+	if (params.state != null)
+		url.searchParams.set("state", params.state);
 	return url;
 }
 

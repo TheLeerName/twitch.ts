@@ -1,13 +1,13 @@
 import * as Main from "../..";
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID. */
 	client_id: string;
 	/** The app or user access token to revoke. */
 	token: string;
 }
 
-export type RequestParameters = RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
 export interface ResponseBodyError {
 	/** HTTP error status code. */
@@ -21,25 +21,26 @@ export interface ResponseBodyError {
 	 * `missing oauth token`|`token` is empty string
 	 * `token Invalid token`|`token` is not valid
 	 */
-	message: string;
+	message:
+	| "missing client id"
+	| "invalid client"
+	| "missing oauth token"
+	| "token Invalid token";
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "revoke", Main.Options.idOAuth2Path);
-	url.searchParams.appendMany({
-		client_id: params.client_id,
-		token: params.token,
-	});
-	return url;
-}
-
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.idOAuth2Path,
+		url: "revoke",
 		method: "POST",
 		headers: {
 			"content-type": "application/x-www-form-urlencoded",
 		},
-		signal: params.signal,
+		params: {
+			client_id: params.client_id,
+			token: params.token,
+		},
+		...params.config,
 	};
 }
 
@@ -47,6 +48,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ## [Revoking Access Tokens](https://dev.twitch.tv/docs/authentication/revoke-tokens/)
  * If your app no longer needs an access token, you can revoke it by using this method.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined, ResponseBodyError>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }
