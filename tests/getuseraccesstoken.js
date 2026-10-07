@@ -7,7 +7,7 @@ const http = require("http");
 
 /**
  * 
- * @param {string[] | undefined} scopes 
+ * @param {string[]} [scopes] 
  */
 async function main(scopes) {
 	if (scopes == null) {

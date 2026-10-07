@@ -6,7 +6,7 @@ const readline = require("readline/promises");
 
 /**
  * 
- * @param {string | undefined} token 
+ * @param {string} [token] 
  */
 async function main(token) {
 	token ??= await (async() => {
