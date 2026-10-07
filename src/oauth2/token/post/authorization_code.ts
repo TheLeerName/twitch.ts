@@ -34,7 +34,19 @@ export interface ResponseBody {
 export interface ResponseBodyError {
 	/** HTTP error status code. */
 	status: number;
-	/** HTTP error message. */
+	/**
+	 * HTTP error message. Can be:
+	 * Value|Reason
+	 * -|-
+	 * `missing client id`|`client_id` is empty string
+	 * `invalid client`|`client_id` is not valid
+	 * `missing client secret`|`client_secret` is empty string
+	 * `invalid client secret`|`client_secret` is not valid
+	 * `missing code`|`code` is empty string
+	 * `Invalid authorization code`|`code` is not valid
+	 * `missing redirect uri`|`redirect_uri` is empty string
+	 * `invalid redirect uri`|`redirect_uri` is not valid
+	 */
 	message: string;
 }
 

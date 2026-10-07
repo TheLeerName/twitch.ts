@@ -12,7 +12,15 @@ export type RequestParameters = RequestQueryParameters;
 export interface ResponseBodyError {
 	/** HTTP error status code. */
 	status: number;
-	/** HTTP error message. */
+	/**
+	 * HTTP error message. Can be:
+	 * Value|Reason
+	 * -|-
+	 * `missing client id`|`client_id` is empty string
+	 * `invalid client`|`client_id` is not valid
+	 * `missing oauth token`|`token` is empty string
+	 * `token Invalid token`|`token` is not valid
+	 */
 	message: string;
 }
 

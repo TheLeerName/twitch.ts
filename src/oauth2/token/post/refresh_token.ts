@@ -1,5 +1,5 @@
 import * as Main from "../../..";
-import { ResponseBody, ResponseBodyError } from "./authorization_code";
+import * as GetUserAccessTokenWithAuthorizationCode from "./authorization_code";
 
 export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID. */
@@ -14,6 +14,25 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 }
 
 export type RequestParameters = RequestQueryParameters;
+
+export type ResponseBody = GetUserAccessTokenWithAuthorizationCode.ResponseBody;
+
+export interface ResponseBodyError {
+	/** HTTP error status code. */
+	status: number;
+	/**
+	 * HTTP error message. Can be:
+	 * Value|Reason
+	 * -|-
+	 * `missing client id`|`client_id` is empty string
+	 * `invalid client`|`client_id` is not valid
+	 * `missing client secret`|`client_secret` is empty string
+	 * `invalid client secret`|`client_secret` is not valid
+	 * `missing refresh token`|`refresh_token` is empty string
+	 * `Invalid refresh token`|`refresh_token` is not valid
+	 */
+	message: string;
+}
 
 export function makeURL(params: RequestParameters) {
 	const url = new Main.URL(params.apiPath ?? "token", Main.Options.idOAuth2Path);

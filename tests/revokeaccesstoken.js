@@ -16,6 +16,8 @@ async function main(client_id, token) {
 		rl.close();
 		return token;
 	})();
+	if (token === "")
+		return console.error("Token must not be empty string!");
 
 	process.stdout.write("Revoking access token... ");
 	const counter = new Counter();
@@ -24,7 +26,13 @@ async function main(client_id, token) {
 	let request;
 	try {
 		request = await Twitch.OAuth2.RevokeAccessToken.fetch({client_id, token});
-		if (!request.ok) throw new Error(`${request.status} ${request.statusText} - ${(await request.json()).message}`, {});
+		if (!request.ok) {
+			const response = await request.json();
+			if (response.message === "token Invalid token")
+				return console.error(`Token is not valid!`);
+
+			throw new Error(`${request.status} ${request.statusText} - ${response.message}`);
+		}
 	} catch(e) {
 		console.error(e);
 		return;

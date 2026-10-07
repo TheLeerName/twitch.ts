@@ -17,17 +17,25 @@ async function main(client_id, client_secret, refresh_token) {
 		rl.close();
 		return token;
 	})();
+	if (refresh_token === "")
+		return console.error("Token must not be empty string!");
 
 	process.stdout.write("Refreshing user access token... ");
 	const counter = new Counter();
 
-	/** @type {Twitch.Response<Twitch.OAuth2.GetUserAccessTokenWithAuthorizationCode.ResponseBody, Twitch.OAuth2.GetUserAccessTokenWithAuthorizationCode.ResponseBodyError>} */
+	/** @type {Twitch.Response<Twitch.OAuth2.RefreshUserAccessToken.ResponseBody, Twitch.OAuth2.RefreshUserAccessToken.ResponseBodyError>} */
 	let request;
-	/** @type {Twitch.OAuth2.GetUserAccessTokenWithAuthorizationCode.ResponseBody} */
+	/** @type {Twitch.OAuth2.RefreshUserAccessToken.ResponseBody} */
 	let response;
 	try {
 		request = await Twitch.OAuth2.RefreshUserAccessToken.fetch({client_id, client_secret, refresh_token});
-		if (!request.ok) throw new Error(`${request.status} ${request.statusText} - ${(await request.json()).message}`);
+		if (!request.ok) {
+			const response = await request.json();
+			if (response.message === "Invalid refresh token")
+				return console.error(`Token is not valid!`);
+
+			throw new Error(`${request.status} ${request.statusText} - ${response.message}`);
+		}
 		response = await request.json();
 	} catch(e) {
 		console.error(e);
@@ -49,5 +57,5 @@ module.exports = {
 
 if (process.argv[1] === __filename) {
 	const env = getEnvVariables();
-	main(env.CLIENT_ID, env.CLIENT_SECRET).catch(console.error);
+	main(env.CLIENT_ID, env.CLIENT_SECRET, process.argv[2]).catch(console.error);
 }
