@@ -7,7 +7,7 @@ function getEnvVariables() {
 	const envSchema = z.object({
 		CLIENT_ID: z.string().nonempty(),
 		CLIENT_SECRET: z.string().nonempty(),
-		REDIRECT_URI: z.string().nonempty()
+		REDIRECT_URI: z.url({protocol: /^http$/, hostname: /localhost/}).nonempty()
 	});
 
 	dotenv.config({quiet: true});
