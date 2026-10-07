@@ -8,7 +8,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	/** Your app’s registered redirect URI. The authorization code is sent to this URI. */
 	redirect_uri: string;
 	/** A space-delimited list of scopes. The APIs that you’re calling will identify the scopes you must list. */
-	scope: string[];
+	scope?: string[];
 	/** Although optional, you are **strongly** encouraged to pass a state string to help prevent [Cross-Site Request Forgery](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12) (CSRF) attacks. The server returns this string to you in your redirect URI (see the `state` parameter in the fragment portion of the URI). If this string doesn’t match the state string that you passed, ignore the response. The state string should be randomly generated and unique for each OAuth request. */
 	state?: string;
 }
@@ -42,7 +42,7 @@ export function makeURL(params: RequestParameters) {
 		force_verify: params.force_verify,
 		redirect_uri: params.redirect_uri,
 		response_type: "code",
-		scope: params.scope.join(" "),
+		scope: params.scope != null ? params.scope.join(" ") : undefined,
 		state: params.state,
 	});
 	return url;

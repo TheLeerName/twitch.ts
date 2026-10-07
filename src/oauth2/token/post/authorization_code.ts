@@ -19,7 +19,7 @@ export interface ResponseBody {
 	expires_in: number;
 	refresh_token: string;
 	// TODO: add Authorization.Scope here
-	scope: string[];
+	scope?: string[];
 	token_type: "bearer";
 }
 
