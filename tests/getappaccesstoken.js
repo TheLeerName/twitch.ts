@@ -4,6 +4,8 @@
 
 const { getEnvVariables, Counter } = require(".");
 const Twitch = require("../dist");
+const axios = require("axios");
+const axiosRetry = require("axios-retry");
 
 /**
  * 
@@ -31,6 +33,7 @@ module.exports = {
 };
 
 if (process.argv[1] === __filename) {
+	axiosRetry.default(axios, {retryDelay: axiosRetry.exponentialDelay});
 	const env = getEnvVariables();
 	main(env.CLIENT_ID, env.CLIENT_SECRET).catch(console.error);
 }

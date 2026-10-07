@@ -3,6 +3,8 @@
 const dotenv = require("dotenv");
 const readline = require("readline/promises");
 const { z } = require("zod");
+const axios = require("axios");
+const axiosRetry = require("axios-retry");
 
 function getEnvVariables() {
 	const envSchema = z.object({
@@ -73,6 +75,7 @@ module.exports = {
 };
 
 if (process.argv[1] === __filename) {
+	axiosRetry.default(axios, {retryDelay: axiosRetry.exponentialDelay});
 	const env = getEnvVariables();
 	main(env).catch(console.error);
 }

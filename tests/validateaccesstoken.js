@@ -3,6 +3,8 @@
 const { Counter } = require(".");
 const Twitch = require("../dist");
 const readline = require("readline/promises");
+const axios = require("axios");
+const axiosRetry = require("axios-retry");
 
 /**
  * 
@@ -48,5 +50,7 @@ module.exports = {
 	main,
 };
 
-if (process.argv[1] === __filename)
+if (process.argv[1] === __filename) {
+	axiosRetry.default(axios, {retryDelay: axiosRetry.exponentialDelay});
 	main(process.argv[2]).catch(console.error);
+}
