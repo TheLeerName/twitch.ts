@@ -5,6 +5,10 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	client_id: string;
 	/** Your app’s registered client secret. */
 	client_secret: string;
+	/** The code that the `/authorize` response returned in the `code` query parameter. */
+	code: string;
+	/** Your app’s registered redirect URI. */
+	redirect_uri: string;
 }
 
 export type RequestParameters = RequestQueryParameters;
@@ -13,6 +17,9 @@ export interface ResponseBody {
 	access_token: string;
 	/** in seconds */
 	expires_in: number;
+	refresh_token: string;
+	// TODO: add Authorization.Scope here
+	scope: string[];
 	token_type: "bearer";
 }
 
@@ -28,7 +35,9 @@ export function makeURL(params: RequestParameters) {
 	url.searchParams.appendMany({
 		client_id: params.client_id,
 		client_secret: params.client_secret,
-		grant_type: "client_credentials",
+		code: params.code,
+		grant_type: "authorization_code",
+		redirect_uri: params.redirect_uri,
 	});
 	return url;
 }
@@ -44,8 +53,8 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
 }
 
 /**
- * ## [Client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
- * Gets app access token, this is meant only for server-to-server API requests that use an app access token.
+ * ## [Authorization code grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
+ * Gets user access token and refresh token, this is meant for apps that use a server, can securely store a client secret, and can make server-to-server requests to the Twitch API.
  */
 export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
 	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
