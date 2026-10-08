@@ -11,3 +11,5 @@
 
 ## TODO
 - change create.js in doc-maker to correspond with v3
+- make eventsub
+- make client for user access and app access tokens (like discord.js does)
