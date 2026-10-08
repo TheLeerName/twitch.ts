@@ -41,7 +41,7 @@ export interface RequestBody {
 	}[];
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** List of successful shard updates. */

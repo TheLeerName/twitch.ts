@@ -25,7 +25,7 @@ export interface RequestBody {
 	length: number;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** An array that contains a single object with the status of your start commercial request. */

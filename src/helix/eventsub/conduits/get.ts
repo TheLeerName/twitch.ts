@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication;
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */

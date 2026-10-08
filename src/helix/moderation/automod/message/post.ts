@@ -31,7 +31,7 @@ export interface RequestBody {
 	action: "ALLOW" | "DENY";
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export type ResponseBodyError = Main.ResponseBodyError;
 

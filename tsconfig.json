@@ -26,7 +26,6 @@
 	"exclude": [
 		"node_modules",
 		"src/old",
-		"src/helix",
 		"src/axios.ts",
 		"src/url.ts",
 		"src/useraccessclient.ts",

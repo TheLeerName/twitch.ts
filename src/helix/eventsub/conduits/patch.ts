@@ -23,7 +23,7 @@ export interface RequestBody {
 	shard_count: number;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */

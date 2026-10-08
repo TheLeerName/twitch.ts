@@ -37,7 +37,7 @@ export interface RequestBody {
 	winning_outcome_id?: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single prediction that you updated. */

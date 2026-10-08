@@ -26,7 +26,7 @@ export interface RequestBody {
 	component?: Record<string, ComponentExtensionType>;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** The extensions that the broadcaster updated. */

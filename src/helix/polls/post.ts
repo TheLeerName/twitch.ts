@@ -35,7 +35,7 @@ export interface RequestBody {
 	channel_points_per_vote?: number;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single poll that you created. */

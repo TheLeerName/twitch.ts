@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication;
 
 export interface ResponseBody {
 	/** The list of chat badges. The list is sorted in ascending order by `set_id`, and within a set, the list is sorted in ascending order by `id`. */

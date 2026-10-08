@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication;
 
 export interface ResponseBody {
 	/** The list of global emotes. */

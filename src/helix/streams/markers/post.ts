@@ -23,7 +23,7 @@ export interface RequestBody {
 	description?: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single marker that you added. */

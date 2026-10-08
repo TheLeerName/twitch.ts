@@ -34,7 +34,7 @@ export interface RequestBody {
 	message: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestBody;
 
 export type ResponseBodyError = Main.ResponseBodyError;
 
