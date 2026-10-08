@@ -16,32 +16,31 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the user to remove VIP status from. */
 	user_id: string;
 	/** The ID of the broadcaster who owns the channel where the user has VIP status. */
 	broadcaster_id: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		broadcaster_id: params.broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "channels/vips",
 		method: "DELETE",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			user_id: params.user_id,
+			broadcaster_id: params.broadcaster_id,
+		},
+		...params.config,
 	};
 }
 
@@ -70,6 +69,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 422 Unprocessable Entity|The user in `user_id` is not a VIP in the broadcaster's channel.
  * 429 Too Many Requests|The broadcaster exceeded the number of VIPs that they may remove within a 10-second window. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

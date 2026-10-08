@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that’s currently running a charity campaign. This ID must match the user ID in the access token. */
 	broadcaster_id: string;
 	/** **Integer**. The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100. The default is 20. */
@@ -25,7 +25,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list that contains the donations that users have made to the broadcaster’s charity campaign. The list is empty if the broadcaster is not currently running a charity campaign; the donation information is not available after the campaign ends. */
@@ -56,24 +56,23 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "charity/donations", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		first: params.first,
-		after: params.after,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "charity/donations",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			first: params.first,
+			after: params.after,
+		},
+		...params.config,
 	};
 }
 
@@ -96,6 +95,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The client ID specified in the Client-Id header must match the client ID specified in the access token.
  * 403 Forbidden|The broadcaster is not a partner or affiliate.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

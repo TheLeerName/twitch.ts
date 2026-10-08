@@ -1,24 +1,23 @@
 import * as Main from "../../..";
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that owns the streaming schedule you want to get. */
 	broadcaster_id: string;
 }
 
-export type RequestParameters = RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "schedule/icalendar", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "schedule/icalendar",
 		method: "GET",
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+		},
+		...params.config,
 	};
 }
 
@@ -38,6 +37,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 400 Bad Request|The `broadcaster_id` query parameter is required.
  * ㅤ|The ID in the `broadcaster_id` query parameter is not valid.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** **Integer**. The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20. */
 	first?: number;
 	/** The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
@@ -27,7 +27,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	before?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of broadcasts. The broadcasts are sorted by the number of viewers, with the most popular first. */
@@ -48,24 +48,23 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "games/top", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		first: params.first,
-		after: params.after,
-		before: params.before,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "games/top",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			first: params.first,
+			after: params.after,
+			before: params.before,
+		},
+		...params.config,
 	};
 }
 
@@ -83,6 +82,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

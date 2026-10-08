@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** Filters the list for specific VIPs. The maximum number of IDs that you may specify is 100. Ignores the ID of those users in the list that aren’t VIPs. */
 	user_id?: string | string[];
 	/** The ID of the broadcaster whose list of VIPs you want to get. This ID must match the user ID in the access token. */
@@ -27,7 +27,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of VIPs. The list is empty if the broadcaster doesn’t have VIP users. */
@@ -46,25 +46,24 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "channels/vips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		broadcaster_id: params.broadcaster_id,
-		first: params.first,
-		after: params.after,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "channels/vips",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			user_id: params.user_id,
+			broadcaster_id: params.broadcaster_id,
+			first: params.first,
+			after: params.after,
+		},
+		...params.config,
 	};
 }
 
@@ -85,6 +84,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID in the `broadcaster_id` query parameter must match the user ID in the access token.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

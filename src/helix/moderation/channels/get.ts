@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** A user’s ID. Returns the list of channels that this user has moderator privileges in. This ID must match the user ID in the user OAuth token */
 	user_id: string;
 	/** The cursor used to get the next page of results. The Pagination object in the response contains the cursor’s value. */
@@ -31,7 +31,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	first?: number;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of channels that the user has moderator privileges in. */
@@ -50,24 +50,23 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "moderation/channels", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-		after: params.after,
-		first: params.first,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "moderation/channels",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			user_id: params.user_id,
+			after: params.after,
+			first: params.first,
+		},
+		...params.config,
 	};
 }
 
@@ -75,6 +74,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ## [Get Moderated Channels](https://dev.twitch.tv/docs/api/reference/#get-moderated-channels)
  * Gets a list of channels that the specified user has moderator privileges in.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** A list of IDs that identify the redemptions to update. You may specify a maximum of 50 IDs. */
 	id: string | string[];
 	/** The ID of the broadcaster that’s updating the redemption. This ID must match the user ID in the user access token. */
@@ -36,7 +36,7 @@ export interface RequestBody {
 	status: "CANCELED" | "FULFILLED";
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** The list contains the single redemption that you updated. */
@@ -80,28 +80,27 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "channel_points/custom_rewards/redemptions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		id: params.id,
-		broadcaster_id: params.broadcaster_id,
-		reward_id: params.reward_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "channel_points/custom_rewards/redemptions",
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			id: params.id,
+			broadcaster_id: params.broadcaster_id,
+			reward_id: params.reward_id,
+		},
+		data: JSON.stringify({
 			status: params.status,
 		}),
+		...params.config,
 	};
 }
 
@@ -127,6 +126,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The redemptions specified using the `id` query parameter were not found or their statuses weren't marked as UNFULFILLED.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

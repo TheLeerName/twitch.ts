@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster running the Guest Star session. */
 	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that has permission to moderate the broadcaster’s chat room. This ID must match the `user_id` in the user access token. */
@@ -25,7 +25,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	session_id: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list of invite objects describing the invited user as well as their ready status. */
@@ -52,24 +52,23 @@ export interface ResponseBody {
 	}[];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "guest_star/invites", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-		session_id: params.session_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "guest_star/invites",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+			session_id: params.session_id,
+		},
+		...params.config,
 	};
 }
 
@@ -86,6 +85,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 403 Forbidden|The user specified in the `moderator_id` is not permitted to view the broadcaster’s invites.
  * 404 Not Found|Invalid `session_id`
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

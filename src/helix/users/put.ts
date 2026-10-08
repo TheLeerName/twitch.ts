@@ -17,7 +17,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/**
 	 * The string to update the channel’s description to. The description is limited to a maximum of 300 characters.
 
@@ -26,29 +26,28 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	description: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list contains the single user that you updated. */
 	data: [User];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "users", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		description: params.description,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "users",
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			description: params.description,
+		},
+		...params.config,
 	};
 }
 
@@ -69,6 +68,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 429 Too Many Requests|The app exceeded the number of requests that it may make. 
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

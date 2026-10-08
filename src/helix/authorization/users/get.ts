@@ -16,12 +16,12 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the user(s) you want to check authorization for. The maximum number of IDs you may specify is 10. */
 	user_id: string | string[];
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** List of users and their authorized scopes. */
@@ -40,22 +40,21 @@ export interface ResponseBody {
 	}[];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "authorization/users", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		user_id: params.user_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "authorization/users",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			user_id: params.user_id,
+		},
+		...params.config,
 	};
 }
 
@@ -74,6 +73,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 403 Forbidden|The client-id in the header must match the client ID in the access token.
  * 500 Internal Error|Internal Server Error.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

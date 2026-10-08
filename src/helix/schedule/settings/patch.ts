@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster whose schedule settings you want to update. The ID must match the user ID in the user access token. */
 	broadcaster_id: string;
 	/** A Boolean value that indicates whether the broadcaster has scheduled a vacation. Set to **true** to enable Vacation Mode and add vacation dates, or **false** to cancel a previously scheduled vacation. */
@@ -29,28 +29,27 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	timezone?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "schedule/settings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		is_vacation_enabled: params.is_vacation_enabled,
-		vacation_start_time: params.vacation_start_time,
-		vacation_end_time: params.vacation_end_time,
-		timezone: params.timezone,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "schedule/settings",
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			is_vacation_enabled: params.is_vacation_enabled,
+			vacation_start_time: params.vacation_start_time,
+			vacation_end_time: params.vacation_end_time,
+			timezone: params.timezone,
+		},
+		...params.config,
 	};
 }
 
@@ -74,6 +73,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 404 Not Found|The broadcaster's schedule was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

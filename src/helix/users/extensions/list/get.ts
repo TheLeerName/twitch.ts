@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of extensions that the user has installed. */
@@ -40,19 +40,18 @@ export interface ResponseBody {
 	}[];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "users/extensions/list", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "users/extensions/list",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		...params.config,
 	};
 }
 
@@ -69,6 +68,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -37,33 +37,32 @@ export interface RequestBody {
 	winning_outcome_id?: string;
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single prediction that you updated. */
 	data: [Prediction];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "predictions", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "predictions",
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		data: JSON.stringify({
 			broadcaster_id: params.broadcaster_id,
 			id: params.id,
 			status: params.status,
 			winning_outcome_id: params.winning_outcome_id,
 		}),
+		...params.config,
 	};
 }
 
@@ -90,6 +89,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 404 Not Found|The prediction in the `id` field was not found.
  * ㅤ|The outcome in the `winning_outcome_id` field was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

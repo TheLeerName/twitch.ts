@@ -18,14 +18,14 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The name of the team to get. This parameter and the `id` parameter are mutually exclusive; you must specify the team’s name or ID but not both. */
 	name: string;
 	/** The ID of the team to get. This parameter and the `name` parameter are mutually exclusive; you must specify the team’s name or ID but not both. */
 	id: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list that contains the single team that you requested. */
@@ -59,23 +59,22 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "teams", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		name: params.name,
-		id: params.id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "teams",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			name: params.name,
+			id: params.id,
+		},
+		...params.config,
 	};
 }
 
@@ -95,6 +94,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 404 Not Found|The specified team was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

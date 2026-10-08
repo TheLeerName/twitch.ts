@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that owns the chat room to send the announcement to. */
 	broadcaster_id: string;
 	/** The ID of a user who has permission to moderate the broadcaster’s chat room, or the broadcaster’s ID if they’re sending the announcement. */
@@ -47,31 +47,30 @@ export interface RequestBody {
 	for_source_only?: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "chat/announcements", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "chat/announcements",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+		},
+		data: JSON.stringify({
 			message: params.message,
 			color: params.color,
 			for_source_only: params.for_source_only,
 		}),
+		...params.config,
 	};
 }
 
@@ -102,6 +101,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The broadcaster must have authorized the app with the **channel:bot** scope.
  * 429 Too Many Requests|The sender has exceeded the number of announcements they may send to this **broadcaster_id** within a given window.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

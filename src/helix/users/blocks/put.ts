@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the user to block. The API ignores the request if the broadcaster has already blocked the user. */
 	target_user_id: string;
 	/**
@@ -34,26 +34,25 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	reason?: "harassment" | "spam" | "other";
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "users/blocks", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		target_user_id: params.target_user_id,
-		source_context: params.source_context,
-		reason: params.reason,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "users/blocks",
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			target_user_id: params.target_user_id,
+			source_context: params.source_context,
+			reason: params.reason,
+		},
+		...params.config,
 	};
 }
 
@@ -76,6 +75,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

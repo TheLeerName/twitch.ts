@@ -39,7 +39,7 @@ export interface RequestBody {
 	pin?: boolean;
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	data: [{
@@ -57,21 +57,19 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "chat/messages", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "chat/messages",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		data: JSON.stringify({
 			broadcaster_id: params.broadcaster_id,
 			sender_id: params.sender_id,
 			message: params.message,
@@ -79,6 +77,7 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
 			for_source_only: params.for_source_only,
 			pin: params.pin,
 		}),
+		...params.config,
 	};
 }
 
@@ -113,6 +112,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 422 Unprocessable Entity|The message is too large.
  * 429 Too Many Requests|The rate limit has been exceeded.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster you want to update Guest Star settings for. */
 	broadcaster_id: string;
 }
@@ -40,32 +40,31 @@ export interface RequestBody {
 	regenerate_browser_sources?: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "guest_star/channel_settings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "guest_star/channel_settings",
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+		},
+		data: JSON.stringify({
 			is_moderator_send_live_enabled: params.is_moderator_send_live_enabled,
 			slot_count: params.slot_count,
 			is_browser_source_audio_enabled: params.is_browser_source_audio_enabled,
 			group_layout: params.group_layout,
 			regenerate_browser_sources: params.regenerate_browser_sources,
 		}),
+		...params.config,
 	};
 }
 
@@ -81,6 +80,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|Invalid `slot_count` 
  * ㅤ| Invalid `group_layout`
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

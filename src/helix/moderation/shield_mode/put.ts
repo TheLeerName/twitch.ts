@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster whose Shield Mode you want to activate or deactivate. */
 	broadcaster_id: string;
 	/** The ID of the broadcaster or a user that is one of the broadcaster’s moderators. This ID must match the user ID in the access token. */
@@ -30,7 +30,7 @@ export interface RequestBody {
 	is_active: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains a single object with the broadcaster’s updated Shield Mode status. */
@@ -48,27 +48,26 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "moderation/shield_mode", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "moderation/shield_mode",
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+		},
+		data: JSON.stringify({
 			is_active: params.is_active,
 		}),
+		...params.config,
 	};
 }
 
@@ -93,6 +92,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 403 Forbidden|The user in `moderator_id` is not one of the broadcaster's moderators.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -31,27 +31,26 @@ export interface RequestBody {
 	action: "ALLOW" | "DENY";
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "moderation/automod/message", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "moderation/automod/message",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		data: JSON.stringify({
 			user_id: params.user_id,
 			msg_id: params.msg_id,
 			action: params.action,
 		}),
+		...params.config,
 	};
 }
 
@@ -75,6 +74,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 403 Forbidden|The user in `user_id` is not one of the broadcaster's moderators.
  * 404 Not Found|The message specified in the `msg_id` field was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

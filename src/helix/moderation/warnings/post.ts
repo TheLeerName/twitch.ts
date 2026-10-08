@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the channel in which the warning will take effect. */
 	broadcaster_id: string;
 	/** The ID of the twitch user who requested the warning. */
@@ -32,7 +32,7 @@ export interface RequestBody {
 	reason: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains information about the warning. */
@@ -48,30 +48,29 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "moderation/warnings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "moderation/warnings",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+		},
+		data: JSON.stringify({
 			data: {
 				user_id: params.user_id,
 				reason: params.reason,
 			},
 		}),
+		...params.config,
 	};
 }
 
@@ -99,6 +98,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 429 Too Many Requests|The app has exceeded the number of requests it may make per minute for this broadcaster.
  * 500 Internal Server Error|Internal Server Error.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

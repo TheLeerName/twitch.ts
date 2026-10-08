@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The URI-encoded search string. For example, encode search strings like `angel of death` as `angel%20of%20death`. */
 	query: string;
 	/** A Boolean value that determines whether the response includes only channels that are currently streaming live. Set to **true** to get only channels that are streaming live; otherwise, **false** to get live and offline channels. The default is **false**. */
@@ -29,7 +29,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of channels that match the query. The list is empty if there are no matches. */
@@ -70,25 +70,24 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "search/channels", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		query: params.query,
-		live_only: params.live_only,
-		first: params.first,
-		after: params.after,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "search/channels",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			query: params.query,
+			live_only: params.live_only,
+			first: params.first,
+			after: params.after,
+		},
+		...params.config,
 	};
 }
 
@@ -111,6 +110,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The access token is not valid.
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters;
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */
@@ -28,19 +28,18 @@ export interface ResponseBody {
 	}[];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "eventsub/conduits", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "eventsub/conduits",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		...params.config,
 	};
 }
 
@@ -54,6 +53,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 200 OK|Successfully retrieved conduits.
  * 401 Unauthenticated|Authorization header required with an app access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

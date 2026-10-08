@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster whose stream you want to create a clip from. */
 	broadcaster_id: string;
 	/** The title of the clip. */
@@ -25,7 +25,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	duration?: number;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list containing the created clip. */
@@ -41,24 +41,23 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "clips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		title: params.title,
-		duration: params.duration,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "clips",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			title: params.title,
+			duration: params.duration,
+		},
+		...params.config,
 	};
 }
 
@@ -92,6 +91,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The user is banned or timed out from the broadcaster’s channel.      
  * 404 Not Found|The broadcaster in the `broadcaster_id` query parameter must be broadcasting live.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The game’s client ID. If specified, the response contains a report for the specified game. If not specified, the response includes a report for each of the authenticated user’s games. */
 	game_id?: string;
 	/**
@@ -52,7 +52,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list of reports. The reports are returned in no particular order; however, the data within each report is in ascending order by date (newest first). The report contains one row of data per day of the reporting window; the report contains rows for only those days that the game was used. A report is available only if the game was broadcast for at least 5 hours over the reporting period. The array is empty if there are no reports. */
@@ -78,27 +78,26 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "analytics/games", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		game_id: params.game_id,
-		type: params.type,
-		started_at: params.started_at,
-		ended_at: params.ended_at,
-		first: params.first,
-		after: params.after,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "analytics/games",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			game_id: params.game_id,
+			type: params.type,
+			started_at: params.started_at,
+			ended_at: params.ended_at,
+			first: params.first,
+			after: params.after,
+		},
+		...params.config,
 	};
 }
 
@@ -122,6 +121,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  * 404 Not Found|The game specified in the `game_id` query parameter was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

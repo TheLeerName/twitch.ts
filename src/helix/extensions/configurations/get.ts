@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that installed the extension. This parameter is required if you set the `segment` parameter to broadcaster or developer. Do not specify this parameter if you set `segment` to global. */
 	broadcaster_id?: string;
 	/** The ID of the extension that contains the configuration segment you want to get. */
@@ -32,7 +32,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	segment: "broadcaster" | "developer" | "global" | ("broadcaster" | "developer" | "global")[];
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of requested configuration segments. The list is returned in the same order that you specified the list of segments in the request. */
@@ -53,24 +53,23 @@ export interface ResponseBody {
 	}[];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		extension_id: params.extension_id,
-		segment: params.segment,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "extensions/configurations",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			extension_id: params.extension_id,
+			segment: params.segment,
+		},
+		...params.config,
 	};
 }
 
@@ -92,6 +91,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The Client-Id header is required.
  * 429 Too many requests|The app exceeded the number of requests that it may make per minute. See Rate Limits above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

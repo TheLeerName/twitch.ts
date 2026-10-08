@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the user sending the whisper. This user must have a verified phone number. This ID must match the user ID in the user access token. */
 	from_user_id: string;
 	/** The ID of the user to receive the whisper. */
@@ -34,29 +34,28 @@ export interface RequestBody {
 	message: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "whispers", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		from_user_id: params.from_user_id,
-		to_user_id: params.to_user_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "whispers",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			from_user_id: params.from_user_id,
+			to_user_id: params.to_user_id,
+		},
+		data: JSON.stringify({
 			message: params.message,
 		}),
+		...params.config,
 	};
 }
 
@@ -91,6 +90,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 404 Not Found|The ID in `to_user_id` was not found.
  * 429 Too Many Requests|The sending user exceeded the number of whisper requests that they may make. See Rate Limits for this endpoint above.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

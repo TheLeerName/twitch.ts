@@ -19,7 +19,7 @@ export interface Authentication {
 }
 
 /** Use the `status`, `type`, `user_id`, `subscription_id`, and `conduit_id` query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter. */
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/**
 	 * Filter subscriptions by its status. Possible values are:
 	 * - enabled — The subscription is enabled.
@@ -74,7 +74,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of subscriptions. The list is ordered by the oldest subscription first. The list is empty if the client hasn't created subscriptions or there are no subscriptions that match the specified filter criteria. */
@@ -158,27 +158,26 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		status: params.status,
-		type: params.type,
-		user_id: params.user_id,
-		subscription_id: params.subscription_id,
-		conduit_id: params.conduit_id,
-		after: params.after,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "eventsub/subscriptions",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			status: params.status,
+			type: params.type,
+			user_id: params.user_id,
+			subscription_id: params.subscription_id,
+			conduit_id: params.conduit_id,
+			after: params.after,
+		},
+		...params.config,
 	};
 }
 
@@ -200,6 +199,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The access token is not valid.
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

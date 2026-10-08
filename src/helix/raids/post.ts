@@ -16,14 +16,14 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that’s sending the raiding party. This ID must match the user ID in the user access token. */
 	from_broadcaster_id: string;
 	/** The ID of the broadcaster to raid. */
 	to_broadcaster_id: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list that contains a single object with information about the pending raid. */
@@ -39,23 +39,22 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "raids", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		from_broadcaster_id: params.from_broadcaster_id,
-		to_broadcaster_id: params.to_broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "raids",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			from_broadcaster_id: params.from_broadcaster_id,
+			to_broadcaster_id: params.to_broadcaster_id,
+		},
+		...params.config,
 	};
 }
 
@@ -90,6 +89,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 409 Conflict|The broadcaster is already in the process of raiding another channel.
  * 429 Too Many Requests|The broadcaster exceeded the number of raid requests that they may make. The limit is 10 requests within a 10-minute window.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

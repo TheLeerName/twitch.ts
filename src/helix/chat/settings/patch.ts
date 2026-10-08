@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster whose chat settings you want to update. */
 	broadcaster_id: string;
 	/** The ID of a user that has permission to moderate the broadcaster’s chat room, or the broadcaster’s ID if they’re making the update. This ID must match the user ID in the user access token. */
@@ -92,7 +92,7 @@ export interface RequestBody {
 	unique_chat_mode?: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** The list of chat settings. The list contains a single object with all the settings. */
@@ -146,25 +146,23 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "chat/settings", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		moderator_id: params.moderator_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "chat/settings",
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+		},
+		data: JSON.stringify({
 			emote_mode: params.emote_mode,
 			follower_mode: params.follower_mode,
 			follower_mode_duration: params.follower_mode_duration,
@@ -175,6 +173,7 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
 			subscriber_mode: params.subscriber_mode,
 			unique_chat_mode: params.unique_chat_mode,
 		}),
+		...params.config,
 	};
 }
 
@@ -207,6 +206,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 403 Forbidden|The user in the `moderator_id` query parameter must have moderator privileges in the broadcaster's channel.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

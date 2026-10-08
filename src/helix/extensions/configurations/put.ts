@@ -34,29 +34,28 @@ export interface RequestBody {
 	version?: string;
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "extensions/configurations", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "extensions/configurations",
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		data: JSON.stringify({
 			extension_id: params.extension_id,
 			segment: params.segment,
 			broadcaster_id: params.broadcaster_id,
 			content: params.content,
 			version: params.version,
 		}),
+		...params.config,
 	};
 }
 
@@ -75,6 +74,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The JWT token is not valid.
  * ㅤ|The Client-Id header is required.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

@@ -16,7 +16,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster whose channel you want to update. This ID must match the user ID in the user access token. */
 	broadcaster_id: string;
 }
@@ -59,26 +59,24 @@ export interface RequestBody {
 	is_branded_content?: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "channels", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "channels",
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+		},
+		data: JSON.stringify({
 			game_id: params.game_id,
 			broadcaster_language: params.broadcaster_language,
 			title: params.title,
@@ -87,6 +85,7 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
 			content_classification_labels: params.content_classification_labels,
 			is_branded_content: params.is_branded_content,
 		}),
+		...params.config,
 	};
 }
 
@@ -123,6 +122,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 409 Too Many Requests|User set the Branded Content flag too frequently
  * 500 Internal server error| 
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<undefined>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

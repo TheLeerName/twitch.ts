@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** An ID that identifies the entitlement to get. You may specify a maximum of 100 IDs. */
 	id?: string | string[];
 	/** An ID that identifies a user that was granted entitlements. */
@@ -37,7 +37,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	first?: number;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of entitlements. */
@@ -68,27 +68,26 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "entitlements/drops", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		id: params.id,
-		user_id: params.user_id,
-		game_id: params.game_id,
-		fulfillment_status: params.fulfillment_status,
-		after: params.after,
-		first: params.first,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "entitlements/drops",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			id: params.id,
+			user_id: params.user_id,
+			game_id: params.game_id,
+			fulfillment_status: params.fulfillment_status,
+			after: params.after,
+			first: params.first,
+		},
+		...params.config,
 	};
 }
 
@@ -125,6 +124,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The organization associated with the client in the access token must own the entitlements specified in the `id` query parameter.
  * 500 Internal Server Error|An internal server error occurred. Please report this issue on [our issue tracker](https://github.com/twitchdev/issues/).
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

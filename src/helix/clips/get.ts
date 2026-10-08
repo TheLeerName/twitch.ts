@@ -19,7 +19,7 @@ export interface Authentication {
 }
 
 /** The `id`, `game_id`, and `broadcaster_id` query parameters are mutually exclusive. */
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** An ID that identifies the broadcaster whose video clips you want to get. Use this parameter to get clips that were captured from the broadcaster’s streams. */
 	broadcaster_id?: string;
 	/** An ID that identifies the game whose clips you want to get. Use this parameter to get clips that were captured from streams that were playing this game. */
@@ -40,7 +40,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	is_featured?: boolean;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of video clips. For clips returned by `game_id` or `broadcaster_id`, the list is in descending order by view count. For lists returned by `id`, the list is in the same order as the input IDs. */
@@ -91,30 +91,29 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "clips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-		game_id: params.game_id,
-		id: params.id,
-		started_at: params.started_at,
-		ended_at: params.ended_at,
-		first: params.first,
-		before: params.before,
-		after: params.after,
-		is_featured: params.is_featured,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "clips",
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			game_id: params.game_id,
+			id: params.id,
+			started_at: params.started_at,
+			ended_at: params.ended_at,
+			first: params.first,
+			before: params.before,
+			after: params.after,
+			is_featured: params.is_featured,
+		},
+		...params.config,
 	};
 }
 
@@ -137,6 +136,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the OAuth token.
  * 404 Not Found|The ID in `game_id` was not found.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

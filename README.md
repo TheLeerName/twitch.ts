@@ -10,4 +10,4 @@
 ## [Tests](tests.md)
 
 ## TODO
-- make update-v3.js in doc-maker with changing fetch to axios
+- change create.js in doc-maker to correspond with v3

@@ -18,7 +18,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The user ID of the editor for the channel you want to create a clip for. If using the broadcaster’s auth token, this is the same as broadcaster_id. This must match the user_id in the user access token. */
 	editor_id: string;
 	/** The user ID for the channel you want to create a clip for. */
@@ -33,7 +33,7 @@ export interface RequestQueryParameters extends Main.RequestQueryParameters {
 	title: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list containing the created clip. */
@@ -45,27 +45,26 @@ export interface ResponseBody {
 	}];
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "videos/clips", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		editor_id: params.editor_id,
-		broadcaster_id: params.broadcaster_id,
-		vod_id: params.vod_id,
-		vod_offset: params.vod_offset,
-		duration: params.duration,
-		title: params.title,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "videos/clips",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 		},
-		signal: params.signal,
+		params: {
+			editor_id: params.editor_id,
+			broadcaster_id: params.broadcaster_id,
+			vod_id: params.vod_id,
+			vod_offset: params.vod_offset,
+			duration: params.duration,
+			title: params.title,
+		},
+		...params.config,
 	};
 }
 
@@ -101,6 +100,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The VOD is not found..
  * ㅤ|The `broadcaster_id` or the `editor_id` does not exist.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

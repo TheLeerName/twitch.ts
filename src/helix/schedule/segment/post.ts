@@ -17,7 +17,7 @@ export interface Authentication {
 	authorization: string;
 }
 
-export interface RequestQueryParameters extends Main.RequestQueryParameters {
+export interface RequestQueryParameters {
 	/** The ID of the broadcaster that owns the schedule to add the broadcast segment to. This ID must match the user ID in the user access token. */
 	broadcaster_id: string;
 }
@@ -37,7 +37,7 @@ export interface RequestBody {
 	title?: string;
 }
 
-export type RequestParameters = Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** The broadcaster’s streaming scheduled. */
@@ -55,24 +55,22 @@ export interface ResponseBody {
 	};
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "schedule/segment", Main.Options.apiHelixPath);
-	url.searchParams.appendMany({
-		broadcaster_id: params.broadcaster_id,
-	});
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "schedule/segment",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		params: {
+			broadcaster_id: params.broadcaster_id,
+		},
+		data: JSON.stringify({
 			start_time: params.start_time,
 			timezone: params.timezone,
 			duration: params.duration,
@@ -80,6 +78,7 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
 			category_id: params.category_id,
 			title: params.title,
 		}),
+		...params.config,
 	};
 }
 
@@ -105,6 +104,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * ㅤ|The ID in the Client-Id header must match the client ID in the access token.
  * 403 Forbidden|Only partners and affiliates may add non-recurring broadcast segments.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }

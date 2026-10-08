@@ -46,7 +46,7 @@ export interface RequestBody {
 	};
 }
 
-export type RequestParameters = Authentication & Main.RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authentication & Main.RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** A list that contains the single subscription that you created. */
@@ -96,26 +96,25 @@ export interface ResponseBody {
 	max_total_cost: number;
 }
 
-export function makeURL(params: RequestParameters) {
-	const url = new Main.URL(params.apiPath ?? "eventsub/subscriptions", Main.Options.apiHelixPath);
-	return url;
-}
+export type ResponseBodyError = Main.ResponseBodyError;
 
-export function makeFetchRequestInit(params: RequestParameters): RequestInit {
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
 	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "eventsub/subscriptions",
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
 			authorization: params.authorization,
 			"content-type": "application/json",
 		},
-		signal: params.signal,
-		body: JSON.stringify({
+		data: JSON.stringify({
 			type: params.type,
 			version: params.version,
 			condition: params.condition,
 			transport: params.transport,
 		}),
+		...params.config,
 	};
 }
 
@@ -147,6 +146,6 @@ export function makeFetchRequestInit(params: RequestParameters): RequestInit {
  * 410 Gone|The subscription type and version combination has been removed and can no longer be subscribed to.
  * 429 Too Many Requests|The request exceeds the number of subscriptions that you may create with the same combination of `type` and `condition` values.
  */
-export async function fetch(params: RequestParameters): Promise<Main.Response<ResponseBody>> {
-	return global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
 }
