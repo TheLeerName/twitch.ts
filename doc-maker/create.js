@@ -286,7 +286,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 		const tds_1_textlower = tds[1].textContent.toLowerCase();
 		if (tds_1_textlower === "float")
 			fieldDeclaration += " number;";
-		else if (tds_1_textlower === "integer") {
+		else if (tds_1_textlower === "integer" || tds_1_textlower === "int") {
 			fieldDeclaration += " number;";
 			descriptionPrefix += "**Integer**. ";
 		}
@@ -298,6 +298,8 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 			fieldDeclaration += " number;";
 			descriptionPrefix += "**64-bit Integer**. ";
 		}
+		else if (tds_1_textlower === "bool")
+			fieldDeclaration += " boolean;";
 		else
 			fieldDeclaration += ` ${tds_1_textlower};`;
 
@@ -343,7 +345,8 @@ function makeRequestBody(requestBodyHTML) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
-		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]{2}/g, "\t").replace(/[  ]/, "");
+		const tabPostfix = tds[0].textContent.match(/^(\t+)/)?.[1] ?? "";
 		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
 		if (tds.length === 3) {
 			fieldDeclaration += tds[0].textContent + ":";
@@ -356,7 +359,7 @@ function makeRequestBody(requestBodyHTML) {
 		const tds_1_textlower = tds[1].textContent.toLowerCase();
 		if (tds_1_textlower === "float")
 			fieldDeclaration += " number;";
-		else if (tds_1_textlower === "integer") {
+		else if (tds_1_textlower === "integer" || tds_1_textlower === "int") {
 			fieldDeclaration += " number;";
 			descriptionPrefix += "**Integer**. ";
 		}
@@ -368,6 +371,8 @@ function makeRequestBody(requestBodyHTML) {
 			fieldDeclaration += " number;";
 			descriptionPrefix += "**64-bit Integer**. ";
 		}
+		else if (tds_1_textlower === "bool")
+			fieldDeclaration += " boolean;";
 		else
 			fieldDeclaration += ` ${tds_1_textlower};`;
 
@@ -376,13 +381,13 @@ function makeRequestBody(requestBodyHTML) {
 		descriptionLines[0] = descriptionPrefix + descriptionLines[0];
 
 		if (descriptionLines.length > 1) {
-			addTextToOutput(`\t/**`);
+			addTextToOutput(`\t${tabPostfix}/**`);
 			for (const line of descriptionLines)
-				addTextToOutput(line.length > 0 ? `\t * ${line}` : "");
-			addTextToOutput(`\t */`);
+				addTextToOutput(line.length > 0 ? `\t${tabPostfix} * ${line}` : "");
+			addTextToOutput(`\t${tabPostfix} */`);
 		}
 		else
-			addTextToOutput(`\t/** ${descriptionLines[0]} */`);
+			addTextToOutput(`\t${tabPostfix}/** ${descriptionLines[0]} */`);
 		addTextToOutput(`\t${fieldDeclaration}`);
 	}
 
