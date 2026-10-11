@@ -53,3 +53,4 @@ export async function axiosRequest<TData, TError extends ResponseBodyError>(conf
 export * as OAuth2 from "./oauth2";
 export { AxiosRequestConfig } from "axios";
 export * as Helix from "./helix";
+export * as EventSub from "./eventsub";
