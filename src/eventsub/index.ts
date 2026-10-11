@@ -1,4 +1,4 @@
-export type Transport = Transport.WebHook | Transport.WebSocket;
+export type Transport = Transport.WebHook | Transport.WebSocket | Transport.Conduit;
 export namespace Transport {
 	export interface WebHook {
 		/** The transport method. */
@@ -33,6 +33,21 @@ export namespace Transport {
 		}
 		export function makeFromObject(params: {session_id: string}): WebSocket {
 			return {method: "websocket", ...params};
+		}
+	}
+
+	export interface Conduit {
+		/** The transport method. */
+		method: "conduit";
+		/** An ID that identifies the conduit to send notifications to. */
+		conduit_id: string;
+	}
+	export namespace Conduit {
+		export function makeFromParams(conduit_id: string): Conduit {
+			return {method: "conduit", conduit_id};
+		}
+		export function makeFromObject(params: {conduit_id: string}): Conduit {
+			return {method: "conduit", ...params};
 		}
 	}
 }

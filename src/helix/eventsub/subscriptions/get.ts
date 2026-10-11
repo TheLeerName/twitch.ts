@@ -126,22 +126,7 @@ export interface ResponseBody {
 		/** The date and time (in RFC3339 format) of when the subscription was created. */
 		created_at: string;
 		/** The transport details used to send the notifications. */
-		transport: {
-			/**
-			 * The transport method. Possible values are:
-			 * - webhook
-			 * - websocket
-			 */
-			method: "webhook" | "websocket";
-			/** The callback URL where the notifications are sent. Included only if `method` is set to **webhook**. */
-			callback?: string;
-			/** An ID that identifies the WebSocket that notifications are sent to. Included only if `method` is set to **websocket**. */
-			session_id?: string;
-			/** The UTC date and time that the WebSocket connection was established. Included only if `method` is set to **websocket**. */
-			connected_at?: string;
-			/** The UTC date and time that the WebSocket connection was lost. Included only if `method` is set to **websocket**. */
-			disconnected_at?: string;
-		};
+		transport: Main.EventSub.Transport;
 		/** **Integer**. The amount that the subscription counts against your limit. [Learn More](https://dev.twitch.tv/docs/eventsub/manage-subscriptions/#subscription-limits) */
 		cost: number;
 	}[];

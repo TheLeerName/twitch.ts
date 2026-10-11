@@ -15,6 +15,9 @@ export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
 	condition: Condition;
 	transport: Main.EventSub.Transport;
 }
+export function RequestBody(condition: Condition, transport: Main.EventSub.Transport): RequestBody {
+	return {type: "automod.terms.update", version: "1", condition, transport};
+}
 
 export interface Condition {
 	/** User ID of the broadcaster (channel). */
