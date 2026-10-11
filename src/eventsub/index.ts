@@ -71,3 +71,4 @@ export namespace ResponseBody {
 
 export * as AutomodMessageHold from "./automod/message/hold";
 export * as AutomodMessageUpdate from "./automod/message/update";
+export * as AutomodTermsUpdate from "./automod/terms/update";
