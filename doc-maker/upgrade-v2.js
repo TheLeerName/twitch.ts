@@ -1,18 +1,19 @@
 const fs = require("fs");
 
 const Create = require("./create.js");
+const { Counter } = require("../tests/index.js");
 
 /**
  * 
  * @param {string} name 
  * @param {Record<string, string> | undefined} params 
  */
-function updateV2(name, params) {
+function upgrade(name, params) {
 	params ??= JSON.parse(fs.readFileSync(Create.filePaths.data).toString())[name];
 
+	const counter = new Counter();
 	const [method, url] = Create.makeMethodAndURL(params.method_and_url);
 	const path = `../src/helix/${url}/${method.toLowerCase()}.ts`;
-	console.log(path);
 	let content = fs.readFileSync(path).toString();
 	let hasCarriageReturn = false;
 	if (content.includes("\r\n")) {
@@ -36,19 +37,28 @@ function updateV2(name, params) {
 		if (hasCarriageReturn)
 			content = content.replaceAll("\n", "\r\n");
 		fs.writeFileSync(path, content);
+		console.log(`${path} (${counter.stamp()}ms)`);
 	}
 	catch(e) {
-		console.log(`Failed: ${e}`);
+		console.error(e);
 	}
 }
 
 if (process.argv[1] === __filename) {
 	const name = process.argv.slice(2).join(" ");
 	if (name.length > 1)
-		updateV2(name);
+		upgrade(name);
 	else {
 		const json = JSON.parse(fs.readFileSync(Create.filePaths.data).toString());
+		const version = Create.getDataVersion(fields);
+		if (version != null && version >= 2) {
+			console.error(`[data.json].version is ${version}, expected undefined or < 2, maybe endpoints were already upgraded?`);
+			process.exit(1);
+		}
+
 		for (const [name, params] of Object.entries(json))
-			updateV2(name, params);
+			upgrade(name, params);
+
+		Create.setDataVersion(2);
 	}
 }

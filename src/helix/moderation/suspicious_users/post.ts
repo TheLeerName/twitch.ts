@@ -84,18 +84,15 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * Code|Description
  * -|-
  * 200 OK|Successfully applied a suspicious user status.
- * 400 Bad Request|        
- * ㅤ|Validation errors: Missing required fields.        
- * ㅤ|The ID in the broadcaster_id query parameter was not found.        
- * ㅤ|The status specified was invalid. Must either be ACTIVE_MONITORING or RESTRICTED        
- * ㅤ|The status update is not allowed for this user.      
- * 401 Unauthorized|        
- * ㅤ|The Authorization header is required and must specify user access token.        
- * ㅤ|The user access token must include the **moderator:manage:suspicious_users** scope.        
- * ㅤ|The OAuth token is not valid.        
- * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.      
- * 403 Forbidden|        
- * ㅤ|The user in the moderator_id query parameter is not one of the broadcaster's moderators.      
+ * 400 Bad Request|Validation errors: Missing required fields.
+ * ㅤ|The ID in the broadcaster_id query parameter was not found.
+ * ㅤ|The status specified was invalid. Must either be ACTIVE_MONITORING or RESTRICTED
+ * ㅤ|The status update is not allowed for this user.
+ * 401 Unauthorized|The Authorization header is required and must specify user access token.
+ * ㅤ|The user access token must include the **moderator:manage:suspicious_users** scope.
+ * ㅤ|The OAuth token is not valid.
+ * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
+ * 403 Forbidden|The user in the moderator_id query parameter is not one of the broadcaster's moderators.
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
 	return Main.axiosRequest(prepareAxiosConfig(params));

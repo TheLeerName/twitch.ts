@@ -67,9 +67,8 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * -|-
  * 200 OK|Successfully retrieved user authorization.
  * 400 Bad Request|Request is malformed - invalid parameters or missing parameters.
- * 401 Unauthorized|     
- * ㅤ|The access token is not valid. 
- * ㅤ|Authorization header is required and must specify an app access token. 
+ * 401 Unauthorized|The access token is not valid.
+ * ㅤ|Authorization header is required and must specify an app access token.
  * 403 Forbidden|The client-id in the header must match the client ID in the access token.
  * 500 Internal Error|Internal Server Error.
  */

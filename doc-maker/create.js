@@ -37,6 +37,24 @@ function addTextToOutput(text) {
 }
 
 /**
+ * @param {Record<string, Record<string, string>>} [fields] 
+ * @returns {number | undefined}
+ */
+function getDataVersion(fields) {
+	const json = fields != null ? fields : JSON.parse(fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}");
+	return json.version;
+}
+
+/**
+ * @param {number} v 
+ * @param {Record<string, Record<string, string>>} [fields] 
+ */
+function setDataVersion(v, fields) {
+	const json = fields != null ? fields : JSON.parse(fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}");
+	json.version = v;
+}
+
+/**
  * 
  * @param {string | null} endpointName 
  * @param {string} fieldName 
@@ -45,7 +63,17 @@ function addTextToOutput(text) {
 function getFieldFromJSON(endpointName, fieldName) {
 	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
-	return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
+
+	/** @type {[string, string, string] | [undefined, undefined, undefined]} */
+	const match = fieldName.match(/(\w+)\[(\d+)\]/);
+	if (match != null) {
+		const index = parseInt(match[2]);
+		/** @type {string[]} */
+		const array = endpointName != null ? json[endpointName]?.[match[1]] : json[match[1]];
+		return array[index];
+	}
+	else
+		return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
 }
 
 /**
@@ -58,12 +86,31 @@ function saveFieldFromJSON(endpointName, fieldName, value) {
 	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
 	const json = JSON.parse(content);
 	value = value.replaceAll(/> +</g, "><");
-	if (endpointName != null) {
-		json[endpointName] ??= {};
-		json[endpointName][fieldName] = value;
+
+	/** @type {[string, string, string] | [undefined, undefined, undefined]} */
+	const match = fieldName.match(/(\w+)\[(\d+)\]/);
+	if (match != null) {
+		const index = parseInt(match[2]);
+		/** @type {string[]} */
+		if (endpointName != null) {
+			json[endpointName] ??= {};
+			json[endpointName][match[1]] ??= [];
+			json[endpointName][match[1]][index] = value;
+		}
+		else {
+			json[match[1]] ??= [];
+			json[match[1]][index] = value;
+		}
 	}
-	else
-		json[fieldName] = value;
+	else {
+		if (endpointName != null) {
+			json[endpointName] ??= {};
+			json[endpointName][fieldName] = value;
+		}
+		else
+			json[fieldName] = value;
+	}
+
 	fs.writeFileSync(filePaths.data, JSON.stringify(json));
 }
 
@@ -73,16 +120,18 @@ function saveFieldFromJSON(endpointName, fieldName, value) {
  * @param {string | null} endpointName 
  * @param {string | null} fieldName 
  * @param {string} text 
+ * @param {(input: string) => string} [changeField]
  * @returns {Promise<string>}
  */
-async function readlineQuestion(rl, endpointName, fieldName, text) {
+async function readlineQuestion(rl, endpointName, fieldName, text, changeField) {
 	const useValues = endpointName != null && fieldName != null;
 	if (useValues) {
 		const fieldValue = getFieldFromJSON(endpointName, fieldName);
 		if (fieldValue != null)
 			rl.write(fieldValue);
 	}
-	const v = await rl.question(text);
+	let v = await rl.question(text);
+	if (changeField != null) v = changeField(v);
 	if (useValues)
 		saveFieldFromJSON(endpointName, fieldName, v);
 	return v;
@@ -90,32 +139,54 @@ async function readlineQuestion(rl, endpointName, fieldName, text) {
 
 /**
  * 
- * @param {boolean} appAccessTokenRequired 
- * @param {boolean} userAccessTokenRequired 
- * @param {string} scopesText 
+ * @param {readline.Interface} rl
+ * @param {string | null} endpointName 
+ * @param {string | null} fieldName 
+ * @param {string} text 
+ * @param {(input: string, index: number) => string} [changeField]
+ * @returns {Promise<string[]>}
  */
-function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
-	if (scopesText.length > 0)
-		scopesText = ` that includes scope${scopesText.includes(" ") ? "s" : ""} ${scopesText}`;
-
-	if (userAccessTokenRequired && appAccessTokenRequired) {
-		addTextToOutput(`\t * - \`token\` must be replaced by one of the following:`);
-		addTextToOutput(`\t *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopesText}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
-		addTextToOutput(`\t *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopesText}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+async function readlineQuestionMany(rl, endpointName, fieldName, text, changeField) {
+	/** @type {string[]} */
+	const array = [];
+	while(true) {
+		const v = await readlineQuestion(rl, endpointName, `${fieldName}[${array.length}]`, text.replace("%i%", array.length) + " (leave empty to stop adding it)", input => changeField(input, array.length));
+		if (v.length < 1) break;
+		array.push(v);
 	}
-	else if (userAccessTokenRequired)
-		addTextToOutput(`\t * - \`token\` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopesText}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
-	else
-		addTextToOutput(`\t * - \`token\` must be replaced by [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopesText}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+	return array;
 }
 
 /**
  * 
  * @param {boolean} userAccessTokenRequired 
  * @param {boolean} appAccessTokenRequired 
- * @param {string} scopesText 
+ * @param {string} scopes 
  */
-function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopesText) {
+function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes) {
+	if (scopes.length > 0) {
+		scopes = scopes.split(" ").map(scopeOrSeparator => scopeOrSeparator.includes(":") ? `\`${scopeOrSeparator}\`` : scopeOrSeparator).join(" ");
+		scopes = ` that includes scope${scopes.includes(" ") ? "s" : ""} ${scopes}`;
+	}
+
+	if (userAccessTokenRequired && appAccessTokenRequired) {
+		addTextToOutput(`\t * - \`token\` must be replaced by one of the following:`);
+		addTextToOutput(`\t *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+		addTextToOutput(`\t *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+	}
+	else if (userAccessTokenRequired)
+		addTextToOutput(`\t * - \`token\` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+	else
+		addTextToOutput(`\t * - \`token\` must be replaced by [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+}
+
+/**
+ * 
+ * @param {boolean} userAccessTokenRequired 
+ * @param {boolean} appAccessTokenRequired 
+ * @param {string} scopes 
+ */
+function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopes) {
 	addTextToOutput(``);
 	addTextToOutput(`export interface Authentication {`);
 	addTextToOutput(`\t/**`);
@@ -128,7 +199,7 @@ function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, sco
 	addTextToOutput(`\t/**`);
 	addTextToOutput(`\t * String \`"Bearer token"\`, where:`);
 
-	makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopesText);
+	makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes);
 
 	addTextToOutput(``);
 	addTextToOutput(`\t * For example: \`"Bearer cfabdegwdoklmawdzdo98xt2fo512y"\``);
@@ -196,7 +267,7 @@ function makeRequestQueryParameters(requestQueryParametersHTML) {
 		return params;
 
 	addTextToOutput(``);
-	addTextToOutput(`export interface RequestQueryParameters extends Main.RequestQueryParameters {`);
+	addTextToOutput(`export interface RequestQueryParameters {`);
 
 	const dom = new JSDOM(requestQueryParametersHTML, "application/xhtml+xml");
 	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
@@ -327,7 +398,7 @@ function makeRequestBody(requestBodyHTML) {
  */
 function makeRequestParameters(requestQueryParameters, requestBody) {
 	addTextToOutput(``);
-	addTextToOutput(`export type RequestParameters = Authentication & ${requestQueryParameters.length > 0 ? "RequestQueryParameters" : "Helix.RequestQueryParameters"}${requestBody.length > 0 ? " & RequestBody" : ""};`);
+	addTextToOutput(`export type RequestParameters = Main.RequestParameters & Authentication${requestQueryParameters.length > 0 ? " & RequestQueryParameters" : ""}${requestBody.length > 0 ? " & RequestBody" : ""};`);
 }
 
 /**
@@ -350,7 +421,8 @@ function makeResponseBody(responseBodyHTML) {
 		let descriptionPrefix = "";
 		let fieldDeclaration = "";
 
-		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]{2}/g, "\t").replace(/[  ]/, "");
+		const tabPostfix = tds[0].textContent.match(/^(\t+)/)?.[1] ?? "";
 		fieldDeclaration += tds[0].textContent + ":";
 
 		const tds_1_textlower = tds[1].textContent.toLowerCase();
@@ -376,13 +448,13 @@ function makeResponseBody(responseBodyHTML) {
 		descriptionLines[0] = descriptionPrefix + descriptionLines[0];
 
 		if (descriptionLines.length > 1) {
-			addTextToOutput(`\t/**`);
+			addTextToOutput(`\t${tabPostfix}/**`);
 			for (const line of descriptionLines)
-				addTextToOutput(line.length > 0 ? `\t * ${line}` : "");
-			addTextToOutput(`\t */`);
+				addTextToOutput(line.length > 0 ? `\t${tabPostfix} * ${line}` : "");
+			addTextToOutput(`\t${tabPostfix} */`);
 		}
 		else
-			addTextToOutput(`\t/** ${descriptionLines[0]} */`);
+			addTextToOutput(`\t${tabPostfix}/** ${descriptionLines[0]} */`);
 		addTextToOutput(`\t${fieldDeclaration}`);
 	}
 
@@ -402,26 +474,14 @@ function makeResponseBody(responseBodyHTML) {
  * @param {string} method 
  * @param {string[]} requestBody 
  */
-function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
+function makeAxios(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
 	const apiDocsURL = `https://dev.twitch.tv/docs/api/reference/#${endpointName.toLowerCase().replaceAll(" ", "-")}`;
 
-	addTextToOutput(``);
-	addTextToOutput(`export function makeURL(params: RequestParameters) {`);
-	if (requestQueryParameters.length > 0) {
-		addTextToOutput(`\tconst url = new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
-		addTextToOutput(`\turl.searchParams.appendMany({`);
-		for (const param of requestQueryParameters)
-			addTextToOutput(`\t\t${param}: params.${param},`);
-		addTextToOutput(`\t});`);
-		addTextToOutput(`\treturn url;`);
-	}
-	else
-		addTextToOutput(`\treturn new Main.URL(params.apiPath ?? "${url}", Main.Options.apiHelixPath);`);
-	addTextToOutput(`}`);
-
-	addTextToOutput(``);
-	addTextToOutput(`export function makeFetchRequestInit(params: RequestParameters): RequestInit {`);
+	addTextToOutput(`\nexport type ResponseBodyError = Main.ResponseBodyError;\n`);
+	addTextToOutput(`export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {`);
 	addTextToOutput(`\treturn {`);
+	addTextToOutput(`\t\tbaseURL: Main.Options.apiHelixPath,`);
+	addTextToOutput(`\t\turl: "${url}",`);
 	addTextToOutput(`\t\tmethod: "${method}",`);
 	addTextToOutput(`\t\theaders: {`);
 	addTextToOutput(`\t\t\t"client-id": params.client_id,`);
@@ -429,14 +489,25 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 	if (requestBody.length > 0)
 		addTextToOutput(`\t\t\t"content-type": "application/json",`);
 	addTextToOutput(`\t\t},`);
-	addTextToOutput(`\t\tsignal: params.signal,`);
+	if (requestQueryParameters.length > 0) {
+		addTextToOutput(`\t\tparams: {`);
+		for (const param of requestQueryParameters)
+			addTextToOutput(`\t\t\t${param}: params.${param},`);
+		addTextToOutput(`\t\t},`);
+	}
+	if (requestBody.length > 0) {
+		addTextToOutput(`\t\tdata: JSON.stringify({`);
+		for (const param of requestBody)
+			addTextToOutput(`\t\t\t${param}: params.${param},`);
+		addTextToOutput(`\t\t}),`);
+	}
+	addTextToOutput(`\t\t...params.config,`);
 	addTextToOutput(`\t};`);
 	addTextToOutput(`}`);
 
 	addTextToOutput(``);
 	addTextToOutput(`/**`);
 	addTextToOutput(` * ## [${endpointName}](${apiDocsURL})`);
-
 	for (const pText of pTexts) {
 		if (pText.length < 1) break;
 		const p = new JSDOM(pText, "application/xhtml+xml").window.document.querySelector("p");
@@ -445,7 +516,6 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 		for (const line of descriptionLines)
 			addTextToOutput(line.length > 0 ? ` * ${line}\n` : "");
 	}
-
 	if (responseCodesHTML.length > 0) {
 		addTextToOutput(` * ### Response Codes`);
 		const dom = new JSDOM(responseCodesHTML, "application/xhtml+xml");
@@ -468,26 +538,26 @@ function makeFetch(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
 				addTextToOutput(` * ${code.textContent}|${description.textContent}`);
 		}
 	}
-
 	addTextToOutput(` */`);
 
-	addTextToOutput(`export async function fetch(params: RequestParameters): Promise<Main.Response<${isResponseBody ? "ResponseBody" : "undefined"}>> {`);
-	addTextToOutput(`\treturn global.fetch(makeURL(params).castToDefaultURL(), makeFetchRequestInit(params));`);
+	addTextToOutput(`export async function axiosRequest(params: RequestParameters): Promise<Main.Response<${isResponseBody ? "ResponseBody" : "{}"}, ResponseBodyError>> {`);
+	addTextToOutput(`\treturn Main.axiosRequest(prepareAxiosConfig(params));`);
 	addTextToOutput(`}`);
 }
 
 /**
  * 
- * @param {{endpointName: string, pTexts: string[], userAccessTokenRequired: boolean, appAccessTokenRequired: boolean, scopesText: string, method: string, url: string, requestQueryParametersHTML: string, requestBodyHTML: string, responseBodyHTML: string, responseCodesHTML: string}} params
+ * @param {string} endpointName 
+ * @param {{pTexts: string[], userAccessTokenRequired: boolean, appAccessTokenRequired: boolean, scopes: string, method: string, url: string, requestQueryParametersHTML: string, requestBodyHTML: string, responseBodyHTML: string, responseCodesHTML: string}} params
  */
-function create(params) {
+function create(endpointName, params) {
 	fs.writeFileSync(filePaths.output, `import * as Main from "../${params.url.replaceAll(/[\w_]+/g, "..")}";`);
-	makeAuthentication(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopesText);
+	makeAuthentication(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopes);
 	const requestQueryParameters = makeRequestQueryParameters(params.requestQueryParametersHTML);
 	const requestBody = makeRequestBody(params.requestBodyHTML);
 	makeRequestParameters(requestQueryParameters, requestBody);
 	const isResponseBody = makeResponseBody(params.responseBodyHTML);
-	makeFetch(params.endpointName, params.pTexts, params.responseCodesHTML, isResponseBody, params.url, requestQueryParameters, params.method, requestBody);
+	makeAxios(endpointName, params.pTexts, params.responseCodesHTML, isResponseBody, params.url, requestQueryParameters, params.method, requestBody);
 }
 
 /**
@@ -505,28 +575,11 @@ async function main() {
 	const rl = readline.createInterface({input: process.stdin, output: process.stdout});
 	const endpointName = await readlineQuestion(rl, null, null, "endpointName: ");
 
-	const pTexts = await (async() => {
-		/** @type {string[]} */
-		const pTexts = [];
-		while(true) {
-			const pText = await readlineQuestion(rl, endpointName, `p_${pTexts.length}`, `html p ${pTexts.length} (leave empty to stop adding it): `);
-			if (pText.length < 1) break;
-
-			pTexts.push(pText);
-		}
-		return pTexts;
-	})();
-	const userAccessTokenRequired = (await readlineQuestion(rl, endpointName, "userAccessTokenRequired", "userAccessTokenRequired (y/n): ")) === "y ";
+	const pTexts = await readlineQuestionMany(rl, endpointName, `pTexts`, `html p %i%`);
+	const userAccessTokenRequired = (await readlineQuestion(rl, endpointName, "userAccessTokenRequired", "userAccessTokenRequired (y/n): ")) === "y";
 	const appAccessTokenRequired = (await readlineQuestion(rl, endpointName, "appAccessTokenRequired", "appAccessTokenRequired (y/n): ")) === "y";
-	const scopesText = await (async() => {
-		const text = await readlineQuestion(rl, endpointName, "scopes", "scopes: ");
-		return (text.length > 0 ? text.split(" ") : []).map(scopeOrSeparator => scopeOrSeparator.includes(":") ? `\`${scopeOrSeparator}\`` : scopeOrSeparator).join(" ");
-	})();
-	let [method, url] = await (async() => {
-		const params = (await readlineQuestion(rl, endpointName, "method_and_url", "method_and_url (like POST https://api.twitch.tv/helix/channel_points/custom_rewards): ")).split(" ");
-		params[1] = params[1].substring(28);
-		return params;
-	})();
+	const scopes = await readlineQuestion(rl, endpointName, "scopes", "scopes: ");
+	const [method, url] = makeMethodAndURL(await readlineQuestion(rl, endpointName, "method_and_url", "method_and_url (like POST https://api.twitch.tv/helix/channel_points/custom_rewards): "));
 	const requestQueryParametersHTML = await readlineQuestion(rl, endpointName, "requestQueryParametersHTML", "requestQueryParametersHTML (leave empty to not add it): ");
 	const requestBodyHTML = await readlineQuestion(rl, endpointName, "requestBodyHTML", "requestBodyHTML (leave empty to not add it): ");
 	const responseBodyHTML = await readlineQuestion(rl, endpointName, "responseBodyHTML", "responseBodyHTML (leave empty to not add it): ");
@@ -538,7 +591,7 @@ async function main() {
 		fs.mkdirSync(filePaths.output, {recursive: true});
 	filePaths.output += "/" + method.toLowerCase() + ".ts";
 
-	create({pTexts, userAccessTokenRequired, appAccessTokenRequired, scopesText, method, url, requestQueryParametersHTML, requestBodyHTML, responseBodyHTML, responseCodesHTML});
+	create(endpointName, {pTexts, userAccessTokenRequired, appAccessTokenRequired, scopes, method, url, requestQueryParametersHTML, requestBodyHTML, responseBodyHTML, responseCodesHTML});
 
 	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
 	const content = fs.readFileSync("../src/helix/index.ts").toString();
@@ -552,6 +605,8 @@ if (process.argv[1] === __filename)
 module.exports = {
 	filePaths,
 	addTextToOutput,
+	getDataVersion,
+	setDataVersion,
 	getFieldFromJSON,
 	saveFieldFromJSON,
 	readlineQuestion,
@@ -562,7 +617,7 @@ module.exports = {
 	makeRequestBody,
 	makeRequestParameters,
 	makeResponseBody,
-	makeFetch,
+	makeAxios,
 	create,
 	makeMethodAndURL,
 };

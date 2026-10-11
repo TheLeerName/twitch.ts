@@ -25,11 +25,12 @@ export type RequestParameters = Main.RequestParameters & Authentication & Reques
 
 export interface ResponseBody {
 	/** List of information about the client’s conduits. */
-	data: object[];
-	/** Conduit ID. */
+	data: {
+		/** Conduit ID. */
 		id: string;
-	/** **Integer**. Number of shards created for this conduit. */
+		/** **Integer**. Number of shards created for this conduit. */
 		shard_count: number;
+	}[];
 }
 
 export type ResponseBodyError = Main.ResponseBodyError;

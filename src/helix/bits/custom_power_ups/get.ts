@@ -9,9 +9,7 @@ export interface Authentication {
 	client_id: string;
 	/**
 	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by one of the following:
-	 *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `bits:read`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
-	 *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scope `bits:read`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+	 * - `token` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `bits:read`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
 
 	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */

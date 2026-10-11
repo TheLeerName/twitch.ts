@@ -75,20 +75,17 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * Code|Description
  * -|-
  * 202 Accepted|Successfully started the clip process.
- * 400 Bad Request|        
- * ㅤ|The `broadcaster_id` query parameter is required.        
- * ㅤ|The ID in the `broadcaster_id` query parameter was not found.        
- * ㅤ|The category is not clippable.        
- * ㅤ|The title did not pass AutoMod checks.      
- * 401 Unauthorized|        
- * ㅤ|The Authorization header is required and must specify user access token.        
- * ㅤ|The user access token must include the **clips:edit** scope.        
- * ㅤ|The OAuth token is not valid.        
- * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.      
- * 403 Forbidden|        
- * ㅤ|The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.        
- * ㅤ|The specified broadcaster has not enabled clips on their channel.        
- * ㅤ|The user is banned or timed out from the broadcaster’s channel.      
+ * 400 Bad Request|The `broadcaster_id` query parameter is required.
+ * ㅤ|The ID in the `broadcaster_id` query parameter was not found.
+ * ㅤ|The category is not clippable.
+ * ㅤ|The title did not pass AutoMod checks.
+ * 401 Unauthorized|The Authorization header is required and must specify user access token.
+ * ㅤ|The user access token must include the **clips:edit** scope.
+ * ㅤ|The OAuth token is not valid.
+ * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
+ * 403 Forbidden|The broadcaster has restricted the ability to capture clips to followers and/or subscribers only.
+ * ㅤ|The specified broadcaster has not enabled clips on their channel.
+ * ㅤ|The user is banned or timed out from the broadcaster’s channel.
  * 404 Not Found|The broadcaster in the `broadcaster_id` query parameter must be broadcasting live.
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {

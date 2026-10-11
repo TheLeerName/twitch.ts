@@ -72,12 +72,11 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * -|-
  * 200 OK|Successfully retrieved the clip download URL(s).
  * 400 Bad Request|The ID in the broadcaster_id, editor_id, or clip_id query parameter is not valid.
- * 401 Unauthorized|     
- * ㅤ|The OAuth token is not valid. 
- * ㅤ|The Authorization header is required and must contain a user access token or app access token. 
- * ㅤ|The access token must include the editor:manage:clips or channel:manage:clips scope 
- * ㅤ|The access token is not valid 
- * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token. 
+ * 401 Unauthorized|The OAuth token is not valid.
+ * ㅤ|The Authorization header is required and must contain a user access token or app access token.
+ * ㅤ|The access token must include the editor:manage:clips or channel:manage:clips scope
+ * ㅤ|The access token is not valid
+ * ㅤ|The client ID specified in the Client-Id header does not match the client ID specified in the access token.
  * 403 Forbidden|The user is not an editor for the specified broadcaster.
  * 500 Internal Error|Internal Server Error.
  */
