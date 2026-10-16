@@ -2,7 +2,7 @@ import * as Main from "../../..";
 
 /**
  * ## [automod.terms.update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodtermsupdate)
- * The `automod.message.update` subscription type sends a notification when a broadcaster’s automod terms are updated. Changes to private terms are not sent.
+ * Sends a notification when a broadcaster’s automod terms are updated. Changes to private terms are not sent.
 
  * ### Authorization
  * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
@@ -28,7 +28,7 @@ export interface Condition {
 
 /**
  * ## [automod.terms.update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#automodtermsupdate)
- * The `automod.message.update` subscription type sends a notification when a broadcaster’s automod terms are updated. Changes to private terms are not sent.
+ * Sends a notification when a broadcaster’s automod terms are updated. Changes to private terms are not sent.
 
  * ### Authorization
  * Requires a user access token that includes the `moderator:manage:automod` scope. The ID in the `moderator_user_id` condition parameter must match the user ID in the access token. If app access token used, then additionally requires the `moderator:manage:automod` scope for the moderator.
@@ -36,36 +36,33 @@ export interface Condition {
  * The moderator must be a moderator or broadcaster for the specified broadcaster.
  */
 export interface ResponseBody {
-	subscription: ResponseBody.Subscription;
-	event: ResponseBody.Event;
+	subscription: ResponseBodySubscription;
+	event: ResponseBodyEvent;
 }
-export namespace ResponseBody {
-	export type Subscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-
-	export interface Event {
-		/** The ID of the broadcaster specified in the request. */
-		broadcaster_user_id: string;
-		/** The login of the broadcaster specified in the request. */
-		broadcaster_user_login: string;
-		/** The user name of the broadcaster specified in the request. */
-		broadcaster_user_name: string;
-		/** The ID of the moderator who changed the channel settings. */
-		moderator_user_id: string;
-		/** The moderator’s login. */
-		moderator_user_login: string;
-		/** The moderator’s user name. */
-		moderator_user_name: string;
-		/**
-		 * The status change applied to the terms. Possible options are: 
-		 * - add_permitted
-		 * - remove_permitted
-		 * - add_blocked
-		 * - remove_blocked
-		 */
-		action: "add_permitted" | "remove_permitted" | "add_blocked" | "remove_blocked";
-		/** Indicates whether this term was added due to an Automod message approve/deny action. */
-		from_automod: boolean;
-		/** The list of terms that had a status change. */
-		terms: string[];
-	}
+export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
+export interface ResponseBodyEvent {
+	/** The ID of the broadcaster specified in the request. */
+	broadcaster_user_id: string;
+	/** The login of the broadcaster specified in the request. */
+	broadcaster_user_login: string;
+	/** The user name of the broadcaster specified in the request. */
+	broadcaster_user_name: string;
+	/** The ID of the moderator who changed the channel settings. */
+	moderator_user_id: string;
+	/** The moderator’s login. */
+	moderator_user_login: string;
+	/** The moderator’s user name. */
+	moderator_user_name: string;
+	/**
+	 * The status change applied to the terms. Possible options are: 
+	 * - add_permitted
+	 * - remove_permitted
+	 * - add_blocked
+	 * - remove_blocked
+	 */
+	action: "add_permitted" | "remove_permitted" | "add_blocked" | "remove_blocked";
+	/** Indicates whether this term was added due to an Automod message approve/deny action. */
+	from_automod: boolean;
+	/** The list of terms that had a status change. */
+	terms: string[];
 }
