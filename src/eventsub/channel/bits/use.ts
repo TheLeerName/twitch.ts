@@ -54,6 +54,10 @@ export interface ResponseBody {
 	subscription: ResponseBodySubscription;
 	event: ResponseBodyEvent;
 }
+export function isResponseBody(obj: unknown): obj is ResponseBody {
+	// @ts-ignore
+	return obj != null && obj.subscription != null && obj.subscription.type === "channel.bits.use" && obj.subscription.version === "1";
+}
 export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
 export type ResponseBodyEvent = ResponseBodyEventCheer | ResponseBodyEventPowerUp | ResponseBodyEventCustomPowerUp;
 /** Used only for extending by interfaces. */

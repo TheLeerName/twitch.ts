@@ -35,6 +35,10 @@ export interface ResponseBody {
 	subscription: ResponseBodySubscription;
 	event: ResponseBodyEvent;
 }
+export function isResponseBody(obj: unknown): obj is ResponseBody {
+	// @ts-ignore
+	return obj != null && obj.subscription != null && obj.subscription.type === "channel.chat.message" && obj.subscription.version === "1";
+}
 export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
 export interface ResponseBodyEvent {
 	/** The broadcaster user ID. */

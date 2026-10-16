@@ -5,7 +5,7 @@ import * as Main from "../..";
  * Sends a notification when any user sends a message to a channel’s chat room.
 
  * ### Authorization
- * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+ * No authorization required.
  */
 export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
 	type: "channel.update";
@@ -27,11 +27,15 @@ export interface Condition {
  * Sends a notification when any user sends a message to a channel’s chat room.
 
  * ### Authorization
- * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+ * No authorization required.
  */
 export interface ResponseBody {
 	subscription: ResponseBodySubscription;
 	event: ResponseBodyEvent;
+}
+export function isResponseBody(obj: unknown): obj is ResponseBody {
+	// @ts-ignore
+	return obj != null && obj.subscription != null && obj.subscription.type === "channel.update" && obj.subscription.version === "2";
 }
 export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
 export interface ResponseBodyEvent {

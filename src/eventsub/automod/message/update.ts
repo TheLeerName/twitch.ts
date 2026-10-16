@@ -41,7 +41,10 @@ export interface ResponseBody {
 	subscription: ResponseBodySubscription;
 	event: ResponseBodyEvent;
 }
-
+export function isResponseBody(obj: unknown): obj is ResponseBody {
+	// @ts-ignore
+	return obj != null && obj.subscription != null && obj.subscription.type === "automod.message.update" && obj.subscription.version === "2";
+}
 export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
 export type ResponseBodyEvent = ResponseBodyEventAutomod | ResponseBodyEventBlockedTermOrLink;
 /** Used only for extending by interfaces. */
