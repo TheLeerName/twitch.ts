@@ -23,7 +23,7 @@ export interface Condition {
 }
 
 /**
- * ## [channel.chat.message](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatmessage)
+ * ## [channel.update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelupdate)
  * Sends a notification when any user sends a message to a channel’s chat room.
 
  * ### Authorization
