@@ -38,6 +38,10 @@ export interface Events {
 	revocation: (message: Main.EventSub.MessageRevocation) => void;
 }
 
+/**
+ * EventSub WebSocket connection using {@link ReconnectingWebSocket} class
+ * - `session_reconnect` and `session_keepalive` messages are already handled here
+ */
 export default class WebSocket extends EventEmitter {
 	readonly ws!: ReconnectingWebSocket;
 	/** EventSub session, do not use it **before** first `session_welcome` message. */
