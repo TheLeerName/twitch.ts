@@ -32,10 +32,19 @@ export interface Events {
 	session_keepalive: (message: Main.EventSub.MessageSessionKeepalive) => void;
 	/** Calls on getting `session_reconnect` message, these messages are sent if the edge server that the client is connected to needs to be swapped. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#reconnect-message) */
 	session_reconnect: (message: Main.EventSub.MessageSessionReconnect) => void;
-	/** Calls on getting `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
-	notification: (message: Main.EventSub.MessageNotification) => void;
 	/** Calls on getting `revocation` message, these messages are sent if Twitch revokes a subscription. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#revocation-message) */
 	revocation: (message: Main.EventSub.MessageRevocation) => void;
+
+	/** Calls on getting any `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
+	notification: (message: Main.EventSub.MessageNotification) => void;
+
+	"automod.message.hold": (message: Main.EventSub.AutomodMessageHold.MessageNotification) => void;
+	"automod.message.update": (message: Main.EventSub.AutomodMessageUpdate.MessageNotification) => void;
+	"automod.terms.update": (message: Main.EventSub.AutomodTermsUpdate.MessageNotification) => void;
+	"channel.bits.use": (message: Main.EventSub.ChannelBitsUse.MessageNotification) => void;
+	"channel.chat.message": (message: Main.EventSub.ChannelChatMessage.MessageNotification) => void;
+	"channel.follow": (message: Main.EventSub.ChannelFollow.MessageNotification) => void;
+	"channel.update": (message: Main.EventSub.ChannelUpdate.MessageNotification) => void;
 }
 
 /**
@@ -128,8 +137,10 @@ export default class WebSocket extends EventEmitter {
 
 				this.emit("session_reconnect", message);
 			}
-			else if (Main.EventSub.isMessageNotification(message))
+			else if (Main.EventSub.isMessageNotification(message)) {
 				this.emit("notification", message);
+				this.emit(message.payload.subscription.type, message as any);
+			}
 			else if (Main.EventSub.isMessageRevocation(message))
 				this.emit("revocation", message);
 		};

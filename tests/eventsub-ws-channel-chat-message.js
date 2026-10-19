@@ -97,9 +97,8 @@ async function main(token, broadcaster_id) {
 			console.log(`Listening for events...`);
 		}
 	});
-	ws.on("notification", message => {
-		if (Twitch.EventSub.ChannelChatMessage.isMessageNotification(message))
-			console.log(`  ${message.payload.event.broadcaster_user_name}: ${message.payload.event.message.text}`);
+	ws.on("channel.chat.message", message => {
+		console.log(`  ${message.payload.event.broadcaster_user_name}: ${message.payload.event.message.text}`);
 	});
 	ws.on("revocation", message => {
 		if (message.payload.subscription.status === "authorization_revoked")
