@@ -18,7 +18,7 @@ import { MessageFragmentText, MessageFragmentCheermote, MessageFragmentEmote } f
  * ### Authorization
  * Requires a user access token that includes the `bits:read` scope.
  */
-export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
+export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "channel.bits.use";
 	version: "1";
 	condition: Condition;
@@ -50,18 +50,23 @@ export interface Condition {
  * ### Authorization
  * Requires a user access token that includes the `bits:read` scope.
  */
-export interface ResponseBody {
-	subscription: ResponseBodySubscription;
-	event: ResponseBodyEvent;
+export interface MessageNotification {
+	/** An object that identifies the message. */
+	metadata: Metadata;
+	/** An object that contains the message. */
+	payload: Payload;
 }
-export function isResponseBody(obj: unknown): obj is ResponseBody {
-	// @ts-ignore
-	return obj != null && obj.subscription != null && obj.subscription.type === "channel.bits.use" && obj.subscription.version === "1";
+export function isMessageNotification(message: Main.EventSub.Message): message is MessageNotification {
+	return Main.EventSub.isMessageNotification(message) && message.metadata.subscription_type === "channel.bits.use" && message.metadata.subscription_version === "1";
 }
-export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-export type ResponseBodyEvent = ResponseBodyEventCheer | ResponseBodyEventPowerUp | ResponseBodyEventCustomPowerUp;
+
+export type Metadata = Main.EventSub.MetadataWithSubscription<"notification", Payload["subscription"]>;
+
+export type Payload = Main.EventSub.Payload<Main.EventSub.PayloadSubscription<RequestBody>, PayloadEvent>;
+export type PayloadSubscription = Main.EventSub.PayloadSubscription<RequestBody>;
+export type PayloadEvent = PayloadEventCheer | PayloadEventPowerUp | PayloadEventCustomPowerUp;
 /** Used only for extending by interfaces. */
-export interface _ResponseBodyEvent {
+export interface _PayloadEvent {
 	/** The User ID of the channel where the Bits were redeemed. */
 	broadcaster_user_id: string;
 	/** The login of the channel where the Bits were used. */
@@ -78,7 +83,7 @@ export interface _ResponseBodyEvent {
 	bits: number;
 	type: string;
 }
-export interface ResponseBodyEventCheer extends _ResponseBodyEvent {
+export interface PayloadEventCheer extends _PayloadEvent {
 	type: "cheer";
 	/** An object that contains the user message and emote information needed to recreate the message. */
 	message: {
@@ -89,25 +94,25 @@ export interface ResponseBodyEventCheer extends _ResponseBodyEvent {
 	};
 }
 
-export interface ResponseBodyEventPowerUp extends _ResponseBodyEvent {
+export interface PayloadEventPowerUp extends _PayloadEvent {
 	type: "power_up";
 	/** Data about a default (i.e. built-in) Power-up. */
-	power_up: ResponseBodyEventPowerUpData;
+	power_up: PayloadEventPowerUpData;
 }
-export type ResponseBodyEventPowerUpData = ResponseBodyEventPowerUpDataMessageEffect | ResponseBodyEventPowerUpDataCelebration | ResponseBodyEventPowerUpDataGigantifyAnEmote;
+export type PayloadEventPowerUpData = PayloadEventPowerUpDataMessageEffect | PayloadEventPowerUpDataCelebration | PayloadEventPowerUpDataGigantifyAnEmote;
 /** Used only for extending by interfaces. */
-export interface _ResponseBodyEventPowerUpData {
+export interface _PayloadEventPowerUpData {
 	type: string;
 }
-export interface ResponseBodyEventPowerUpDataMessageEffect extends _ResponseBodyEventPowerUpData {
+export interface PayloadEventPowerUpDataMessageEffect extends _PayloadEventPowerUpData {
 	type: "message_effect";
 	/** The ID of the message effect. */
 	message_effect_id: string;
 }
-export interface ResponseBodyEventPowerUpDataCelebration extends _ResponseBodyEventPowerUpData {
+export interface PayloadEventPowerUpDataCelebration extends _PayloadEventPowerUpData {
 	type: "celebration";
 }
-export interface ResponseBodyEventPowerUpDataGigantifyAnEmote extends _ResponseBodyEventPowerUpData {
+export interface PayloadEventPowerUpDataGigantifyAnEmote extends _PayloadEventPowerUpData {
 	type: "gigantify_an_emote";
 	/** Emote associated with the reward. */
 	emote: {
@@ -118,7 +123,7 @@ export interface ResponseBodyEventPowerUpDataGigantifyAnEmote extends _ResponseB
 	};
 }
 
-export interface ResponseBodyEventCustomPowerUp extends _ResponseBodyEvent {
+export interface PayloadEventCustomPowerUp extends _PayloadEvent {
 	type: "custom_power_up";
 	/** Data about a custom Power-up. */
 	custom_power_up: {

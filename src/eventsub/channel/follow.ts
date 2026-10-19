@@ -7,7 +7,7 @@ import * as Main from "../..";
  * ### Authorization
  * Must have `moderator:read:followers` scope.
  */
-export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
+export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "channel.follow";
 	version: "2";
 	condition: Condition;
@@ -31,16 +31,21 @@ export interface Condition {
  * ### Authorization
  * Must have `moderator:read:followers` scope.
  */
-export interface ResponseBody {
-	subscription: ResponseBodySubscription;
-	event: ResponseBodyEvent;
+export interface MessageNotification {
+	/** An object that identifies the message. */
+	metadata: Metadata;
+	/** An object that contains the message. */
+	payload: Payload;
 }
-export function isResponseBody(obj: unknown): obj is ResponseBody {
-	// @ts-ignore
-	return obj != null && obj.subscription != null && obj.subscription.type === "channel.follow" && obj.subscription.version === "2";
+export function isMessageNotification(message: Main.EventSub.Message): message is MessageNotification {
+	return Main.EventSub.isMessageNotification(message) && message.metadata.subscription_type === "channel.follow" && message.metadata.subscription_version === "2";
 }
-export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-export interface ResponseBodyEvent {
+
+export type Metadata = Main.EventSub.MetadataWithSubscription<"notification", Payload["subscription"]>;
+
+export type Payload = Main.EventSub.Payload<Main.EventSub.PayloadSubscription<RequestBody>, PayloadEvent>;
+export type PayloadSubscription = Main.EventSub.PayloadSubscription<RequestBody>;
+export interface PayloadEvent {
 	/** The user ID for the user now following the specified channel. */
 	user_id: string;
 	/** The user login for the user now following the specified channel. */

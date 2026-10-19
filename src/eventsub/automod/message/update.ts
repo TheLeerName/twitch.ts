@@ -11,7 +11,7 @@ import { TextBoundary } from "./hold";
 
  * The moderator must be a moderator or broadcaster for the specified broadcaster.
  */
-export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
+export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "automod.message.update";
 	version: "2";
 	condition: Condition;
@@ -37,18 +37,23 @@ export interface Condition {
 
  * The moderator must be a moderator or broadcaster for the specified broadcaster.
  */
-export interface ResponseBody {
-	subscription: ResponseBodySubscription;
-	event: ResponseBodyEvent;
+export interface MessageNotification {
+	/** An object that identifies the message. */
+	metadata: Metadata;
+	/** An object that contains the message. */
+	payload: Payload;
 }
-export function isResponseBody(obj: unknown): obj is ResponseBody {
-	// @ts-ignore
-	return obj != null && obj.subscription != null && obj.subscription.type === "automod.message.update" && obj.subscription.version === "2";
+export function isMessageNotification(message: Main.EventSub.Message): message is MessageNotification {
+	return Main.EventSub.isMessageNotification(message) && message.metadata.subscription_type === "automod.message.update" && message.metadata.subscription_version === "2";
 }
-export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-export type ResponseBodyEvent = ResponseBodyEventAutomod | ResponseBodyEventBlockedTermOrLink;
+
+export type Metadata = Main.EventSub.MetadataWithSubscription<"notification", Payload["subscription"]>;
+
+export type Payload = Main.EventSub.Payload<Main.EventSub.PayloadSubscription<RequestBody>, PayloadEvent>;
+export type PayloadSubscription = Main.EventSub.PayloadSubscription<RequestBody>;
+export type PayloadEvent = PayloadEventAutomod | PayloadEventBlockedTermOrLink;
 /** Used only for extending by interfaces. */
-export interface _ResponseBodyEvent {
+export interface _PayloadEvent {
 	/** The ID of the broadcaster specified in the request. */
 	broadcaster_user_id: string;
 	/** The login of the broadcaster specified in the request. */
@@ -83,7 +88,7 @@ export interface _ResponseBodyEvent {
 	/** The reason why the message was caught. */
 	reason: string;
 }
-export interface ResponseBodyEventAutomod extends _ResponseBodyEvent {
+export interface PayloadEventAutomod extends _PayloadEvent {
 	reason: "automod";
 	/** If the message was caught by automod, this will be populated. */
 	automod: {
@@ -95,7 +100,7 @@ export interface ResponseBodyEventAutomod extends _ResponseBodyEvent {
 		boundaries: TextBoundary[];
 	};
 }
-export interface ResponseBodyEventBlockedTermOrLink extends _ResponseBodyEvent {
+export interface PayloadEventBlockedTermOrLink extends _PayloadEvent {
 	reason: "blocked_term" | "blocked_link";
 	/** If the message was caught due to a blocked term or a blocked link, this will be populated. */
 	blocked_term: {

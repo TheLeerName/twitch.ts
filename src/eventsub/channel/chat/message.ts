@@ -7,7 +7,7 @@ import * as Main from "../../..";
  * ### Authorization
  * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
  */
-export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
+export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "channel.chat.message";
 	version: "1";
 	condition: Condition;
@@ -31,16 +31,21 @@ export interface Condition {
  * ### Authorization
  * Requires `user:read:chat` scope from the chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
  */
-export interface ResponseBody {
-	subscription: ResponseBodySubscription;
-	event: ResponseBodyEvent;
+export interface MessageNotification {
+	/** An object that identifies the message. */
+	metadata: Metadata;
+	/** An object that contains the message. */
+	payload: Payload;
 }
-export function isResponseBody(obj: unknown): obj is ResponseBody {
-	// @ts-ignore
-	return obj != null && obj.subscription != null && obj.subscription.type === "channel.chat.message" && obj.subscription.version === "1";
+export function isMessageNotification(message: Main.EventSub.Message): message is MessageNotification {
+	return Main.EventSub.isMessageNotification(message) && message.metadata.subscription_type === "channel.chat.message" && message.metadata.subscription_version === "1";
 }
-export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-export interface ResponseBodyEvent {
+
+export type Metadata = Main.EventSub.MetadataWithSubscription<"notification", Payload["subscription"]>;
+
+export type Payload = Main.EventSub.Payload<Main.EventSub.PayloadSubscription<RequestBody>, PayloadEvent>;
+export type PayloadSubscription = Main.EventSub.PayloadSubscription<RequestBody>;
+export interface PayloadEvent {
 	/** The broadcaster user ID. */
 	broadcaster_user_id: string;
 	/** The broadcaster display name. */

@@ -9,7 +9,7 @@ import * as Main from "../../..";
 
  * The moderator must be a moderator or broadcaster for the specified broadcaster.
  */
-export interface RequestBody extends Main.EventSub.RequestBody.Subscription {
+export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "automod.terms.update";
 	version: "1";
 	condition: Condition;
@@ -35,16 +35,21 @@ export interface Condition {
 
  * The moderator must be a moderator or broadcaster for the specified broadcaster.
  */
-export interface ResponseBody {
-	subscription: ResponseBodySubscription;
-	event: ResponseBodyEvent;
+export interface MessageNotification {
+	/** An object that identifies the message. */
+	metadata: Metadata;
+	/** An object that contains the message. */
+	payload: Payload;
 }
-export function isResponseBody(obj: unknown): obj is ResponseBody {
-	// @ts-ignore
-	return obj != null && obj.subscription != null && obj.subscription.type === "automod.terms.update" && obj.subscription.version === "1";
+export function isMessageNotification(message: Main.EventSub.Message): message is MessageNotification {
+	return Main.EventSub.isMessageNotification(message) && message.metadata.subscription_type === "automod.terms.update" && message.metadata.subscription_version === "1";
 }
-export type ResponseBodySubscription = Main.EventSub.ResponseBody.Subscription<RequestBody>;
-export interface ResponseBodyEvent {
+
+export type Metadata = Main.EventSub.MetadataWithSubscription<"notification", Payload["subscription"]>;
+
+export type Payload = Main.EventSub.Payload<Main.EventSub.PayloadSubscription<RequestBody>, PayloadEvent>;
+export type PayloadSubscription = Main.EventSub.PayloadSubscription<RequestBody>;
+export interface PayloadEvent {
 	/** The ID of the broadcaster specified in the request. */
 	broadcaster_user_id: string;
 	/** The login of the broadcaster specified in the request. */
