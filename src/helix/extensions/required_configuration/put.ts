@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,12 +8,11 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to **external** and the `user_id` field to the ID of the user that owns the extension.
+	 * A signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to **external** and the `user_id` field to the ID of the user that owns the extension.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -30,7 +29,7 @@ export interface RequestBody {
 	required_configuration: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters & RequestBody;
 
 export type ResponseBodyError = Main.ResponseBodyError;
 
@@ -41,7 +40,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "PUT",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 			"content-type": "application/json",
 		},
 		params: {

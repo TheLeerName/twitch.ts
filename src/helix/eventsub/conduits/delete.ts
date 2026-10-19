@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,12 +8,11 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+	 * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -21,7 +20,7 @@ export interface RequestQueryParameters {
 	id: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters;
 
 export type ResponseBodyError = Main.ResponseBodyError;
 
@@ -32,7 +31,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "DELETE",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 		},
 		params: {
 			id: params.id,

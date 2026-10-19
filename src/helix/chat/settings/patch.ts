@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,14 +8,11 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by one of the following:
-	 *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `moderator:manage:chat_settings`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
-	 *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scope `moderator:manage:chat_settings`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scope `moderator:manage:chat_settings`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -92,7 +89,7 @@ export interface RequestBody {
 	unique_chat_mode?: boolean;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters & RequestBody;
 
 export interface ResponseBody {
 	/** The list of chat settings. The list contains a single object with all the settings. */
@@ -155,7 +152,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "PATCH",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 			"content-type": "application/json",
 		},
 		params: {

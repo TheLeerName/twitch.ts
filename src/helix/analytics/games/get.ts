@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,12 +8,11 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `analytics:read:games`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `analytics:read:games`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -52,7 +51,7 @@ export interface RequestQueryParameters {
 	after?: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** A list of reports. The reports are returned in no particular order; however, the data within each report is in ascending order by date (newest first). The report contains one row of data per day of the reporting window; the report contains rows for only those days that the game was used. A report is available only if the game was broadcast for at least 5 hours over the reporting period. The array is empty if there are no reports. */
@@ -87,7 +86,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 		},
 		params: {
 			game_id: params.game_id,

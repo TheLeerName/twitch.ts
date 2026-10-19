@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,14 +8,12 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by one of the following:
-	 *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `moderator:manage:announcements`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
-	 *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scopes `moderator:manage:announcements` and `user:bot` (for the user represented by the `moderator_id`) or `channel:bot` (for the user represented by the `broadcaster_id`). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+	 * - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scope `moderator:manage:announcements`.
+	 * - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scopes `moderator:manage:announcements` and `user:bot` (for the user represented by the `moderator_id`) or `channel:bot` (for the user represented by the `broadcaster_id`).
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}. For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -47,7 +45,7 @@ export interface RequestBody {
 	for_source_only?: boolean;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters & RequestBody;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters & RequestBody;
 
 export type ResponseBodyError = Main.ResponseBodyError;
 
@@ -58,7 +56,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "POST",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 			"content-type": "application/json",
 		},
 		params: {

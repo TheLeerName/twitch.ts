@@ -1,6 +1,6 @@
 import * as Main from "../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,12 +8,11 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to **external**.
+	 * A signed JSON Web Token (JWT) created by an Extension Backend Service (EBS). For signing requirements, see [Signing the JWT](https://dev.twitch.tv/docs/extensions/building/#signing-the-jwt). The signed JWT must include the `role`, `user_id`, and `exp` fields (see [JWT Schema](https://dev.twitch.tv/docs/extensions/reference/#jwt-schema)). The `role` field must be set to **external**.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
 export interface RequestQueryParameters {
@@ -32,7 +31,7 @@ export interface RequestQueryParameters {
 	segment: "broadcaster" | "developer" | "global" | ("broadcaster" | "developer" | "global")[];
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication & RequestQueryParameters;
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters;
 
 export interface ResponseBody {
 	/** The list of requested configuration segments. The list is returned in the same order that you specified the list of segments in the request. */
@@ -62,7 +61,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 		},
 		params: {
 			broadcaster_id: params.broadcaster_id,

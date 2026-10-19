@@ -23,9 +23,9 @@ async function main(client_id, client_secret) {
 	}
 
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	console.log(`APP_ACCESS_TOKEN: ${result.access_token}`);
-	console.log(`EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
-	console.log(`TOKEN_TYPE: ${result.token_type}`);
+	console.log(`  APP_ACCESS_TOKEN: ${result.access_token}`);
+	console.log(`  EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
+	console.log(`  TOKEN_TYPE: ${result.token_type}`);
 }
 
 module.exports = {

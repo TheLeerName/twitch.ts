@@ -33,17 +33,17 @@ async function main(token) {
 	}
 
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	console.log(`CLIENT_ID: ${result.client_id}`);
+	console.log(`  CLIENT_ID: ${result.client_id}`);
 	if (result.scopes != null)
-		console.log(`SCOPES: ${result.scopes.join(", ")}`);
-	console.log(`EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
+		console.log(`  SCOPES: ${result.scopes.join(", ")}`);
+	console.log(`  EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
 	if (result.login != null) {
-		console.log(`IS_USER_ACCESS_TOKEN: true`);
-		console.log(`USER_ID: ${result.user_id}`);
-		console.log(`LOGIN: ${result.login}`);
+		console.log(`  IS_USER_ACCESS_TOKEN: true`);
+		console.log(`  USER_ID: ${result.user_id}`);
+		console.log(`  LOGIN: ${result.login}`);
 	}
 	else
-		console.log(`IS_USER_ACCESS_TOKEN: false`);
+		console.log(`  IS_USER_ACCESS_TOKEN: false`);
 }
 
 module.exports = {

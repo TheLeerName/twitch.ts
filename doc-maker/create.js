@@ -163,21 +163,18 @@ async function readlineQuestionMany(rl, endpointName, fieldName, text, changeFie
  * @param {boolean} appAccessTokenRequired 
  * @param {string} scopes 
  */
-function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes) {
+function makeAuthorizationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes) {
 	if (scopes.length > 0) {
 		scopes = scopes.split(" ").map(scopeOrSeparator => scopeOrSeparator.includes(":") ? `\`${scopeOrSeparator}\`` : scopeOrSeparator).join(" ");
 		scopes = ` that includes scope${scopes.includes(" ") ? "s" : ""} ${scopes}`;
 	}
 
-	if (userAccessTokenRequired && appAccessTokenRequired) {
-		addTextToOutput(`\t * - \`token\` must be replaced by one of the following:`);
-		addTextToOutput(`\t *   - An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
-		addTextToOutput(`\t *   - An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
-	}
+	if (userAccessTokenRequired && appAccessTokenRequired)
+		addTextToOutput(`\t * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
 	else if (userAccessTokenRequired)
-		addTextToOutput(`\t * - \`token\` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+		addTextToOutput(`\t * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
 	else
-		addTextToOutput(`\t * - \`token\` must be replaced by [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+		addTextToOutput(`\t * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
 }
 
 /**
@@ -186,25 +183,22 @@ function makeAuthenticationAuthorizationDescription(userAccessTokenRequired, app
  * @param {boolean} appAccessTokenRequired 
  * @param {string} scopes 
  */
-function makeAuthentication(userAccessTokenRequired, appAccessTokenRequired, scopes) {
+function makeAuthorization(userAccessTokenRequired, appAccessTokenRequired, scopes) {
 	addTextToOutput(``);
-	addTextToOutput(`export interface Authentication {`);
+	addTextToOutput(`export interface Authorization {`);
 	addTextToOutput(`\t/**`);
 	addTextToOutput(`\t * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).`);
 	addTextToOutput(``);
-	addTextToOutput(`\t * For example: For example: \`"uo6dggojyb8d6soh92zknwmi5ej1q2"\``);
+	addTextToOutput(`\t * For example: \`"uo6dggojyb8d6soh92zknwmi5ej1q2"\``);
 	addTextToOutput(`\t */`);
 	addTextToOutput(`\tclient_id: string;`);
 
 	addTextToOutput(`\t/**`);
-	addTextToOutput(`\t * String \`"Bearer token"\`, where:`);
-
-	makeAuthenticationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes);
-
+	makeAuthorizationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes);
 	addTextToOutput(``);
-	addTextToOutput(`\t * For example: \`"Bearer cfabdegwdoklmawdzdo98xt2fo512y"\``);
+	addTextToOutput(`\t * For example: \`"cfabdegwdoklmawdzdo98xt2fo512y"\``);
 	addTextToOutput(`\t */`);
-	addTextToOutput(`\tauthorization: string;`);
+	addTextToOutput(`\ttoken: string;`);
 
 	addTextToOutput(`}`);
 }
@@ -403,7 +397,7 @@ function makeRequestBody(requestBodyHTML) {
  */
 function makeRequestParameters(requestQueryParameters, requestBody) {
 	addTextToOutput(``);
-	addTextToOutput(`export type RequestParameters = Main.RequestParameters & Authentication${requestQueryParameters.length > 0 ? " & RequestQueryParameters" : ""}${requestBody.length > 0 ? " & RequestBody" : ""};`);
+	addTextToOutput(`export type RequestParameters = Main.RequestParameters & Authorization${requestQueryParameters.length > 0 ? " & RequestQueryParameters" : ""}${requestBody.length > 0 ? " & RequestBody" : ""};`);
 }
 
 /**
@@ -557,7 +551,7 @@ function makeAxios(endpointName, pTexts, responseCodesHTML, isResponseBody, url,
  */
 function create(endpointName, params) {
 	fs.writeFileSync(filePaths.output, `import * as Main from "../${params.url.replaceAll(/[\w_]+/g, "..")}";`);
-	makeAuthentication(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopes);
+	makeAuthorization(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopes);
 	const requestQueryParameters = makeRequestQueryParameters(params.requestQueryParametersHTML);
 	const requestBody = makeRequestBody(params.requestBodyHTML);
 	makeRequestParameters(requestQueryParameters, requestBody);
@@ -615,8 +609,8 @@ module.exports = {
 	getFieldFromJSON,
 	saveFieldFromJSON,
 	readlineQuestion,
-	makeAuthenticationAuthorizationDescription,
-	makeAuthentication,
+	makeAuthorizationAuthorizationDescription,
+	makeAuthorization,
 	addDescriptionLines,
 	makeRequestQueryParameters,
 	makeRequestBody,

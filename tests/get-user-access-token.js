@@ -67,7 +67,7 @@ async function main(client_id, client_secret, redirect_uri, scopes) {
 			process.stdout.write(`Started on ${redirect_uri} (${counter.stamp()}ms)\nClick the link and authorize the app: ${Twitch.OAuth2.GetAuthorizationCode.makeURL({client_id, redirect_uri, scope: scopes})}\n`);
 		});
 	});
-	process.stdout.write(`AUTHORIZATION_CODE: ${code}\n\n`);
+	process.stdout.write(`  AUTHORIZATION_CODE: ${code}\n\n`);
 
 	process.stdout.write("Requesting user access token... ");
 	counter.reset();
@@ -79,12 +79,12 @@ async function main(client_id, client_secret, redirect_uri, scopes) {
 	}
 
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	console.log(`USER_ACCESS_TOKEN: ${result.access_token}`);
-	console.log(`REFRESH_TOKEN: ${result.refresh_token}`);
+	console.log(`  USER_ACCESS_TOKEN: ${result.access_token}`);
+	console.log(`  REFRESH_TOKEN: ${result.refresh_token}`);
 	if (result.scope != null)
-		console.log(`SCOPES: ${result.scope.join(", ")}`);
-	console.log(`EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
-	console.log(`TOKEN_TYPE: ${result.token_type}`);
+		console.log(`  SCOPES: ${result.scope.join(", ")}`);
+	console.log(`  EXPIRES_IN: ${result.expires_in}s - ${new Date(Date.now() + result.expires_in * 1000).toString()}`);
+	console.log(`  TOKEN_TYPE: ${result.token_type}`);
 }
 
 module.exports = {

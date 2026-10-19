@@ -1,7 +1,11 @@
 import * as Main from "../..";
 
 export interface RequestQueryParameters {
-	/** App or user access token to validate. */
+	/**
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens).
+
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
+	 */
 	token: string;
 }
 
@@ -14,7 +18,7 @@ export namespace ResponseBody {
 		client_id: string;
 		/** A list of scopes granted to the access token. */
 		// TODO: add Authorization.Scope here
-		scopes: string[];
+		scopes?: string[];
 		/** **Integer**. The amount of seconds from now in which the token will expire. */
 		expires_in: number;
 		/** The lowercase username for the user associated with the access token. If the access token is an App Access Token, this field will be not included in response. */

@@ -60,11 +60,11 @@ async function main(env) {
 
 	console.log("");
 	switch(answer) {
-		case "1": await require("./validateaccesstoken").main(); console.log(""); break;
-		case "2": await require("./getappaccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
-		case "3": await require("./getuseraccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET, env.REDIRECT_URI); console.log(""); break;
-		case "4": await require("./refreshuseraccesstoken").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
-		case "5": await require("./revokeaccesstoken").main(env.CLIENT_ID); console.log(""); break;
+		case "1": await require("./validate-access-token").main(); console.log(""); break;
+		case "2": await require("./get-app-access-token").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
+		case "3": await require("./get-user-access-token").main(env.CLIENT_ID, env.CLIENT_SECRET, env.REDIRECT_URI); console.log(""); break;
+		case "4": await require("./refresh-user-access-token").main(env.CLIENT_ID, env.CLIENT_SECRET); console.log(""); break;
+		case "5": await require("./revoke-access-token").main(env.CLIENT_ID); console.log(""); break;
 	}
 	return main(env);
 }

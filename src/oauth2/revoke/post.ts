@@ -3,7 +3,11 @@ import * as Main from "../..";
 export interface RequestQueryParameters {
 	/** Your app’s [registered](https://dev.twitch.tv/docs/authentication/register-app) client ID. */
 	client_id: string;
-	/** The app or user access token to revoke. */
+	/**
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
+	 */
 	token: string;
 }
 

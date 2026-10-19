@@ -1,6 +1,6 @@
 import * as Main from "../../../..";
 
-export interface Authentication {
+export interface Authorization {
 	/**
 	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
 
@@ -8,15 +8,14 @@ export interface Authentication {
 	 */
 	client_id: string;
 	/**
-	 * String `"Bearer token"`, where:
-	 * - `token` must be replaced by [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scopes `user:read:broadcast` or `user:edit:broadcast`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}. To include inactive extensions, you must include the `user:edit:broadcast` scope.
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) that includes scopes `user:read:broadcast` or `user:edit:broadcast`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}. To include inactive extensions, you must include the `user:edit:broadcast` scope.
 
-	 * For example: `"Bearer cfabdegwdoklmawdzdo98xt2fo512y"`
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
 	 */
-	authorization: string;
+	token: string;
 }
 
-export type RequestParameters = Main.RequestParameters & Authentication;
+export type RequestParameters = Main.RequestParameters & Authorization;
 
 export interface ResponseBody {
 	/** The list of extensions that the user has installed. */
@@ -49,7 +48,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 		method: "GET",
 		headers: {
 			"client-id": params.client_id,
-			authorization: params.authorization,
+			authorization: `Bearer ${params.token}`,
 		},
 		...params.config,
 	};
