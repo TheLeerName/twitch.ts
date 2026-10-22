@@ -7,8 +7,9 @@ import * as ChannelFollow from "./channel/follow";
 import * as ChannelAdBreakBegin from "./channel/ad_break/begin";
 import * as ChannelChatClear from "./channel/chat/clear";
 import * as ChannelChatClearUserMessages from "./channel/chat/clear_user_messages";
-
 import * as ChannelChatMessage from "./channel/chat/message";
+import * as ChannelChatMessageDelete from "./channel/chat/message_delete";
+
 
 export type Transport = TransportWebHook | TransportWebSocket | TransportConduit;
 export interface TransportWebHook {
@@ -72,7 +73,9 @@ export type RequestBody =
 | ChannelAdBreakBegin.RequestBody
 | ChannelChatClear.RequestBody
 | ChannelChatClearUserMessages.RequestBody
-| ChannelChatMessage.RequestBody;
+| ChannelChatMessage.RequestBody
+| ChannelChatMessageDelete.RequestBody
+;
 export interface _RequestBody {
 	/** The subscription type name. */
 	type: string;
@@ -191,7 +194,9 @@ export type MessageNotification =
 | ChannelAdBreakBegin.MessageNotification
 | ChannelChatClear.MessageNotification
 | ChannelChatClearUserMessages.MessageNotification
-| ChannelChatMessage.MessageNotification;
+| ChannelChatMessage.MessageNotification
+| ChannelChatMessageDelete.MessageNotification
+;
 export function isMessageNotification(obj: Message): obj is MessageNotification {
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
 }
@@ -247,6 +252,6 @@ export {
 	ChannelAdBreakBegin,
 	ChannelChatClear,
 	ChannelChatClearUserMessages,
-
 	ChannelChatMessage,
+	ChannelChatMessageDelete,
 };
