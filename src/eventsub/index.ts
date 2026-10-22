@@ -5,6 +5,7 @@ import * as ChannelBitsUse from "./channel/bits/use";
 import * as ChannelUpdate from "./channel/update";
 import * as ChannelFollow from "./channel/follow";
 import * as ChannelAdBreakBegin from "./channel/ad_break/begin";
+import * as ChannelChatClear from "./channel/chat/clear";
 
 import * as ChannelChatMessage from "./channel/chat/message";
 
@@ -68,6 +69,7 @@ export type RequestBody =
 | ChannelUpdate.RequestBody
 | ChannelFollow.RequestBody
 | ChannelAdBreakBegin.RequestBody
+| ChannelChatClear.RequestBody
 | ChannelChatMessage.RequestBody;
 export interface _RequestBody {
 	/** The subscription type name. */
@@ -185,6 +187,7 @@ export type MessageNotification =
 | ChannelUpdate.MessageNotification
 | ChannelFollow.MessageNotification
 | ChannelAdBreakBegin.MessageNotification
+| ChannelChatClear.MessageNotification
 | ChannelChatMessage.MessageNotification;
 export function isMessageNotification(obj: Message): obj is MessageNotification {
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
@@ -239,6 +242,7 @@ export {
 	ChannelUpdate,
 	ChannelFollow,
 	ChannelAdBreakBegin,
+	ChannelChatClear,
 
 	ChannelChatMessage,
 };
