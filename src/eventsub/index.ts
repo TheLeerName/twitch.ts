@@ -4,6 +4,7 @@ import * as AutomodTermsUpdate from "./automod/terms/update";
 import * as ChannelBitsUse from "./channel/bits/use";
 import * as ChannelUpdate from "./channel/update";
 import * as ChannelFollow from "./channel/follow";
+import * as ChannelAdBreakBegin from "./channel/ad_break/begin";
 
 import * as ChannelChatMessage from "./channel/chat/message";
 
@@ -59,7 +60,15 @@ export namespace TransportConduit {
 	}
 }
 
-export type RequestBody = AutomodMessageHold.RequestBody | AutomodMessageUpdate.RequestBody | AutomodTermsUpdate.RequestBody | ChannelBitsUse.RequestBody | ChannelUpdate.RequestBody | ChannelFollow.RequestBody | ChannelChatMessage.RequestBody;
+export type RequestBody =
+| AutomodMessageHold.RequestBody
+| AutomodMessageUpdate.RequestBody
+| AutomodTermsUpdate.RequestBody
+| ChannelBitsUse.RequestBody
+| ChannelUpdate.RequestBody
+| ChannelFollow.RequestBody
+| ChannelAdBreakBegin.RequestBody
+| ChannelChatMessage.RequestBody;
 export interface _RequestBody {
 	/** The subscription type name. */
 	type: string;
@@ -136,7 +145,12 @@ export interface PayloadSubscription<_RequestBody extends RequestBody = RequestB
 	created_at: string;
 }
 
-export type Message = MessageWelcome | MessageSessionKeepalive | MessageNotification | MessageSessionReconnect | MessageRevocation;
+export type Message =
+| MessageWelcome
+| MessageSessionKeepalive
+| MessageNotification
+| MessageSessionReconnect
+| MessageRevocation;
 /** Defines the first message that the EventSub WebSocket server sends after your client connects to the server. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#welcome-message) */
 export interface MessageWelcome {
 	/** An object that identifies the message. */
@@ -170,6 +184,7 @@ export type MessageNotification =
 | ChannelBitsUse.MessageNotification
 | ChannelUpdate.MessageNotification
 | ChannelFollow.MessageNotification
+| ChannelAdBreakBegin.MessageNotification
 | ChannelChatMessage.MessageNotification;
 export function isMessageNotification(obj: Message): obj is MessageNotification {
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
@@ -223,6 +238,7 @@ export {
 	ChannelBitsUse,
 	ChannelUpdate,
 	ChannelFollow,
+	ChannelAdBreakBegin,
 
 	ChannelChatMessage,
 };
