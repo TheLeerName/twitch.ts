@@ -103,11 +103,12 @@ export interface _PayloadEvent {
 		/** Ordered list of chat message fragments. */
 		fragments: (MessageFragmentText | MessageFragmentCheermote | MessageFragmentEmote | MessageFragmentMention)[];
 	};
-	/** The type of notice. */
+	/** The type of notice. Some notices can have own metadata's. */
 	notice_type: string;
 }
 
 export interface PayloadEventSub extends _PayloadEvent {
+	/** The type of notice. Currently it is user is being subscribed to channel, metadata is in `sub` field. */
 	notice_type: "sub";
 	/** Information about the sub event. */
 	sub: {
@@ -128,6 +129,7 @@ export interface PayloadEventSub extends _PayloadEvent {
 }
 
 export interface PayloadEventResub extends _PayloadEvent {
+	/** The type of notice. Currently it is user is being resubscribed to channel, metadata is in `resub` field. */
 	notice_type: "resub";
 	/** Information about the resub event. */
 	resub: PayloadEventResubInfo;
@@ -176,6 +178,7 @@ export interface PayloadEventResubInfoNonAnonymous extends _PayloadEventResubInf
 }
 
 export interface PayloadEventSubGift extends _PayloadEvent {
+	/** The type of notice. Currently it is user is gaining gift subscription to channel, metadata is in `sub_gift` field. */
 	notice_type: "sub_gift";
 	/** Information about the gift sub event. */
 	sub_gift: {
@@ -204,6 +207,7 @@ export interface PayloadEventSubGift extends _PayloadEvent {
 }
 
 export interface PayloadEventCommunitySubGift extends _PayloadEvent {
+	/** The type of notice. Currently it is community are gaining gift subscriptions to channel, metadata is in `community_sub_gift` field. */
 	notice_type: "community_sub_gift";
 	/** Information about the community gift sub event. */
 	community_sub_gift: {
@@ -226,6 +230,7 @@ export interface PayloadEventCommunitySubGift extends _PayloadEvent {
 }
 
 export interface PayloadEventGiftPaidUpgrade extends _PayloadEvent {
+	/** The type of notice. Currently it is user is being subscribed to channel after getting subscription by gift, metadata is in `gift_paid_upgrade` field. */
 	notice_type: "gift_paid_upgrade";
 	/** Information about the community gift paid upgrade event. */
 	gift_paid_upgrade: PayloadEventGiftPaidUpgradeInfo;
@@ -251,6 +256,7 @@ export interface PayloadEventGiftPaidUpgradeInfoNonAnonymous extends _PayloadEve
 }
 
 export interface PayloadEventPrimePaidUpgrade extends _PayloadEvent {
+	/** The type of notice. Currently it is user is being subscribed to channel after getting Prime subscription, metadata is in `prime_paid_upgrade` field. */
 	notice_type: "prime_paid_upgrade";
 	/** Information about the Prime gift paid upgrade event. */
 	prime_paid_upgrade: {
@@ -267,6 +273,7 @@ export interface PayloadEventPrimePaidUpgrade extends _PayloadEvent {
 }
 
 export interface PayloadEventPayItForward extends _PayloadEvent {
+	/** The type of notice. Currently it is user is gifting subscription to their gifter, metadata is in `pay_it_forward` field. */
 	notice_type: "pay_it_forward";
 	/** Information about the pay it forward event. */
 	pay_it_forward: PayloadEventPayItForwardInfo;
@@ -275,7 +282,7 @@ export type PayloadEventPayItForwardInfo = PayloadEventPayItForwardInfoAnonymous
 export interface _PayloadEventPayItForwardInfo {
 	/** Whether the gift was given anonymously. */
 	gifter_is_anonymous: boolean;
-	/** The user ID of the user w`ho gifted the subscription. Is `null` if anonymous. */
+	/** The user ID of the user who gifted the subscription. Is `null` if anonymous. */
 	gifter_user_id: string | null;
 	/** The user name of the user who gifted the subscription. Is `null` if anonymous. */
 	gifter_user_name: string | null;
@@ -296,6 +303,7 @@ export interface PayloadEventPayItForwardInfoNonAnonymous extends _PayloadEventP
 }
 
 export interface PayloadEventRaid extends _PayloadEvent {
+	/** The type of notice. Currently it is user is being raided, metadata is in `raid` field. */
 	notice_type: "raid";
 	/** Information about the raid event. */
 	raid: {
@@ -313,21 +321,14 @@ export interface PayloadEventRaid extends _PayloadEvent {
 }
 
 export interface PayloadEventUnraid extends _PayloadEvent {
+	/** The type of notice. Currently it is user is no longer being raided. */
 	notice_type: "unraid";
 	/** Information about the unraid event. Is empty. */
 	unraid: {};
 }
 
 export interface PayloadEventAnnouncement extends _PayloadEvent {
-	notice_type: "announcement";
-	/** Information about the announcement event. */
-	announcement: {
-		/** Color of the announcement. */
-		color: string;
-	};
-}
-
-export interface PayloadEventAnnouncement extends _PayloadEvent {
+	/** The type of notice. Currently it is chat is getting announcement message, metadata is in `announcement` field. */
 	notice_type: "announcement";
 	/** Information about the announcement event. */
 	announcement: {
@@ -337,6 +338,7 @@ export interface PayloadEventAnnouncement extends _PayloadEvent {
 }
 
 export interface PayloadEventBitsBadgeTier extends _PayloadEvent {
+	/** The type of notice. Currently it is user's bits badge tier is being updated, metadata is in `bits_badge_tier` field. */
 	notice_type: "bits_badge_tier";
 	/** Information about the Bits badge tier event. */
 	bits_badge_tier: {
@@ -346,6 +348,7 @@ export interface PayloadEventBitsBadgeTier extends _PayloadEvent {
 }
 
 export interface PayloadEventCharityDonation extends _PayloadEvent {
+	/** The type of notice. Currently it is charity donation message, metadata is in `charity_donation` field. */
 	notice_type: "charity_donation";
 	/** Information about the charity donation event. */
 	charity_donation: {
@@ -364,6 +367,7 @@ export interface PayloadEventCharityDonation extends _PayloadEvent {
 }
 
 export interface PayloadEventWatchStreak extends _PayloadEvent {
+	/** The type of notice. Currently it is user is posting their watch streak message, metadata is in `watch_streak` field. */
 	notice_type: "watch_streak";
 	/** Information about the Watch Streak event. */
 	watch_streak: {
@@ -375,6 +379,7 @@ export interface PayloadEventWatchStreak extends _PayloadEvent {
 }
 
 export interface PayloadEventModiversary extends _PayloadEvent {
+	/** The type of notice. Currently it is user is posting their modiversary message, metadata is in `watch_streak` field. */
 	notice_type: "modiversary";
 	/** Information about the modiversary event. */
 	modiversary: {
@@ -384,6 +389,7 @@ export interface PayloadEventModiversary extends _PayloadEvent {
 }
 
 export interface PayloadEventGiftedDropsSummary extends _PayloadEvent {
+	/** The type of notice. Metadata is in `gifted_drops_summary` field. */
 	notice_type: "gifted_drops_summary";
 	/** Information about the gifted Drops summary event. */
 	gifted_drops_summary: {
