@@ -9,7 +9,70 @@ import * as ChannelChatClear from "./channel/chat/clear";
 import * as ChannelChatClearUserMessages from "./channel/chat/clear_user_messages";
 import * as ChannelChatMessage from "./channel/chat/message";
 import * as ChannelChatMessageDelete from "./channel/chat/message_delete";
-
+import * as ChannelChatNotification from "./channel/chat/notification";
+import * as ChannelChatSettingsUpdate from "./channel/chat_settings/update";
+import * as ChannelChatUserMessageHold from "./channel/chat/user_message_hold";
+import * as ChannelChatUserMessageUpdate from "./channel/chat/user_message_update";
+import * as ChannelSubscribe from "./channel/subscribe";
+import * as ChannelSubscriptionEnd from "./channel/subscription/end";
+import * as ChannelSubscriptionMessage from "./channel/subscription/message";
+import * as ChannelRaid from "./channel/raid";
+import * as ChannelBan from "./channel/ban";
+import * as ChannelUnban from "./channel/unban";
+import * as ChannelUnbanRequestCreate from "./channel/unban_request/create";
+import * as ChannelUnbanRequestResolve from "./channel/unban_request/resolve";
+import * as ChannelModerate from "./channel/moderate";
+import * as ChannelModeratorAdd from "./channel/moderator/add";
+import * as ChannelModeratorRemove from "./channel/moderator/remove";
+import * as ChannelGuestStarSessionBegin from "./channel/guest_star_session/begin";
+import * as ChannelGuestStarSessionEnd from "./channel/guest_star_session/end";
+import * as ChannelGuestStarGuestUpdate from "./channel/guest_star_guest/update";
+import * as ChannelGuestStarSettingsUpdate from "./channel/guest_star_settings/update";
+import * as ChannelChannelPointsAutomaticRewardRedemptionAdd from "./channel/channel_points_automatic_reward_redemption/add";
+import * as ChannelChannelPointsCustomRewardAdd from "./channel/channel_points_custom_reward/add";
+import * as ChannelChannelPointsCustomRewardUpdate from "./channel/channel_points_custom_reward/update";
+import * as ChannelChannelPointsCustomRewardRemove from "./channel/channel_points_custom_reward/remove";
+import * as ChannelChannelPointsCustomRewardRedemptionAdd from "./channel/channel_points_custom_reward_redemption/add";
+import * as ChannelChannelPointsCustomRewardRedemptionUpdate from "./channel/channel_points_custom_reward_redemption/update";
+import * as ChannelCustomPowerUpRedemptionAdd from "./channel/custom_power_up_redemption/add";
+import * as ChannelPollBegin from "./channel/poll/begin";
+import * as ChannelPollProgress from "./channel/poll/progress";
+import * as ChannelPollEnd from "./channel/poll/end";
+import * as ChannelPredictionBegin from "./channel/prediction/begin";
+import * as ChannelPredictionProgress from "./channel/prediction/progress";
+import * as ChannelPredictionLock from "./channel/prediction/lock";
+import * as ChannelPredictionEnd from "./channel/prediction/end";
+import * as ChannelSuspiciousUserUpdate from "./channel/suspicious_user/update";
+import * as ChannelSuspiciousUserMessage from "./channel/suspicious_user/message";
+import * as ChannelVipAdd from "./channel/vip/add";
+import * as ChannelVipRemove from "./channel/vip/remove";
+import * as ChannelWarningAcknowledge from "./channel/warning/acknowledge";
+import * as ChannelWarningSend from "./channel/warning/send";
+import * as ChannelHypeTrainBegin from "./channel/hype_train/begin";
+import * as ChannelHypeTrainProgress from "./channel/hype_train/progress";
+import * as ChannelCharityCampaignDonate from "./channel/charity_campaign/donate";
+import * as ChannelCharityCampaignStart from "./channel/charity_campaign/start";
+import * as ChannelCharityCampaignProgress from "./channel/charity_campaign/progress";
+import * as ChannelCharityCampaignStop from "./channel/charity_campaign/stop";
+import * as ChannelSharedChatBegin from "./channel/shared_chat/begin";
+import * as ChannelSharedChatUpdate from "./channel/shared_chat/update";
+import * as ChannelSharedChatEnd from "./channel/shared_chat/end";
+import * as ChannelShieldModeBegin from "./channel/shield_mode/begin";
+import * as ChannelShieldModeEnd from "./channel/shield_mode/end";
+import * as ChannelShoutoutCreate from "./channel/shoutout/create";
+import * as ChannelShoutoutReceive from "./channel/shoutout/receive";
+import * as ConduitShardDisabled from "./conduit/shard/disabled";
+import * as DropEntitlementGrant from "./drop/entitlement/grant";
+import * as ExtensionBitsTransactionCreate from "./extension/bits_transaction/create";
+import * as ChannelGoalBegin from "./channel/goal/begin";
+import * as ChannelGoalProgress from "./channel/goal/progress";
+import * as ChannelGoalEnd from "./channel/goal/end";
+import * as StreamOnline from "./stream/online";
+import * as StreamOffline from "./stream/offline";
+import * as UserAuthorizationGrant from "./user/authorization/grant";
+import * as UserAuthorizationRevoke from "./user/authorization/revoke";
+import * as UserUpdate from "./user/update";
+import * as UserWhisperMessage from "./user/whisper/message";
 
 export type Transport = TransportWebHook | TransportWebSocket | TransportConduit;
 export interface TransportWebHook {
@@ -75,6 +138,70 @@ export type RequestBody =
 | ChannelChatClearUserMessages.RequestBody
 | ChannelChatMessage.RequestBody
 | ChannelChatMessageDelete.RequestBody
+| ChannelChatNotification.RequestBody
+| ChannelChatSettingsUpdate.RequestBody
+| ChannelChatUserMessageHold.RequestBody
+| ChannelChatUserMessageUpdate.RequestBody
+| ChannelSubscribe.RequestBody
+| ChannelSubscriptionEnd.RequestBody
+| ChannelSubscriptionMessage.RequestBody
+| ChannelRaid.RequestBody
+| ChannelBan.RequestBody
+| ChannelUnban.RequestBody
+| ChannelUnbanRequestCreate.RequestBody
+| ChannelUnbanRequestResolve.RequestBody
+| ChannelModerate.RequestBody
+| ChannelModeratorAdd.RequestBody
+| ChannelModeratorRemove.RequestBody
+| ChannelGuestStarSessionBegin.RequestBody
+| ChannelGuestStarSessionEnd.RequestBody
+| ChannelGuestStarGuestUpdate.RequestBody
+| ChannelGuestStarSettingsUpdate.RequestBody
+| ChannelChannelPointsAutomaticRewardRedemptionAdd.RequestBody
+| ChannelChannelPointsCustomRewardAdd.RequestBody
+| ChannelChannelPointsCustomRewardUpdate.RequestBody
+| ChannelChannelPointsCustomRewardRemove.RequestBody
+| ChannelChannelPointsCustomRewardRedemptionAdd.RequestBody
+| ChannelChannelPointsCustomRewardRedemptionUpdate.RequestBody
+| ChannelCustomPowerUpRedemptionAdd.RequestBody
+| ChannelPollBegin.RequestBody
+| ChannelPollProgress.RequestBody
+| ChannelPollEnd.RequestBody
+| ChannelPredictionBegin.RequestBody
+| ChannelPredictionProgress.RequestBody
+| ChannelPredictionLock.RequestBody
+| ChannelPredictionEnd.RequestBody
+| ChannelSuspiciousUserUpdate.RequestBody
+| ChannelSuspiciousUserMessage.RequestBody
+| ChannelVipAdd.RequestBody
+| ChannelVipRemove.RequestBody
+| ChannelWarningAcknowledge.RequestBody
+| ChannelWarningSend.RequestBody
+| ChannelHypeTrainBegin.RequestBody
+| ChannelHypeTrainProgress.RequestBody
+| ChannelCharityCampaignDonate.RequestBody
+| ChannelCharityCampaignStart.RequestBody
+| ChannelCharityCampaignProgress.RequestBody
+| ChannelCharityCampaignStop.RequestBody
+| ChannelSharedChatBegin.RequestBody
+| ChannelSharedChatUpdate.RequestBody
+| ChannelSharedChatEnd.RequestBody
+| ChannelShieldModeBegin.RequestBody
+| ChannelShieldModeEnd.RequestBody
+| ChannelShoutoutCreate.RequestBody
+| ChannelShoutoutReceive.RequestBody
+| ConduitShardDisabled.RequestBody
+| DropEntitlementGrant.RequestBody
+| ExtensionBitsTransactionCreate.RequestBody
+| ChannelGoalBegin.RequestBody
+| ChannelGoalProgress.RequestBody
+| ChannelGoalEnd.RequestBody
+| StreamOnline.RequestBody
+| StreamOffline.RequestBody
+| UserAuthorizationGrant.RequestBody
+| UserAuthorizationRevoke.RequestBody
+| UserUpdate.RequestBody
+| UserWhisperMessage.RequestBody
 ;
 export interface _RequestBody {
 	/** The subscription type name. */
@@ -196,7 +323,70 @@ export type MessageNotification =
 | ChannelChatClearUserMessages.MessageNotification
 | ChannelChatMessage.MessageNotification
 | ChannelChatMessageDelete.MessageNotification
-;
+| ChannelChatNotification.MessageNotification
+| ChannelChatSettingsUpdate.MessageNotification
+| ChannelChatUserMessageHold.MessageNotification
+| ChannelChatUserMessageUpdate.MessageNotification
+| ChannelSubscribe.MessageNotification
+| ChannelSubscriptionEnd.MessageNotification
+| ChannelSubscriptionMessage.MessageNotification
+| ChannelRaid.MessageNotification
+| ChannelBan.MessageNotification
+| ChannelUnban.MessageNotification
+| ChannelUnbanRequestCreate.MessageNotification
+| ChannelUnbanRequestResolve.MessageNotification
+| ChannelModerate.MessageNotification
+| ChannelModeratorAdd.MessageNotification
+| ChannelModeratorRemove.MessageNotification
+| ChannelGuestStarSessionBegin.MessageNotification
+| ChannelGuestStarSessionEnd.MessageNotification
+| ChannelGuestStarGuestUpdate.MessageNotification
+| ChannelGuestStarSettingsUpdate.MessageNotification
+| ChannelChannelPointsAutomaticRewardRedemptionAdd.MessageNotification
+| ChannelChannelPointsCustomRewardAdd.MessageNotification
+| ChannelChannelPointsCustomRewardUpdate.MessageNotification
+| ChannelChannelPointsCustomRewardRemove.MessageNotification
+| ChannelChannelPointsCustomRewardRedemptionAdd.MessageNotification
+| ChannelChannelPointsCustomRewardRedemptionUpdate.MessageNotification
+| ChannelCustomPowerUpRedemptionAdd.MessageNotification
+| ChannelPollBegin.MessageNotification
+| ChannelPollProgress.MessageNotification
+| ChannelPollEnd.MessageNotification
+| ChannelPredictionBegin.MessageNotification
+| ChannelPredictionProgress.MessageNotification
+| ChannelPredictionLock.MessageNotification
+| ChannelPredictionEnd.MessageNotification
+| ChannelSuspiciousUserUpdate.MessageNotification
+| ChannelSuspiciousUserMessage.MessageNotification
+| ChannelVipAdd.MessageNotification
+| ChannelVipRemove.MessageNotification
+| ChannelWarningAcknowledge.MessageNotification
+| ChannelWarningSend.MessageNotification
+| ChannelHypeTrainBegin.MessageNotification
+| ChannelHypeTrainProgress.MessageNotification
+| ChannelCharityCampaignDonate.MessageNotification
+| ChannelCharityCampaignStart.MessageNotification
+| ChannelCharityCampaignProgress.MessageNotification
+| ChannelCharityCampaignStop.MessageNotification
+| ChannelSharedChatBegin.MessageNotification
+| ChannelSharedChatUpdate.MessageNotification
+| ChannelSharedChatEnd.MessageNotification
+| ChannelShieldModeBegin.MessageNotification
+| ChannelShieldModeEnd.MessageNotification
+| ChannelShoutoutCreate.MessageNotification
+| ChannelShoutoutReceive.MessageNotification
+| ConduitShardDisabled.MessageNotification
+| DropEntitlementGrant.MessageNotification
+| ExtensionBitsTransactionCreate.MessageNotification
+| ChannelGoalBegin.MessageNotification
+| ChannelGoalProgress.MessageNotification
+| ChannelGoalEnd.MessageNotification
+| StreamOnline.MessageNotification
+| StreamOffline.MessageNotification
+| UserAuthorizationGrant.MessageNotification
+| UserAuthorizationRevoke.MessageNotification
+| UserUpdate.MessageNotification
+| UserWhisperMessage.MessageNotification;
 export function isMessageNotification(obj: Message): obj is MessageNotification {
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
 }
@@ -254,4 +444,68 @@ export {
 	ChannelChatClearUserMessages,
 	ChannelChatMessage,
 	ChannelChatMessageDelete,
+	ChannelChatNotification,
+	ChannelChatSettingsUpdate,
+	ChannelChatUserMessageHold,
+	ChannelChatUserMessageUpdate,
+	ChannelSubscribe,
+	ChannelSubscriptionEnd,
+	ChannelSubscriptionMessage,
+	ChannelRaid,
+	ChannelBan,
+	ChannelUnban,
+	ChannelUnbanRequestCreate,
+	ChannelUnbanRequestResolve,
+	ChannelModerate,
+	ChannelModeratorAdd,
+	ChannelModeratorRemove,
+	ChannelGuestStarSessionBegin,
+	ChannelGuestStarSessionEnd,
+	ChannelGuestStarGuestUpdate,
+	ChannelGuestStarSettingsUpdate,
+	ChannelChannelPointsAutomaticRewardRedemptionAdd,
+	ChannelChannelPointsCustomRewardAdd,
+	ChannelChannelPointsCustomRewardUpdate,
+	ChannelChannelPointsCustomRewardRemove,
+	ChannelChannelPointsCustomRewardRedemptionAdd,
+	ChannelChannelPointsCustomRewardRedemptionUpdate,
+	ChannelCustomPowerUpRedemptionAdd,
+	ChannelPollBegin,
+	ChannelPollProgress,
+	ChannelPollEnd,
+	ChannelPredictionBegin,
+	ChannelPredictionProgress,
+	ChannelPredictionLock,
+	ChannelPredictionEnd,
+	ChannelSuspiciousUserUpdate,
+	ChannelSuspiciousUserMessage,
+	ChannelVipAdd,
+	ChannelVipRemove,
+	ChannelWarningAcknowledge,
+	ChannelWarningSend,
+	ChannelHypeTrainBegin,
+	ChannelHypeTrainProgress,
+	ChannelCharityCampaignDonate,
+	ChannelCharityCampaignStart,
+	ChannelCharityCampaignProgress,
+	ChannelCharityCampaignStop,
+	ChannelSharedChatBegin,
+	ChannelSharedChatUpdate,
+	ChannelSharedChatEnd,
+	ChannelShieldModeBegin,
+	ChannelShieldModeEnd,
+	ChannelShoutoutCreate,
+	ChannelShoutoutReceive,
+	ConduitShardDisabled,
+	DropEntitlementGrant,
+	ExtensionBitsTransactionCreate,
+	ChannelGoalBegin,
+	ChannelGoalProgress,
+	ChannelGoalEnd,
+	StreamOnline,
+	StreamOffline,
+	UserAuthorizationGrant,
+	UserAuthorizationRevoke,
+	UserUpdate,
+	UserWhisperMessage,
 };
