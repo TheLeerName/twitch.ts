@@ -25,8 +25,8 @@ export interface Condition {
 }
 
 /**
- * ## [channel.guest_star_settings.update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_guestupdate)
- * Sends a notification when a guest or a slot is updated in an active Guest Star session.
+ * ## [channel.guest_star_settings.update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelguest_star_settingsupdate)
+ * Sends a notification when the host preferences for Guest Star have been updated.
 
  * ### Authorization
  * Must have `channel:read:guest_star`, `channel:manage:guest_star`, `moderator:read:guest_star` or `moderator:manage:guest_star` scope.
