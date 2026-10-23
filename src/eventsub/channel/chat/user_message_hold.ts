@@ -3,10 +3,10 @@ import { MessageFragmentText, MessageFragmentEmote, MessageFragmentCheermote } f
 
 /**
  * ## [channel.chat.user_message_hold](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_hold)
- * Sends a notification when a moderator or bot clears all messages from the chat room.
+ * Notifies a user if their message is caught by automod.
 
  * ### Authorization
- * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+ * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
  */
 export interface RequestBody extends Main.EventSub._RequestBody {
 	type: "channel.chat.user_message_hold";
@@ -26,11 +26,11 @@ export interface Condition {
 }
 
 /**
- * ## [channel.chat.user_message_hold](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatclear)
- * Sends a notification when a moderator or bot clears all messages from the chat room.
+ * ## [channel.chat.user_message_hold](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_hold)
+ * Notifies a user if their message is caught by automod.
 
  * ### Authorization
- * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user, and either `channel:bot` scope from broadcaster or moderator status.
+ * Requires `user:read:chat` scope from chatting user. If app access token used, then additionally requires `user:bot` scope from chatting user.
  */
 export interface MessageNotification {
 	/** An object that identifies the message. */
