@@ -91,8 +91,8 @@ export type PayloadEvent =
 | PayloadEventDenyUnbanRequest
 | PayloadEventWarn
 | PayloadEventSharedChatBan
-| PayloadEventSharedChatTimeout
 | PayloadEventSharedChatUnban
+| PayloadEventSharedChatTimeout
 | PayloadEventSharedChatUntimeout
 | PayloadEventSharedChatDelete;
 export interface _PayloadEvent {
@@ -114,11 +114,12 @@ export interface _PayloadEvent {
 	moderator_user_login: string;
 	/** The user name of the moderator. */
 	moderator_user_name: string;
-	/** The action performed. */
+	/** The action performed. Some actions can have own metadata's. */
 	action: string;
 }
 
 export interface PayloadEventBan extends _PayloadEvent {
+	/** The action performed. Currently it is user is being banned, event metadata is in `ban` field. */
 	action: "ban";
 	/** Optional. Metadata associated with the ban command. */
 	ban: {
@@ -134,6 +135,7 @@ export interface PayloadEventBan extends _PayloadEvent {
 }
 
 export interface PayloadEventUnban extends _PayloadEvent {
+	/** The action performed. Currently it is user is being unbanned, event metadata is in `unban` field. */
 	action: "unban";
 	/** Metadata associated with the unban command. */
 	unban: {
@@ -147,6 +149,7 @@ export interface PayloadEventUnban extends _PayloadEvent {
 }
 
 export interface PayloadEventTimeout extends _PayloadEvent {
+	/** The action performed. Currently it is user is being timed out, event metadata is in `timeout` field. */
 	action: "timeout";
 	/** Metadata associated with the timeout command. */
 	timeout: {
@@ -164,6 +167,7 @@ export interface PayloadEventTimeout extends _PayloadEvent {
 }
 
 export interface PayloadEventUntimeout extends _PayloadEvent {
+	/** The action performed. Currently it is user is being untimed out, event metadata is in `untimeout` field. */
 	action: "untimeout";
 	/** Metadata associated with the untimeout command. */
 	untimeout: {
@@ -177,17 +181,21 @@ export interface PayloadEventUntimeout extends _PayloadEvent {
 }
 
 export interface PayloadEventClear extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being cleared. */
 	action: "clear";
 }
 
 export interface PayloadEventEmoteOnly extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being set to emote-only mode. */
 	action: "emoteonly";
 }
 export interface PayloadEventEmoteOnlyOff extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being unset from emote-only mode. */
 	action: "emoteonlyoff";
 }
 
 export interface PayloadEventFollowers extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being set to follower-only mode, event metadata is in `followers` field. */
 	action: "followers";
 	/** Metadata associated with the followers command. */
 	followers: {
@@ -196,17 +204,21 @@ export interface PayloadEventFollowers extends _PayloadEvent {
 	};
 }
 export interface PayloadEventFollowersOff extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being unset from follower-only mode. */
 	action: "followersoff";
 }
 
 export interface PayloadEventUniqueChat extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being set to unique message mode. */
 	action: "uniquechat";
 }
 export interface PayloadEventUniqueChatOff extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being unset from unique message mode. */
 	action: "uniquechatoff";
 }
 
 export interface PayloadEventSlow extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being set to slow mode, event metadata is in `slow` field. */
 	action: "slow";
 	/** Metadata associated with the slow command. */
 	slow: {
@@ -215,17 +227,21 @@ export interface PayloadEventSlow extends _PayloadEvent {
 	};
 }
 export interface PayloadEventSlowOff extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being unset from slow mode. */
 	action: "slowoff";
 }
 
 export interface PayloadEventSubscribers extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being set to subscriber-only mode. */
 	action: "subscribers";
 }
 export interface PayloadEventSubscribersOff extends _PayloadEvent {
+	/** The action performed. Currently it is chat is being unset from subscriber-only mode. */
 	action: "subscribersoff";
 }
 
 export interface PayloadEventDelete extends _PayloadEvent {
+	/** The action performed. Currently it is message is being deleted, event metadata is in `delete` field. */
 	action: "delete";
 	/** Metadata associated with the delete command. */
 	delete: {
@@ -243,6 +259,7 @@ export interface PayloadEventDelete extends _PayloadEvent {
 }
 
 export interface PayloadEventVip extends _PayloadEvent {
+	/** The action performed. Currently it is user is gaining VIP status, event metadata is in `vip` field. */
 	action: "vip";
 	/** Metadata associated with the vip command. */
 	vip: {
@@ -256,6 +273,7 @@ export interface PayloadEventVip extends _PayloadEvent {
 }
 
 export interface PayloadEventUnvip extends _PayloadEvent {
+	/** The action performed. Currently it is user is losing their VIP status, event metadata is in `unvip` field. */
 	action: "unvip";
 	/** Metadata associated with the unvip command. */
 	unvip: {
@@ -269,6 +287,7 @@ export interface PayloadEventUnvip extends _PayloadEvent {
 }
 
 export interface PayloadEventRaid extends _PayloadEvent {
+	/** The action performed. Currently it is user is being raided, event metadata is in `raid` field. */
 	action: "raid";
 	/** Metadata associated with the raid command. */
 	raid: {
@@ -284,6 +303,7 @@ export interface PayloadEventRaid extends _PayloadEvent {
 }
 
 export interface PayloadEventUnraid extends _PayloadEvent {
+	/** The action performed. Currently it is user is no longer being raided, event metadata is in `unraid` field. */
 	action: "unraid";
 	/** Metadata associated with the unraid command. */
 	unraid: {
@@ -297,6 +317,7 @@ export interface PayloadEventUnraid extends _PayloadEvent {
 }
 
 export interface PayloadEventAddBlockedTerm extends _PayloadEvent {
+	/** The action performed. Currently it is AutoMod blocked term is being added, event metadata is in `add_blocked_term` field. */
 	action: "add_blocked_term";
 	/** Metadata associated with the automod terms changes. */
 	automod_terms: {
@@ -310,6 +331,7 @@ export interface PayloadEventAddBlockedTerm extends _PayloadEvent {
 }
 
 export interface PayloadEventAddPermittedTerm extends _PayloadEvent {
+	/** The action performed. Currently it is AutoMod permitted term is being added, event metadata is in `add_permitted_term` field. */
 	action: "add_permitted_term";
 	/** Metadata associated with the automod terms changes. */
 	automod_terms: {
@@ -323,6 +345,7 @@ export interface PayloadEventAddPermittedTerm extends _PayloadEvent {
 }
 
 export interface PayloadEventRemoveBlockedTerm extends _PayloadEvent {
+	/** The action performed. Currently it is AutoMod blocked term is being removed, event metadata is in `remove_blocked_term` field. */
 	action: "remove_blocked_term";
 	/** Metadata associated with the automod terms changes. */
 	automod_terms: {
@@ -336,6 +359,7 @@ export interface PayloadEventRemoveBlockedTerm extends _PayloadEvent {
 }
 
 export interface PayloadEventRemovePermittedTerm extends _PayloadEvent {
+	/** The action performed. Currently it is AutoMod permitted term is being removed, event metadata is in `remove_permitted_term` field. */
 	action: "remove_permitted_term";
 	/** Metadata associated with the automod terms changes. */
 	automod_terms: {
@@ -349,6 +373,7 @@ export interface PayloadEventRemovePermittedTerm extends _PayloadEvent {
 }
 
 export interface PayloadEventMod extends _PayloadEvent {
+	/** The action performed. Currently it is user is gaining moderator status, event metadata is in `mod` field. */
 	action: "mod";
 	/** Metadata associated with the mod command. */
 	mod: {
@@ -362,6 +387,7 @@ export interface PayloadEventMod extends _PayloadEvent {
 }
 
 export interface PayloadEventUnmod extends _PayloadEvent {
+	/** The action performed. Currently it is user is losing their moderator status, event metadata is in `unmod` field. */
 	action: "unmod";
 	/** Metadata associated with the unmod command. */
 	unmod: {
@@ -375,6 +401,7 @@ export interface PayloadEventUnmod extends _PayloadEvent {
 }
 
 export interface PayloadEventApproveUnbanRequest extends _PayloadEvent {
+	/** The action performed. Currently it is unban request is being approved, event metadata is in `approve_unban_request` field. */
 	action: "approve_unban_request";
 	/** Metadata associated with an unban request. */
 	unban_request: {
@@ -391,6 +418,7 @@ export interface PayloadEventApproveUnbanRequest extends _PayloadEvent {
 }
 
 export interface PayloadEventDenyUnbanRequest extends _PayloadEvent {
+	/** The action performed. Currently it is unban request is being denied, event metadata is in `deny_unban_request` field. */
 	action: "deny_unban_request";
 	/** Metadata associated with an unban request. */
 	unban_request: {
@@ -407,6 +435,7 @@ export interface PayloadEventDenyUnbanRequest extends _PayloadEvent {
 }
 
 export interface PayloadEventWarn extends _PayloadEvent {
+	/** The action performed. Currently it is user is being warned, event metadata is in `warn` field. */
 	action: "warn";
 	/** Metadata associated with the warn command. */
 	warn: {
@@ -424,30 +453,35 @@ export interface PayloadEventWarn extends _PayloadEvent {
 }
 
 export interface PayloadEventSharedChatBan extends _PayloadEvent {
+	/** The action performed. Currently it is user is being banned in channel other than the broadcaster in the subscription condition, event metadata is in `shared_chat_ban` field. */
 	action: "shared_chat_ban";
 	/** This field has the same information as the `ban` field but for a action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition. */
 	shared_chat_ban: PayloadEventBan[PayloadEventBan["action"]];
 }
 
 export interface PayloadEventSharedChatUnban extends _PayloadEvent {
+	/** The action performed. Currently it is user is being unbanned in channel other than the broadcaster in the subscription condition, event metadata is in `shared_chat_unban` field. */
 	action: "shared_chat_unban";
 	/** This field has the same information as the `ban` field but for a action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition. */
 	shared_chat_unban: PayloadEventUnban[PayloadEventUnban["action"]];
 }
 
 export interface PayloadEventSharedChatTimeout extends _PayloadEvent {
+	/** The action performed. Currently it is user is being timed out in channel other than the broadcaster in the subscription condition, event metadata is in `shared_chat_timeout` field. */
 	action: "shared_chat_timeout";
 	/** This field has the same information as the `ban` field but for a action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition. */
 	shared_chat_timeout: PayloadEventTimeout[PayloadEventTimeout["action"]];
 }
 
 export interface PayloadEventSharedChatUntimeout extends _PayloadEvent {
+	/** The action performed. Currently it is user is being untimed out in channel other than the broadcaster in the subscription condition, event metadata is in `shared_chat_untimeout` field. */
 	action: "shared_chat_timeout";
 	/** This field has the same information as the `ban` field but for a action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition. */
 	shared_chat_untimeout: PayloadEventUntimeout[PayloadEventUntimeout["action"]];
 }
 
 export interface PayloadEventSharedChatDelete extends _PayloadEvent {
+	/** The action performed. Currently it is message is being deleted in channel other than the broadcaster in the subscription condition, event metadata is in `shared_chat_delete` field. */
 	action: "shared_chat_delete";
 	/** This field has the same information as the `delete` field but for a action that happened for a channel in a shared chat session other than the broadcaster in the subscription condition. */
 	shared_chat_delete: PayloadEventDelete[PayloadEventDelete["action"]];
