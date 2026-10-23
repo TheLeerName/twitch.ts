@@ -10,11 +10,12 @@ import * as ChannelChatClearUserMessages from "./channel/chat/clear_user_message
 import * as ChannelChatMessage from "./channel/chat/message";
 import * as ChannelChatMessageDelete from "./channel/chat/message_delete";
 import * as ChannelChatNotification from "./channel/chat/notification";
-/*import * as ChannelChatSettingsUpdate from "./channel/chat_settings/update";
+import * as ChannelChatSettingsUpdate from "./channel/chat_settings/update";
 import * as ChannelChatUserMessageHold from "./channel/chat/user_message_hold";
 import * as ChannelChatUserMessageUpdate from "./channel/chat/user_message_update";
 import * as ChannelSubscribe from "./channel/subscribe";
 import * as ChannelSubscriptionEnd from "./channel/subscription/end";
+import * as ChannelSubscriptionGift from "./channel/subscription/gift";
 import * as ChannelSubscriptionMessage from "./channel/subscription/message";
 import * as ChannelRaid from "./channel/raid";
 import * as ChannelBan from "./channel/ban";
@@ -72,7 +73,7 @@ import * as StreamOffline from "./stream/offline";
 import * as UserAuthorizationGrant from "./user/authorization/grant";
 import * as UserAuthorizationRevoke from "./user/authorization/revoke";
 import * as UserUpdate from "./user/update";
-import * as UserWhisperMessage from "./user/whisper/message";*/
+import * as UserWhisperMessage from "./user/whisper/message";
 
 export type Transport = TransportWebHook | TransportWebSocket | TransportConduit;
 export interface TransportWebHook {
@@ -139,11 +140,12 @@ export type RequestBody =
 | ChannelChatMessage.RequestBody
 | ChannelChatMessageDelete.RequestBody
 | ChannelChatNotification.RequestBody
-/*| ChannelChatSettingsUpdate.RequestBody
+| ChannelChatSettingsUpdate.RequestBody
 | ChannelChatUserMessageHold.RequestBody
 | ChannelChatUserMessageUpdate.RequestBody
 | ChannelSubscribe.RequestBody
 | ChannelSubscriptionEnd.RequestBody
+| ChannelSubscriptionGift.RequestBody
 | ChannelSubscriptionMessage.RequestBody
 | ChannelRaid.RequestBody
 | ChannelBan.RequestBody
@@ -201,7 +203,7 @@ export type RequestBody =
 | UserAuthorizationGrant.RequestBody
 | UserAuthorizationRevoke.RequestBody
 | UserUpdate.RequestBody
-| UserWhisperMessage.RequestBody*/;
+| UserWhisperMessage.RequestBody;
 export interface _RequestBody {
 	/** The subscription type name. */
 	type: string;
@@ -323,11 +325,12 @@ export type MessageNotification =
 | ChannelChatMessage.MessageNotification
 | ChannelChatMessageDelete.MessageNotification
 | ChannelChatNotification.MessageNotification
-/*| ChannelChatSettingsUpdate.MessageNotification
+| ChannelChatSettingsUpdate.MessageNotification
 | ChannelChatUserMessageHold.MessageNotification
 | ChannelChatUserMessageUpdate.MessageNotification
 | ChannelSubscribe.MessageNotification
 | ChannelSubscriptionEnd.MessageNotification
+| ChannelSubscriptionGift.MessageNotification
 | ChannelSubscriptionMessage.MessageNotification
 | ChannelRaid.MessageNotification
 | ChannelBan.MessageNotification
@@ -385,7 +388,7 @@ export type MessageNotification =
 | UserAuthorizationGrant.MessageNotification
 | UserAuthorizationRevoke.MessageNotification
 | UserUpdate.MessageNotification
-| UserWhisperMessage.MessageNotification*/;
+| UserWhisperMessage.MessageNotification;
 export function isMessageNotification(obj: Message): obj is MessageNotification {
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
 }
@@ -444,11 +447,12 @@ export {
 	ChannelChatMessage,
 	ChannelChatMessageDelete,
 	ChannelChatNotification,
-	/*ChannelChatSettingsUpdate,
+	ChannelChatSettingsUpdate,
 	ChannelChatUserMessageHold,
 	ChannelChatUserMessageUpdate,
 	ChannelSubscribe,
 	ChannelSubscriptionEnd,
+	ChannelSubscriptionGift,
 	ChannelSubscriptionMessage,
 	ChannelRaid,
 	ChannelBan,
@@ -506,5 +510,5 @@ export {
 	UserAuthorizationGrant,
 	UserAuthorizationRevoke,
 	UserUpdate,
-	UserWhisperMessage,*/
+	UserWhisperMessage,
 };

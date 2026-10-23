@@ -50,7 +50,7 @@ export interface Events {
 	"channel.chat.message": (message: Main.EventSub.ChannelChatMessage.MessageNotification) => void;
 	"channel.chat.message_delete": (message: Main.EventSub.ChannelChatMessageDelete.MessageNotification) => void;
 	"channel.chat.notification": (message: Main.EventSub.ChannelChatNotification.MessageNotification) => void;
-	/*"channel.chat_settings.update": (message: Main.EventSub.ChannelChatSettingsUpdate.MessageNotification) => void;
+	"channel.chat_settings.update": (message: Main.EventSub.ChannelChatSettingsUpdate.MessageNotification) => void;
 	"channel.chat.user_message_hold": (message: Main.EventSub.ChannelChatUserMessageHold.MessageNotification) => void;
 	"channel.chat.user_message_update": (message: Main.EventSub.ChannelChatUserMessageUpdate.MessageNotification) => void;
 	"channel.subscribe": (message: Main.EventSub.ChannelSubscribe.MessageNotification) => void;
@@ -112,7 +112,7 @@ export interface Events {
 	"user.authorization.grant": (message: Main.EventSub.UserAuthorizationGrant.MessageNotification) => void;
 	"user.authorization.revoke": (message: Main.EventSub.UserAuthorizationRevoke.MessageNotification) => void;
 	"user.update": (message: Main.EventSub.UserUpdate.MessageNotification) => void;
-	"user.whisper.message": (message: Main.EventSub.UserWhisperMessage.MessageNotification) => void;*/
+	"user.whisper.message": (message: Main.EventSub.UserWhisperMessage.MessageNotification) => void;
 }
 
 /**
