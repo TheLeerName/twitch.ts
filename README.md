@@ -36,7 +36,7 @@ Twitch.Helix.GetStreams.axiosRequest({
 ```
 - Getting chat messages
 ```js
-import * as Twitch from "../dist";
+import * as Twitch from "twitch.ts";
 
 const client_id = "";
 // user access token, app access token cant be used on websockets
