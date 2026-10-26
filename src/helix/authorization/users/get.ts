@@ -1,0 +1,76 @@
+import * as Main from "../../..";
+
+export interface Authorization{
+	/**
+	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
+
+	 * For example: For example: `"uo6dggojyb8d6soh92zknwmi5ej1q2"`
+	 */
+	client_id: string;
+	/**
+	 * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
+	 */
+	token: string;
+}
+
+export interface RequestQueryParameters {
+	/** The ID of the user(s) you want to check authorization for. The maximum number of IDs you may specify is 10. */
+	user_id: string | string[];
+}
+
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters;
+
+export interface ResponseBody {
+	/** List of users and their authorized scopes. */
+	data: {
+		/** The user’s ID. */
+		user_id: string;
+		/** The user’s display name. */
+		user_name: string;
+		/** The user’s login name. */
+		user_login: string;
+		/** An array of all the scopes the user has granted to the client ID. */
+		scopes: string[];
+		// TODO: add Authorization.Scope here
+		/** A boolean indicating whether or not the specified user has authorized this application. */
+		has_authorized: boolean;
+	}[];
+}
+
+export type ResponseBodyError = Main.ResponseBodyError;
+
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
+	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "authorization/users",
+		method: "GET",
+		headers: {
+			"client-id": params.client_id,
+			authorization: `Bearer ${params.token}`,
+		},
+		params: {
+			user_id: params.user_id,
+		},
+		...params.config,
+	};
+}
+
+/**
+ * ## [Get Authorization By User](https://dev.twitch.tv/docs/api/reference/#get-authorization-by-user)
+ * Gets the authorization scopes that the specified user(s) have granted the application.
+
+ * ### Response Codes
+ * Code|Description
+ * -|-
+ * 200 OK|Successfully retrieved user authorization.
+ * 400 Bad Request|Request is malformed - invalid parameters or missing parameters.
+ * 401 Unauthorized|The access token is not valid.
+ * ㅤ|Authorization header is required and must specify an app access token.
+ * 403 Forbidden|The client-id in the header must match the client ID in the access token.
+ * 500 Internal Error|Internal Server Error.
+ */
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
+}

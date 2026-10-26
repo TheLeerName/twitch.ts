@@ -1,0 +1,96 @@
+import * as Main from "../../..";
+
+export interface Authorization {
+	/**
+	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
+
+	 * For example: For example: `"uo6dggojyb8d6soh92zknwmi5ej1q2"`
+	 */
+	client_id: string;
+	/**
+	 * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens) that includes scope `moderator:manage:suspicious_users`. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
+	 */
+	token: string;
+}
+
+export interface RequestQueryParameters {
+	/** The user ID of the broadcaster, indicating the channel where the status is being applied. */
+	broadcaster_id: string;
+	/** The user ID of the moderator who is applying the status. */
+	moderator_id: string;
+}
+
+export interface RequestBody {
+	/** The ID of the user being given the suspicious status. */
+	user_id: string;
+	/** The type of suspicious status. Possible values are: ACTIVE_MONITORING, RESTRICTED */
+	status: "ACTIVE_MONITORING" | "RESTRICTED";
+}
+
+export type RequestParameters = Main.RequestParameters & Authorization & RequestQueryParameters & RequestBody;
+
+export interface ResponseBody {
+	/** An array with one object containing information about the suspicious user action. */
+	data: [{
+		/** The ID of the user being given the suspicious status. */
+		user_id: string;
+		/** The user ID of the broadcaster indicating in which channel the status is being applied. */
+		broadcaster_id: string;
+		/** The user ID of the moderator who applied the last status. */
+		moderator_id: string;
+		/** The timestamp of the last time this user’s status was updated. */
+		updated_at: string;
+		/** The type of suspicious status. Possible values are: ACTIVE_MONITORING, RESTRICTED */
+		status: "ACTIVE_MONITORING" | "RESTRICTED";
+		/** An array of strings representing the type(s) of suspicious user this is. Possible values are: MANUALLY_ADDED, DETECTED_BAN_EVADER, DETECTED_SUS_CHATTER, BANNED_IN_SHARED_CHANNEL */
+		types: ("MANUALLY_ADDED" | "DETECTED_BAN_EVADER" | "DETECTED_SUS_CHATTER" | "BANNED_IN_SHARED_CHANNEL")[];
+	}];
+}
+
+export type ResponseBodyError = Main.ResponseBodyError;
+
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
+	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "moderation/suspicious_users",
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: `Bearer ${params.token}`,
+			"content-type": "application/json",
+		},
+		params: {
+			broadcaster_id: params.broadcaster_id,
+			moderator_id: params.moderator_id,
+		},
+		data: JSON.stringify({
+			user_id: params.user_id,
+			status: params.status,
+		}),
+		...params.config,
+	};
+}
+
+/**
+ * ## [Add Suspicious Status to Chat User](https://dev.twitch.tv/docs/api/reference/#add-suspicious-status-to-chat-user)
+ * Adds a suspicious user status to a chatter on the broadcaster’s channel.
+
+ * ### Response Codes
+ * Code|Description
+ * -|-
+ * 200 OK|Successfully applied a suspicious user status.
+ * 400 Bad Request|Validation errors: Missing required fields.
+ * ㅤ|The ID in the broadcaster_id query parameter was not found.
+ * ㅤ|The status specified was invalid. Must either be ACTIVE_MONITORING or RESTRICTED
+ * ㅤ|The status update is not allowed for this user.
+ * 401 Unauthorized|The Authorization header is required and must specify user access token.
+ * ㅤ|The user access token must include the **moderator:manage:suspicious_users** scope.
+ * ㅤ|The OAuth token is not valid.
+ * ㅤ|The ID in the Client-Id header must match the Client ID in the OAuth token.
+ * 403 Forbidden|The user in the moderator_id query parameter is not one of the broadcaster's moderators.
+ */
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
+}

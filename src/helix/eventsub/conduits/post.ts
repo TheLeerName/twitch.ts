@@ -1,0 +1,68 @@
+import * as Main from "../../..";
+
+export interface Authorization {
+	/**
+	 * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).
+
+	 * For example: For example: `"uo6dggojyb8d6soh92zknwmi5ej1q2"`
+	 */
+	client_id: string;
+	/**
+	 * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens). It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.
+
+	 * For example: `"cfabdegwdoklmawdzdo98xt2fo512y"`
+	 */
+	token: string;
+}
+
+export interface RequestBody {
+	/** **Integer**. The number of shards to create for this conduit. */
+	shard_count: number;
+}
+
+export type RequestParameters = Main.RequestParameters & Authorization & RequestBody;
+
+export interface ResponseBody {
+	/** List of information about the client’s conduits. */
+	data: {
+		/** Conduit ID. */
+		id: string;
+		/** **Integer**. Number of shards created for this conduit. */
+		shard_count: number;
+	}[];
+}
+
+export type ResponseBodyError = Main.ResponseBodyError;
+
+export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {
+	return {
+		baseURL: Main.Options.apiHelixPath,
+		url: "eventsub/conduits",
+		method: "POST",
+		headers: {
+			"client-id": params.client_id,
+			authorization: `Bearer ${params.token}`,
+			"content-type": "application/json",
+		},
+		data: JSON.stringify({
+			shard_count: params.shard_count,
+		}),
+		...params.config,
+	};
+}
+
+/**
+ * ## [Create Conduits](https://dev.twitch.tv/docs/api/reference/#create-conduits)
+ * Creates a new [conduit](https://dev.twitch.tv/docs/eventsub/handling-conduit-events/).
+
+ * ### Response Codes
+ * Code|Meaning
+ * -|-
+ * 200 OK|Conduit created.
+ * 400 Bad Request|Invalid shard count.
+ * 401 Unauthenticated|Authorization header required with an app access token.
+ * 429 Too Many Requests|Conduit limit reached.
+ */
+export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
+	return Main.axiosRequest(prepareAxiosConfig(params));
+}

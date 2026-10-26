@@ -1,0 +1,622 @@
+const fs = require("fs");
+const readline = require("readline/promises");
+const { JSDOM } = require("jsdom");
+
+/*
+
+cd doc-maker
+node create.js
+1. copypaste endpoint name
+2. copypaste <p>'s after name and until authorization or smth else
+3. check requiring tokens and scopes
+4. insert request query table if any
+5. insert request body table if any
+6. insert response body table if any
+7. insert response codes table if any
+
+*/
+/*
+const scriptFileNameWithoutExt = (() => {
+	let filename = import.meta.filename.replaceAll("\\", "/");
+	filename = filename.substring(filename.lastIndexOf("/") + 1);
+	filename = filename.substring(0, filename.indexOf("."));
+	return filename;
+})();*/
+const filePaths = {
+	data: "data.json",
+	output: "../src/helix/"
+};
+
+/**
+ * 
+ * @param {string} text 
+ */
+function addTextToOutput(text) {
+	const content = fs.existsSync(filePaths.output) ? fs.readFileSync(filePaths.output).toString() : "";
+	fs.writeFileSync(filePaths.output, content + "\n" + text);
+}
+
+/**
+ * @param {Record<string, Record<string, string>>} [fields] 
+ * @returns {number | undefined}
+ */
+function getDataVersion(fields) {
+	const json = fields != null ? fields : JSON.parse(fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}");
+	return json.version;
+}
+
+/**
+ * @param {number} v 
+ * @param {Record<string, Record<string, string>>} [fields] 
+ */
+function setDataVersion(v, fields) {
+	const json = fields != null ? fields : JSON.parse(fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}");
+	json.version = v;
+}
+
+/**
+ * 
+ * @param {string | null} endpointName 
+ * @param {string} fieldName 
+ * @returns {string}
+ */
+function getFieldFromJSON(endpointName, fieldName) {
+	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
+	const json = JSON.parse(content);
+
+	/** @type {[string, string, string] | [undefined, undefined, undefined]} */
+	const match = fieldName.match(/(\w+)\[(\d+)\]/);
+	if (match != null) {
+		const index = parseInt(match[2]);
+		/** @type {string[]} */
+		const array = endpointName != null ? json[endpointName]?.[match[1]] : json[match[1]];
+		return array[index];
+	}
+	else
+		return endpointName != null ? json[endpointName]?.[fieldName] : json[fieldName];
+}
+
+/**
+ * 
+ * @param {string | null} endpointName 
+ * @param {string} fieldName 
+ * @param {string} value 
+ */
+function saveFieldFromJSON(endpointName, fieldName, value) {
+	const content = fs.existsSync(filePaths.data) ? fs.readFileSync(filePaths.data).toString() : "{}";
+	const json = JSON.parse(content);
+	value = value.replaceAll(/> +</g, "><");
+
+	/** @type {[string, string, string] | [undefined, undefined, undefined]} */
+	const match = fieldName.match(/(\w+)\[(\d+)\]/);
+	if (match != null) {
+		const index = parseInt(match[2]);
+		/** @type {string[]} */
+		if (endpointName != null) {
+			json[endpointName] ??= {};
+			json[endpointName][match[1]] ??= [];
+			json[endpointName][match[1]][index] = value;
+		}
+		else {
+			json[match[1]] ??= [];
+			json[match[1]][index] = value;
+		}
+	}
+	else {
+		if (endpointName != null) {
+			json[endpointName] ??= {};
+			json[endpointName][fieldName] = value;
+		}
+		else
+			json[fieldName] = value;
+	}
+
+	fs.writeFileSync(filePaths.data, JSON.stringify(json));
+}
+
+/**
+ * 
+ * @param {readline.Interface} rl
+ * @param {string | null} endpointName 
+ * @param {string | null} fieldName 
+ * @param {string} text 
+ * @param {(input: string) => string} [changeField]
+ * @returns {Promise<string>}
+ */
+async function readlineQuestion(rl, endpointName, fieldName, text, changeField) {
+	const useValues = endpointName != null && fieldName != null;
+	if (useValues) {
+		const fieldValue = getFieldFromJSON(endpointName, fieldName);
+		if (fieldValue != null)
+			rl.write(fieldValue);
+	}
+	let v = await rl.question(text);
+	if (changeField != null) v = changeField(v);
+	if (useValues)
+		saveFieldFromJSON(endpointName, fieldName, v);
+	return v;
+}
+
+/**
+ * 
+ * @param {readline.Interface} rl
+ * @param {string | null} endpointName 
+ * @param {string | null} fieldName 
+ * @param {string} text 
+ * @param {(input: string, index: number) => string} [changeField]
+ * @returns {Promise<string[]>}
+ */
+async function readlineQuestionMany(rl, endpointName, fieldName, text, changeField) {
+	/** @type {string[]} */
+	const array = [];
+	while(true) {
+		const v = await readlineQuestion(rl, endpointName, `${fieldName}[${array.length}]`, text.replace("%i%", array.length) + " (leave empty to stop adding it)", input => changeField(input, array.length));
+		if (v.length < 1) break;
+		array.push(v);
+	}
+	return array;
+}
+
+/**
+ * 
+ * @param {boolean} userAccessTokenRequired 
+ * @param {boolean} appAccessTokenRequired 
+ * @param {string} scopes 
+ */
+function makeAuthorizationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes) {
+	if (scopes.length > 0) {
+		scopes = scopes.split(" ").map(scopeOrSeparator => scopeOrSeparator.includes(":") ? `\`${scopeOrSeparator}\`` : scopeOrSeparator).join(" ");
+		scopes = ` that includes scope${scopes.includes(" ") ? "s" : ""} ${scopes}`;
+	}
+
+	if (userAccessTokenRequired && appAccessTokenRequired)
+		addTextToOutput(`\t * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens) or [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+	else if (userAccessTokenRequired)
+		addTextToOutput(`\t * An [user access token](https://dev.twitch.tv/docs/authentication#user-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+	else
+		addTextToOutput(`\t * An [app access token](https://dev.twitch.tv/docs/authentication#app-access-tokens)${scopes}. It must belong to [developer app](https://dev.twitch.tv/docs/authentication/register-app/) specified in {@link client_id}.`);
+}
+
+/**
+ * 
+ * @param {boolean} userAccessTokenRequired 
+ * @param {boolean} appAccessTokenRequired 
+ * @param {string} scopes 
+ */
+function makeAuthorization(userAccessTokenRequired, appAccessTokenRequired, scopes) {
+	addTextToOutput(``);
+	addTextToOutput(`export interface Authorization {`);
+	addTextToOutput(`\t/**`);
+	addTextToOutput(`\t * ID of [developer app](https://dev.twitch.tv/docs/authentication/register-app/).`);
+	addTextToOutput(``);
+	addTextToOutput(`\t * For example: \`"uo6dggojyb8d6soh92zknwmi5ej1q2"\``);
+	addTextToOutput(`\t */`);
+	addTextToOutput(`\tclient_id: string;`);
+
+	addTextToOutput(`\t/**`);
+	makeAuthorizationAuthorizationDescription(userAccessTokenRequired, appAccessTokenRequired, scopes);
+	addTextToOutput(``);
+	addTextToOutput(`\t * For example: \`"cfabdegwdoklmawdzdo98xt2fo512y"\``);
+	addTextToOutput(`\t */`);
+	addTextToOutput(`\ttoken: string;`);
+
+	addTextToOutput(`}`);
+}
+
+/**
+ * @param {HTMLTableCellElement} cell 
+ * @param {string[]} descriptionLines 
+ * @param {number} i 
+ */
+function addDescriptionLines(cell, descriptionLines, i) {
+	if (cell.childNodes == null) {
+		if (!descriptionLines[i])
+			descriptionLines[i] = "";
+
+		descriptionLines[i] += cell.textContent;
+		i++;
+		return i;
+	}
+
+	for (const el of cell.childNodes) {
+		if (!descriptionLines[i])
+			descriptionLines[i] = "";
+
+		if (el.nodeName === "#text")
+			descriptionLines[i] += el.textContent;
+		else if (el.nodeName === "BR")
+			i++;
+		else if (el.nodeName === "STRONG" || el.nodeName === "B" || el.nodeName === "SPAN")
+			descriptionLines[i] += `**${el.textContent}**`;
+		else if (el.nodeName === "A")
+			descriptionLines[i] += `[${el.textContent}](${new URL(el.getAttribute("href"), "https://dev.twitch.tv/docs/api/reference").toString()})`;
+		else if (el.nodeName === "EM" || el.nodeName === "CODE" || el.nodeName === "I")
+			descriptionLines[i] += `\`${el.textContent}\``;
+		else if (el.nodeName === "UL" || el.nodeName === "P")
+			i = addDescriptionLines(el, descriptionLines, i);
+		else if (el.nodeName === "LI") {
+			if (descriptionLines[i] !== "") {
+				descriptionLines.push(`- `);
+				i++;
+			}
+			else
+				descriptionLines[i] += `- `;
+			i = addDescriptionLines(el, descriptionLines, i);
+		}
+		else {
+			throw new Error(`unknown nodeName: ${el.nodeName}`);
+		}
+	}
+	return i;
+}
+
+/**
+ * 
+ * @param {string} requestQueryParametersHTML 
+ * @returns {string[]}
+ */
+function makeRequestQueryParameters(requestQueryParametersHTML) {
+	const params = [];
+	if (requestQueryParametersHTML.length < 1)
+		return params;
+
+	addTextToOutput(``);
+	addTextToOutput(`export interface RequestQueryParameters {`);
+
+	const dom = new JSDOM(requestQueryParametersHTML, "application/xhtml+xml");
+	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
+		const tds = tr.querySelectorAll("td");
+		if (tds.length < 4)
+			throw new Error(`table.tbody.tr[${Array.from(tr.parentElement.children).indexOf(tr)}].td.length is ${tds.length} (must be < 4)`);
+
+		let descriptionPrefix = "";
+		let fieldDeclaration = "";
+
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]+/g, "\t");
+		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
+		fieldDeclaration += tds[0].textContent;
+		fieldDeclaration += tds[2].textContent === "Yes" ? ":" : "?:";
+
+		const tds_1_textlower = tds[1].textContent.toLowerCase();
+		if (tds_1_textlower === "float")
+			fieldDeclaration += " number;";
+		else if (tds_1_textlower === "integer" || tds_1_textlower === "int") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Integer**. ";
+		}
+		else if (tds_1_textlower === "unsigned integer") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Unsigned Integer**. ";
+		}
+		else if (tds_1_textlower === "int64") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**64-bit Integer**. ";
+		}
+		else if (tds_1_textlower === "bool")
+			fieldDeclaration += " boolean;";
+		else
+			fieldDeclaration += ` ${tds_1_textlower};`;
+
+		const descriptionLines = [];
+		addDescriptionLines(tds[3], descriptionLines, descriptionLines.length);
+		descriptionLines[0] = descriptionPrefix + descriptionLines[0];
+
+		if (descriptionLines.length > 1) {
+			addTextToOutput(`\t/**`);
+			for (const line of descriptionLines)
+				addTextToOutput(line.length > 0 ? `\t * ${line}` : "");
+			addTextToOutput(`\t */`);
+		}
+		else
+			addTextToOutput(`\t/** ${descriptionLines[0]} */`);
+		addTextToOutput(`\t${fieldDeclaration}`);
+	}
+
+	addTextToOutput(`}`);
+
+	return params;
+}
+
+/**
+ * 
+ * @param {string} requestBodyHTML 
+ * @returns {string[]}
+ */
+function makeRequestBody(requestBodyHTML) {
+	const params = [];
+	if (requestBodyHTML.length < 1)
+		return params;
+
+	addTextToOutput(``);
+	addTextToOutput(`export interface RequestBody {`);
+
+	const dom = new JSDOM(requestBodyHTML, "application/xhtml+xml");
+	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
+		const tds = tr.querySelectorAll("td");
+		if (!(tds.length === 3 || tds.length === 4))
+			throw new Error(`table.tbody.tr[${Array.from(tr.parentElement.children).indexOf(tr)}].td.length is ${tds.length} (must be 3 or 4)`);
+
+		let descriptionPrefix = "";
+		let fieldDeclaration = "";
+
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]{2}/g, "\t").replace(/[  ]/, "");
+		const tabPostfix = tds[0].textContent.match(/^(\t+)/)?.[1] ?? "";
+		params.push(tds[0].textContent.replaceAll("\t", "").replaceAll(" ", ""));
+		if (tds.length === 3) {
+			fieldDeclaration += tds[0].textContent + ":";
+		}
+		else {
+			fieldDeclaration += tds[0].textContent;
+			fieldDeclaration += tds[2].textContent === "Yes" ? ":" : "?:";
+		}
+
+		const tds_1_textlower = tds[1].textContent.toLowerCase();
+		if (tds_1_textlower === "float")
+			fieldDeclaration += " number;";
+		else if (tds_1_textlower === "integer" || tds_1_textlower === "int") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Integer**. ";
+		}
+		else if (tds_1_textlower === "unsigned integer") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Unsigned Integer**. ";
+		}
+		else if (tds_1_textlower === "int64") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**64-bit Integer**. ";
+		}
+		else if (tds_1_textlower === "bool")
+			fieldDeclaration += " boolean;";
+		else
+			fieldDeclaration += ` ${tds_1_textlower};`;
+
+		const descriptionLines = [];
+		addDescriptionLines(tds[tds.length === 3 ? 2 : 3], descriptionLines, descriptionLines.length);
+		descriptionLines[0] = descriptionPrefix + descriptionLines[0];
+
+		if (descriptionLines.length > 1) {
+			addTextToOutput(`\t${tabPostfix}/**`);
+			for (const line of descriptionLines)
+				addTextToOutput(line.length > 0 ? `\t${tabPostfix} * ${line}` : "");
+			addTextToOutput(`\t${tabPostfix} */`);
+		}
+		else
+			addTextToOutput(`\t${tabPostfix}/** ${descriptionLines[0]} */`);
+		addTextToOutput(`\t${fieldDeclaration}`);
+	}
+
+	addTextToOutput(`}`);
+
+	return params;
+}
+
+/**
+ * 
+ * @param {string[]} requestQueryParameters 
+ * @param {string[]} requestBody 
+ */
+function makeRequestParameters(requestQueryParameters, requestBody) {
+	addTextToOutput(``);
+	addTextToOutput(`export type RequestParameters = Main.RequestParameters & Authorization${requestQueryParameters.length > 0 ? " & RequestQueryParameters" : ""}${requestBody.length > 0 ? " & RequestBody" : ""};`);
+}
+
+/**
+ * 
+ * @param {string} responseBodyHTML 
+ */
+function makeResponseBody(responseBodyHTML) {
+	if (responseBodyHTML.length < 1)
+		return false;
+
+	addTextToOutput(``);
+	addTextToOutput(`export interface ResponseBody {`);
+
+	const dom = new JSDOM(responseBodyHTML, "application/xhtml+xml");
+	for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
+		const tds = tr.querySelectorAll("td");
+		if (tds.length < 3)
+			throw new Error(`table.tbody.tr[${Array.from(tr.parentElement.children).indexOf(tr)}].td.length is ${tds.length} (must be < 3)`);
+
+		let descriptionPrefix = "";
+		let fieldDeclaration = "";
+
+		tds[0].textContent = tds[0].textContent.replaceAll(/[  ]{2}/g, "\t").replace(/[  ]/, "");
+		const tabPostfix = tds[0].textContent.match(/^(\t+)/)?.[1] ?? "";
+		fieldDeclaration += tds[0].textContent + ":";
+
+		const tds_1_textlower = tds[1].textContent.toLowerCase();
+		if (tds_1_textlower === "float")
+			fieldDeclaration += " number;";
+		else if (tds_1_textlower === "integer") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Integer**. ";
+		}
+		else if (tds_1_textlower === "unsigned integer") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**Unsigned Integer**. ";
+		}
+		else if (tds_1_textlower === "int64") {
+			fieldDeclaration += " number;";
+			descriptionPrefix += "**64-bit Integer**. ";
+		}
+		else
+			fieldDeclaration += ` ${tds_1_textlower};`;
+
+		const descriptionLines = [];
+		addDescriptionLines(tds[2], descriptionLines, descriptionLines.length);
+		descriptionLines[0] = descriptionPrefix + descriptionLines[0];
+
+		if (descriptionLines.length > 1) {
+			addTextToOutput(`\t${tabPostfix}/**`);
+			for (const line of descriptionLines)
+				addTextToOutput(line.length > 0 ? `\t${tabPostfix} * ${line}` : "");
+			addTextToOutput(`\t${tabPostfix} */`);
+		}
+		else
+			addTextToOutput(`\t${tabPostfix}/** ${descriptionLines[0]} */`);
+		addTextToOutput(`\t${fieldDeclaration}`);
+	}
+
+	addTextToOutput(`}`);
+
+	return true;
+}
+
+/**
+ * 
+ * @param {string} endpointName 
+ * @param {string[]} pTexts 
+ * @param {string} responseCodesHTML 
+ * @param {boolean} isResponseBody 
+ * @param {string} url 
+ * @param {string[]} requestQueryParameters 
+ * @param {string} method 
+ * @param {string[]} requestBody 
+ */
+function makeAxios(endpointName, pTexts, responseCodesHTML, isResponseBody, url, requestQueryParameters, method, requestBody) {
+	const apiDocsURL = `https://dev.twitch.tv/docs/api/reference/#${endpointName.toLowerCase().replaceAll(" ", "-")}`;
+
+	addTextToOutput(`\nexport type ResponseBodyError = Main.ResponseBodyError;\n`);
+	addTextToOutput(`export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequestConfig {`);
+	addTextToOutput(`\treturn {`);
+	addTextToOutput(`\t\tbaseURL: Main.Options.apiHelixPath,`);
+	addTextToOutput(`\t\turl: "${url}",`);
+	addTextToOutput(`\t\tmethod: "${method}",`);
+	addTextToOutput(`\t\theaders: {`);
+	addTextToOutput(`\t\t\t"client-id": params.client_id,`);
+	addTextToOutput(`\t\t\tauthorization: params.authorization,`);
+	if (requestBody.length > 0)
+		addTextToOutput(`\t\t\t"content-type": "application/json",`);
+	addTextToOutput(`\t\t},`);
+	if (requestQueryParameters.length > 0) {
+		addTextToOutput(`\t\tparams: {`);
+		for (const param of requestQueryParameters)
+			addTextToOutput(`\t\t\t${param}: params.${param},`);
+		addTextToOutput(`\t\t},`);
+	}
+	if (requestBody.length > 0) {
+		addTextToOutput(`\t\tdata: JSON.stringify({`);
+		for (const param of requestBody)
+			addTextToOutput(`\t\t\t${param}: params.${param},`);
+		addTextToOutput(`\t\t}),`);
+	}
+	addTextToOutput(`\t\t...params.config,`);
+	addTextToOutput(`\t};`);
+	addTextToOutput(`}`);
+
+	addTextToOutput(``);
+	addTextToOutput(`/**`);
+	addTextToOutput(` * ## [${endpointName}](${apiDocsURL})`);
+	for (const pText of pTexts) {
+		if (pText.length < 1) break;
+		const p = new JSDOM(pText, "application/xhtml+xml").window.document.querySelector("p");
+		const descriptionLines = [];
+		addDescriptionLines(p, descriptionLines, descriptionLines.length);
+		for (const line of descriptionLines)
+			addTextToOutput(line.length > 0 ? ` * ${line}\n` : "");
+	}
+	if (responseCodesHTML.length > 0) {
+		addTextToOutput(` * ### Response Codes`);
+		const dom = new JSDOM(responseCodesHTML, "application/xhtml+xml");
+		const ths = dom.window.document.querySelectorAll("table thead tr th");
+		addTextToOutput(` * ${Array.from(ths).map(th => th.textContent).join("|")}`);
+		addTextToOutput(` * ${Array.from(Array(ths.length), _ => "-").join("|")}`);
+		for (const tr of dom.window.document.querySelectorAll("table tbody tr")) {
+			let code = tr.children[0];
+			const description = tr.children[1];
+
+			if (description.childNodes) {
+				const descriptionLines = [];
+				addDescriptionLines(description, descriptionLines, descriptionLines.length);
+				for (const line of descriptionLines) {
+					addTextToOutput(` * ${code?.textContent ?? "ㅤ"}|${line.startsWith("- ") ? line.substring(2) : line}`);
+					code = null;
+				}
+			}
+			else
+				addTextToOutput(` * ${code.textContent}|${description.textContent}`);
+		}
+	}
+	addTextToOutput(` */`);
+
+	addTextToOutput(`export async function axiosRequest(params: RequestParameters): Promise<Main.Response<${isResponseBody ? "ResponseBody" : "{}"}, ResponseBodyError>> {`);
+	addTextToOutput(`\treturn Main.axiosRequest(prepareAxiosConfig(params));`);
+	addTextToOutput(`}`);
+}
+
+/**
+ * 
+ * @param {string} endpointName 
+ * @param {{pTexts: string[], userAccessTokenRequired: boolean, appAccessTokenRequired: boolean, scopes: string, method: string, url: string, requestQueryParametersHTML: string, requestBodyHTML: string, responseBodyHTML: string, responseCodesHTML: string}} params
+ */
+function create(endpointName, params) {
+	fs.writeFileSync(filePaths.output, `import * as Main from "../${params.url.replaceAll(/[\w_]+/g, "..")}";`);
+	makeAuthorization(params.userAccessTokenRequired, params.appAccessTokenRequired, params.scopes);
+	const requestQueryParameters = makeRequestQueryParameters(params.requestQueryParametersHTML);
+	const requestBody = makeRequestBody(params.requestBodyHTML);
+	makeRequestParameters(requestQueryParameters, requestBody);
+	const isResponseBody = makeResponseBody(params.responseBodyHTML);
+	makeAxios(endpointName, params.pTexts, params.responseCodesHTML, isResponseBody, params.url, requestQueryParameters, params.method, requestBody);
+}
+
+/**
+ * 
+ * @param {string} method_and_url 
+ * @returns {[string, string]}
+ */
+function makeMethodAndURL(method_and_url) {
+	const array = method_and_url.split(" ");
+	array[1] = array[1].substring(28);
+	return array;
+}
+
+async function main() {
+	const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+	const endpointName = await readlineQuestion(rl, null, null, "endpointName: ");
+
+	const pTexts = await readlineQuestionMany(rl, endpointName, `pTexts`, `html p %i%`);
+	const userAccessTokenRequired = (await readlineQuestion(rl, endpointName, "userAccessTokenRequired", "userAccessTokenRequired (y/n): ")) === "y";
+	const appAccessTokenRequired = (await readlineQuestion(rl, endpointName, "appAccessTokenRequired", "appAccessTokenRequired (y/n): ")) === "y";
+	const scopes = await readlineQuestion(rl, endpointName, "scopes", "scopes: ");
+	const [method, url] = makeMethodAndURL(await readlineQuestion(rl, endpointName, "method_and_url", "method_and_url (like POST https://api.twitch.tv/helix/channel_points/custom_rewards): "));
+	const requestQueryParametersHTML = await readlineQuestion(rl, endpointName, "requestQueryParametersHTML", "requestQueryParametersHTML (leave empty to not add it): ");
+	const requestBodyHTML = await readlineQuestion(rl, endpointName, "requestBodyHTML", "requestBodyHTML (leave empty to not add it): ");
+	const responseBodyHTML = await readlineQuestion(rl, endpointName, "responseBodyHTML", "responseBodyHTML (leave empty to not add it): ");
+	const responseCodesHTML = await readlineQuestion(rl, endpointName, "responseCodesHTML", "responseCodesHTML (leave empty to not add it): ");
+	rl.close();
+
+	filePaths.output += url;
+	if (!fs.existsSync(filePaths.output))
+		fs.mkdirSync(filePaths.output, {recursive: true});
+	filePaths.output += "/" + method.toLowerCase() + ".ts";
+
+	create(endpointName, {pTexts, userAccessTokenRequired, appAccessTokenRequired, scopes, method, url, requestQueryParametersHTML, requestBodyHTML, responseBodyHTML, responseCodesHTML});
+
+	const newString = `\nexport * as ${endpointName.replaceAll(" ", "").replaceAll("-", "")} from "./${url}/${method.toLowerCase()}";`;
+	const content = fs.readFileSync("../src/helix/index.ts").toString();
+	if (!content.includes(newString))
+		fs.writeFileSync("../src/helix/index.ts", content + newString);
+}
+
+if (process.argv[1] === __filename)
+	main().catch(console.error);
+
+module.exports = {
+	filePaths,
+	addTextToOutput,
+	getDataVersion,
+	setDataVersion,
+	getFieldFromJSON,
+	saveFieldFromJSON,
+	readlineQuestion,
+	makeAuthorizationAuthorizationDescription,
+	makeAuthorization,
+	addDescriptionLines,
+	makeRequestQueryParameters,
+	makeRequestBody,
+	makeRequestParameters,
+	makeResponseBody,
+	makeAxios,
+	create,
+	makeMethodAndURL,
+};
