@@ -55,11 +55,11 @@ export interface PayloadEvent {
 	broadcaster_user_login: string;
 	/** The requested broadcaster display name. */
 	broadcaster_user_name: string;
-	/** Is the reward currently enabled. If false, the reward won’t show up to viewers. */
+	/** Is the reward currently enabled. If `false`, the reward won’t show up to viewers. */
 	is_enabled: boolean;
-	/** Is the reward currently paused. If true, viewers can’t redeem. */
+	/** Is the reward currently paused. If `true`, viewers can’t redeem. */
 	is_paused: boolean;
-	/** Is the reward currently in stock. If false, viewers can’t redeem. */
+	/** Is the reward currently in stock. If `false`, viewers can’t redeem. */
 	is_in_stock: boolean;
 	/** The reward title. */
 	title: string;
@@ -83,8 +83,8 @@ export interface PayloadEvent {
 	default_image: Image;
 	/** Whether a cooldown is enabled and what the cooldown is in seconds. */
 	global_cooldown: GlobalCooldown;
-	/** Timestamp of the cooldown expiration. null if the reward isn’t on cooldown. */
+	/** Timestamp of the cooldown expiration. Is `null` if the reward isn’t on cooldown. */
 	cooldown_expires_at: string;
-	/** **Integer**. The number of redemptions redeemed during the current live stream. Counts against the max_per_stream limit. null if the broadcasters stream isn’t live or max_per_stream isn’t enabled. */
+	/** **Integer**. The number of redemptions redeemed during the current live stream. Counts against the {@link max_per_stream} limit. Is `null` if the broadcasters stream isn’t live or {@link max_per_stream} isn’t enabled. */
 	redemptions_redeemed_current_stream: number;
 }

@@ -52,11 +52,11 @@ export interface PayloadEvent {
 	broadcaster_user_login: string;
 	/** The requested broadcaster display name. */
 	broadcaster_user_name: string;
-	/** Is the reward currently enabled. If false, the reward won’t show up to viewers. */
+	/** Is the reward currently enabled. If `false`, the reward won’t show up to viewers. */
 	is_enabled: boolean;
-	/** Is the reward currently paused. If true, viewers can’t redeem. */
+	/** Is the reward currently paused. If `true`, viewers can’t redeem. */
 	is_paused: boolean;
-	/** Is the reward currently in stock. If false, viewers can’t redeem. */
+	/** Is the reward currently in stock. If `false`, viewers can’t redeem. */
 	is_in_stock: boolean;
 	/** The reward title. */
 	title: string;
