@@ -1,5 +1,5 @@
 import * as Main from "../../..";
-import { MessageFragmentText, MessageFragmentEmote, MessageFragmentCheermote } from "./message";
+import { MessageFragment } from "./message";
 
 /**
  * ## [channel.chat.user_message_update](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatuser_message_update)
@@ -68,6 +68,6 @@ export interface PayloadEvent {
 		/** The contents of the message caught by automod. */
 		text: string;
 		/** Ordered list of chat message fragments. */
-		fragments: (MessageFragmentText | MessageFragmentEmote | MessageFragmentCheermote)[];
+		fragments: MessageFragment[];
 	};
 }

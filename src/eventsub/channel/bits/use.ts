@@ -1,5 +1,5 @@
 import * as Main from "../../..";
-import { MessageFragmentText, MessageFragmentCheermote, MessageFragmentEmote } from "../chat/message";
+import { MessageFragment } from "../chat/message";
 
 /**
  * ## [channel.bits.use](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelbitsuse)
@@ -90,7 +90,7 @@ export interface PayloadEventCheer extends _PayloadEvent {
 		/** The chat message in plain text. */
 		text: string;
 		/** The ordered list of chat message fragments. */
-		fragments: (MessageFragmentText | MessageFragmentCheermote | MessageFragmentEmote)[];
+		fragments: MessageFragment[];
 	};
 }
 

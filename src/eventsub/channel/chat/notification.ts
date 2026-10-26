@@ -1,5 +1,5 @@
 import * as Main from "../../..";
-import { Badge, MessageFragmentText, MessageFragmentCheermote, MessageFragmentEmote, MessageFragmentMention } from "./message";
+import { Badge, MessageFragment } from "./message";
 
 /**
  * ## [channel.chat.notification](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchatnotification)
@@ -101,7 +101,7 @@ export interface _PayloadEvent {
 		/** The chat message in plain text. */
 		text: string;
 		/** Ordered list of chat message fragments. */
-		fragments: (MessageFragmentText | MessageFragmentCheermote | MessageFragmentEmote | MessageFragmentMention)[];
+		fragments: MessageFragment[];
 	};
 	/** The type of notice. Some notices can have own metadata's. */
 	notice_type: string;

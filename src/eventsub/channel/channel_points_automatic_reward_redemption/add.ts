@@ -1,5 +1,5 @@
 import * as Main from "../../..";
-import { MessageFragmentText, MessageFragmentEmote } from "../chat/message";
+import { MessageFragment } from "../chat/message";
 
 /**
  * ## [channel.channel_points_automatic_reward_redemption.add](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelchannel_points_automatic_reward_redemptionadd)
@@ -78,7 +78,7 @@ export interface PayloadEvent {
 		/** The chat message in plain text. */
 		text: string;
 		/** The ordered list of chat message fragments. */
-		fragments: (MessageFragmentText | MessageFragmentEmote)[];
+		fragments: MessageFragment[];
 	} | null;
 	/** The UTC date and time (in RFC3339 format) of when the reward was redeemed. */
 	redeemed_at: string;
