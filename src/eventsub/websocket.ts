@@ -58,6 +58,7 @@ export interface Events {
 	"channel.subscription.end": (message: Main.EventSub.ChannelSubscriptionEnd.MessageNotification) => void;
 	"channel.subscription.gift": (message: Main.EventSub.ChannelSubscriptionGift.MessageNotification) => void;
 	"channel.subscription.message": (message: Main.EventSub.ChannelSubscriptionMessage.MessageNotification) => void;
+	"channel.cheer": (message: Main.EventSub.ChannelCheer.MessageNotification) => void;
 	"channel.raid": (message: Main.EventSub.ChannelRaid.MessageNotification) => void;
 	"channel.ban": (message: Main.EventSub.ChannelBan.MessageNotification) => void;
 	"channel.unban": (message: Main.EventSub.ChannelUnban.MessageNotification) => void;
@@ -92,6 +93,7 @@ export interface Events {
 	"channel.warning.send": (message: Main.EventSub.ChannelWarningSend.MessageNotification) => void;
 	"channel.hype_train.begin": (message: Main.EventSub.ChannelHypeTrainBegin.MessageNotification) => void;
 	"channel.hype_train.progress": (message: Main.EventSub.ChannelHypeTrainProgress.MessageNotification) => void;
+	"channel.hype_train.end": (message: Main.EventSub.ChannelHypeTrainEnd.MessageNotification) => void;
 	"channel.charity_campaign.donate": (message: Main.EventSub.ChannelCharityCampaignDonate.MessageNotification) => void;
 	"channel.charity_campaign.start": (message: Main.EventSub.ChannelCharityCampaignStart.MessageNotification) => void;
 	"channel.charity_campaign.progress": (message: Main.EventSub.ChannelCharityCampaignProgress.MessageNotification) => void;
@@ -204,6 +206,7 @@ export default class WebSocket extends EventEmitter {
 			}
 			else if (Main.EventSub.isMessageNotificationWebSocket(message)) {
 				this.emit("notification", message);
+				// i hope you wont use old versions of events, or it will break typing :(
 				this.emit(message.payload.subscription.type, message as any);
 			}
 			else if (Main.EventSub.isMessageRevocation(message))

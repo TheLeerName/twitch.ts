@@ -18,6 +18,7 @@ import * as ChannelSubscribe from "./channel/subscribe";
 import * as ChannelSubscriptionEnd from "./channel/subscription/end";
 import * as ChannelSubscriptionGift from "./channel/subscription/gift";
 import * as ChannelSubscriptionMessage from "./channel/subscription/message";
+import * as ChannelCheer from "./channel/cheer";
 import * as ChannelRaid from "./channel/raid";
 import * as ChannelBan from "./channel/ban";
 import * as ChannelUnban from "./channel/unban";
@@ -52,6 +53,7 @@ import * as ChannelWarningAcknowledge from "./channel/warning/acknowledge";
 import * as ChannelWarningSend from "./channel/warning/send";
 import * as ChannelHypeTrainBegin from "./channel/hype_train/begin";
 import * as ChannelHypeTrainProgress from "./channel/hype_train/progress";
+import * as ChannelHypeTrainEnd from "./channel/hype_train/end";
 import * as ChannelCharityCampaignDonate from "./channel/charity_campaign/donate";
 import * as ChannelCharityCampaignStart from "./channel/charity_campaign/start";
 import * as ChannelCharityCampaignProgress from "./channel/charity_campaign/progress";
@@ -149,6 +151,7 @@ export type RequestBody =
 | ChannelSubscriptionEnd.RequestBody
 | ChannelSubscriptionGift.RequestBody
 | ChannelSubscriptionMessage.RequestBody
+| ChannelCheer.RequestBody
 | ChannelRaid.RequestBody
 | ChannelBan.RequestBody
 | ChannelUnban.RequestBody
@@ -183,6 +186,7 @@ export type RequestBody =
 | ChannelWarningSend.RequestBody
 | ChannelHypeTrainBegin.RequestBody
 | ChannelHypeTrainProgress.RequestBody
+| ChannelHypeTrainEnd.RequestBody
 | ChannelCharityCampaignDonate.RequestBody
 | ChannelCharityCampaignStart.RequestBody
 | ChannelCharityCampaignProgress.RequestBody
@@ -335,6 +339,7 @@ export type MessageNotification =
 | ChannelSubscriptionEnd.MessageNotification
 | ChannelSubscriptionGift.MessageNotification
 | ChannelSubscriptionMessage.MessageNotification
+| ChannelCheer.MessageNotification
 | ChannelRaid.MessageNotification
 | ChannelBan.MessageNotification
 | ChannelUnban.MessageNotification
@@ -369,6 +374,7 @@ export type MessageNotification =
 | ChannelWarningSend.MessageNotification
 | ChannelHypeTrainBegin.MessageNotification
 | ChannelHypeTrainProgress.MessageNotification
+| ChannelHypeTrainEnd.MessageNotification
 | ChannelCharityCampaignDonate.MessageNotification
 | ChannelCharityCampaignStart.MessageNotification
 | ChannelCharityCampaignProgress.MessageNotification
@@ -468,6 +474,7 @@ export {
 	ChannelSubscriptionEnd,
 	ChannelSubscriptionGift,
 	ChannelSubscriptionMessage,
+	ChannelCheer,
 	ChannelRaid,
 	ChannelBan,
 	ChannelUnban,
@@ -502,6 +509,7 @@ export {
 	ChannelWarningSend,
 	ChannelHypeTrainBegin,
 	ChannelHypeTrainProgress,
+	ChannelHypeTrainEnd,
 	ChannelCharityCampaignDonate,
 	ChannelCharityCampaignStart,
 	ChannelCharityCampaignProgress,
