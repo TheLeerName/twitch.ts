@@ -55,7 +55,7 @@ export interface PayloadEvent {
 	/** Question displayed for the poll. */
 	title: string;
 	/** An array of choices for the poll. */
-	choices: Choice[];
+	choices: ChoiceWithoutVotes[];
 	/** Not supported. */
 	bits_voting: BitsVoting;
 	/** The Channel Points voting settings for the poll. */
@@ -67,17 +67,11 @@ export interface PayloadEvent {
 }
 
 /** An choice for a particular poll. Each poll’s event payload includes a choices array. The choices array contains an object that describes each choice and, if applicable, the votes for that choice. */
-export interface Choice {
+export interface ChoiceWithoutVotes {
 	/** ID for the choice. */
 	id: string;
 	/** Text displayed for the choice. */
 	title: string;
-	/** **Integer**. Not used; will be set to 0. */
-	bits_votes: 0;
-	/** **Integer**. Number of votes received via Channel Points. */
-	channel_points_votes: number;
-	/** **Integer**. Total number of votes received for the choice across all methods of voting. */
-	votes: number;
 }
 
 /** **NOTE**: Bits voting is not supported. */
