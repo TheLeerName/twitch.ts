@@ -2,7 +2,7 @@ import * as Main from "../../..";
 import { BitsVoting, ChannelPointsVoting, ChoiceWithoutVotes } from "./begin";
 
 /**
- * ## [channel.poll.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollprogress)
+ * ## [channel.poll.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelpollend)
  * Sends a notification when a poll ends on the specified channel.
 
  * ### Authorization
