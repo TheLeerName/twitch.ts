@@ -40,6 +40,7 @@ export interface Events {
 
 	"automod.message.hold": (message: Main.EventSub.AutomodMessageHold.MessageNotification) => void;
 	"automod.message.update": (message: Main.EventSub.AutomodMessageUpdate.MessageNotification) => void;
+	"automod.settings.update": (message: Main.EventSub.AutomodSettingsUpdate.MessageNotification) => void;
 	"automod.terms.update": (message: Main.EventSub.AutomodTermsUpdate.MessageNotification) => void;
 	"channel.bits.use": (message: Main.EventSub.ChannelBitsUse.MessageNotification) => void;
 	"channel.update": (message: Main.EventSub.ChannelUpdate.MessageNotification) => void;

@@ -1,5 +1,6 @@
 import * as AutomodMessageHold from "./automod/message/hold";
 import * as AutomodMessageUpdate from "./automod/message/update";
+import * as AutomodSettingsUpdate from "./automod/settings/update";
 import * as AutomodTermsUpdate from "./automod/terms/update";
 import * as ChannelBitsUse from "./channel/bits/use";
 import * as ChannelUpdate from "./channel/update";
@@ -130,6 +131,7 @@ export namespace TransportConduit {
 export type RequestBody =
 | AutomodMessageHold.RequestBody
 | AutomodMessageUpdate.RequestBody
+| AutomodSettingsUpdate.RequestBody
 | AutomodTermsUpdate.RequestBody
 | ChannelBitsUse.RequestBody
 | ChannelUpdate.RequestBody
@@ -315,6 +317,7 @@ export function isMessageSessionKeepalive(obj: Message): obj is MessageSessionKe
 export type MessageNotification =
 | AutomodMessageHold.MessageNotification
 | AutomodMessageUpdate.MessageNotification
+| AutomodSettingsUpdate.MessageNotification
 | AutomodTermsUpdate.MessageNotification
 | ChannelBitsUse.MessageNotification
 | ChannelUpdate.MessageNotification
@@ -437,6 +440,7 @@ export {
 export {
 	AutomodMessageHold,
 	AutomodMessageUpdate,
+	AutomodSettingsUpdate,
 	AutomodTermsUpdate,
 	ChannelBitsUse,
 	ChannelUpdate,
