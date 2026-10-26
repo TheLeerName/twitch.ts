@@ -68,7 +68,7 @@ export interface PayloadEvent {
 	 * `new_bit`|The goal is to increase the amount of Bits used on the channel.
 	 * `new_cheerer`|The goal is to increase the number of unique Cheerers to Cheer on the channel.
 	 */
-	type: string;
+	type: "follow" | "subscription" | "subscription_count" | "new_subscription" | "new_subscription_count" | "new_bit" | "new_cheerer";
 	/** A description of the goal, if specified. The description may contain a maximum of 40 characters. */
 	description: string;
 	/** 
