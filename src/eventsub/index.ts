@@ -396,6 +396,16 @@ export function isMessageNotification(obj: Message): obj is MessageNotification 
 	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
 }
 
+export type MessageNotificationWebSocket = Exclude<MessageNotification, 
+| ConduitShardDisabled.MessageNotification
+| DropEntitlementGrant.MessageNotification
+| ExtensionBitsTransactionCreate.MessageNotification
+| UserAuthorizationGrant.MessageNotification
+| UserAuthorizationRevoke.MessageNotification>;
+export function isMessageNotificationWebSocket(obj: Message): obj is MessageNotificationWebSocket {
+	return obj != null && obj.metadata != null && obj.metadata.message_type === "notification";
+}
+
 /** Defines the message that the EventSub WebSocket server sends if the server must drop the connection. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events#reconnect-message) */
 export interface MessageSessionReconnect {
 	/** An object that identifies the message. */

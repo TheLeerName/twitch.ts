@@ -36,7 +36,7 @@ export interface Events {
 	revocation: (message: Main.EventSub.MessageRevocation) => void;
 
 	/** Calls on getting any `notification` message, these messages are sent when an event that you subscribe to occurs. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#notification-message) */
-	notification: (message: Main.EventSub.MessageNotification) => void;
+	notification: (message: Main.EventSub.MessageNotificationWebSocket) => void;
 
 	"automod.message.hold": (message: Main.EventSub.AutomodMessageHold.MessageNotification) => void;
 	"automod.message.update": (message: Main.EventSub.AutomodMessageUpdate.MessageNotification) => void;
@@ -56,6 +56,7 @@ export interface Events {
 	"channel.chat.user_message_update": (message: Main.EventSub.ChannelChatUserMessageUpdate.MessageNotification) => void;
 	"channel.subscribe": (message: Main.EventSub.ChannelSubscribe.MessageNotification) => void;
 	"channel.subscription.end": (message: Main.EventSub.ChannelSubscriptionEnd.MessageNotification) => void;
+	"channel.subscription.gift": (message: Main.EventSub.ChannelSubscriptionGift.MessageNotification) => void;
 	"channel.subscription.message": (message: Main.EventSub.ChannelSubscriptionMessage.MessageNotification) => void;
 	"channel.raid": (message: Main.EventSub.ChannelRaid.MessageNotification) => void;
 	"channel.ban": (message: Main.EventSub.ChannelBan.MessageNotification) => void;
@@ -201,7 +202,7 @@ export default class WebSocket extends EventEmitter {
 
 				this.emit("session_reconnect", message);
 			}
-			else if (Main.EventSub.isMessageNotification(message)) {
+			else if (Main.EventSub.isMessageNotificationWebSocket(message)) {
 				this.emit("notification", message);
 				this.emit(message.payload.subscription.type, message as any);
 			}
