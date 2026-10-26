@@ -2,7 +2,7 @@ import * as Main from "../../..";
 import { SharedTrainParticipant, TopContributor } from "./begin";
 
 /**
- * ## [channel.hype_train.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainprogress)
+ * ## [channel.hype_train.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainend)
  * Sends a notification when a Hype Train ends on the specified channel.
 
  * ### Authorization
@@ -24,7 +24,7 @@ export interface Condition {
 }
 
 /**
- * ## [channel.hype_train.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainprogress)
+ * ## [channel.hype_train.end](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelhype_trainend)
  * Sends a notification when a Hype Train ends on the specified channel.
 
  * ### Authorization
