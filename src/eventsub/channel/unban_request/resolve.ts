@@ -24,7 +24,7 @@ export function RequestBody(condition: Condition, transport: Main.EventSub.Trans
 export interface Condition {
 	/** The ID of the user that has permission to moderate the broadcaster’s channel and has granted your app permission to subscribe to this subscription type. */
 	moderator_user_id: string;
-	/** The ID of the broadcaster you want to get unban request resolution notifications for. Maximum: 1. */
+	/** The ID of the broadcaster you want to get unban request resolution notifications for. */
 	broadcaster_user_id: string;
 }
 

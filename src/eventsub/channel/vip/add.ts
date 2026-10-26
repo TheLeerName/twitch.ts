@@ -18,7 +18,7 @@ export function RequestBody(condition: Condition, transport: Main.EventSub.Trans
 }
 
 export interface Condition {
-	/** The User ID of the broadcaster (channel) Maximum: 1 */
+	/** The User ID of the broadcaster (channel). */
 	broadcaster_user_id: string;
 }
 
