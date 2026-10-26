@@ -101,16 +101,11 @@ export interface Events {
 	"channel.shield_mode.end": (message: Main.EventSub.ChannelShieldModeEnd.MessageNotification) => void;
 	"channel.shoutout.create": (message: Main.EventSub.ChannelShoutoutCreate.MessageNotification) => void;
 	"channel.shoutout.receive": (message: Main.EventSub.ChannelShoutoutReceive.MessageNotification) => void;
-	"conduit.shard.disabled": (message: Main.EventSub.ConduitShardDisabled.MessageNotification) => void;
-	"drop.entitlement.grant": (message: Main.EventSub.DropEntitlementGrant.MessageNotification) => void;
-	"extension.bits_transaction.create": (message: Main.EventSub.ExtensionBitsTransactionCreate.MessageNotification) => void;
 	"channel.goal.begin": (message: Main.EventSub.ChannelGoalBegin.MessageNotification) => void;
 	"channel.goal.progress": (message: Main.EventSub.ChannelGoalProgress.MessageNotification) => void;
 	"channel.goal.end": (message: Main.EventSub.ChannelGoalEnd.MessageNotification) => void;
 	"stream.online": (message: Main.EventSub.StreamOnline.MessageNotification) => void;
 	"stream.offline": (message: Main.EventSub.StreamOffline.MessageNotification) => void;
-	"user.authorization.grant": (message: Main.EventSub.UserAuthorizationGrant.MessageNotification) => void;
-	"user.authorization.revoke": (message: Main.EventSub.UserAuthorizationRevoke.MessageNotification) => void;
 	"user.update": (message: Main.EventSub.UserUpdate.MessageNotification) => void;
 	"user.whisper.message": (message: Main.EventSub.UserWhisperMessage.MessageNotification) => void;
 }
