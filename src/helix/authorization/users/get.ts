@@ -33,7 +33,6 @@ export interface ResponseBody {
 		user_login: string;
 		/** An array of all the scopes the user has granted to the client ID. */
 		scopes: string[];
-		// TODO: add Authorization.Scope here
 		/** A boolean indicating whether or not the specified user has authorized this application. */
 		has_authorized: boolean;
 	}[];

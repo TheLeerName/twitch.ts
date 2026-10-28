@@ -17,7 +17,6 @@ export namespace ResponseBody {
 		/** The Client ID associated with the access token. */
 		client_id: string;
 		/** A list of scopes granted to the access token. */
-		// TODO: add Authorization.Scope here
 		scopes?: string[];
 		/** **Integer**. The amount of seconds from now in which the token will expire. */
 		expires_in: number;
