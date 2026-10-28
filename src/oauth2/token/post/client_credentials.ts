@@ -53,6 +53,8 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 /**
  * ## [Client credentials grant flow](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow)
  * Gets app access token, this is meant only for server-to-server API requests that use an app access token.
+
+ * **NOTE**: This endpoint also can be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
 	return Main.axiosRequest(prepareAxiosConfig(params));
