@@ -22,9 +22,6 @@
 		"src/**/*.js",
 	],
 	"exclude": [
-		"node_modules",
-		"src/old",
-		"src/useraccessclient.ts",
-		"src/utils.ts",
+		"node_modules"
 	]
 }
