@@ -62,7 +62,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Set Extension Configuration Segment](https://dev.twitch.tv/docs/api/reference/#set-extension-configuration-segment)
  * Updates a configuration segment. The segment is limited to 5 KB. Extensions that are active on a channel do not receive the updated configuration.
 
- * **Rate Limits**: You may update the configuration a maximum of 20 times per minute.
+ * **Rate Limits:** You may update the configuration a maximum of 20 times per minute.
 
  * ### Response Codes
  * Code|Description

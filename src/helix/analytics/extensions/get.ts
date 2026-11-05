@@ -40,7 +40,7 @@ export interface RequestQueryParameters {
 	/**
 	 * **Integer**. The maximum number of report URLs to return per page in the response. The minimum page size is 1 URL per page and the maximum is 100 URLs per page. The default is 20.
 
-	 * **NOTE**: While you may specify a maximum value of 100, the response will contain at most 20 URLs per page.
+	 * **NOTE:** While you may specify a maximum value of 100, the response will contain at most 20 URLs per page.
 	 */
 	first?: number;
 	/**

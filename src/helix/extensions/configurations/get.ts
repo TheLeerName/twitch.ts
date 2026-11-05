@@ -76,7 +76,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get Extension Configuration Segment](https://dev.twitch.tv/docs/api/reference/#get-extension-configuration-segment)
  * Gets the specified configuration segment from the specified extension.
 
- * **Rate Limits**: You may retrieve each segment a maximum of 20 times per minute.
+ * **Rate Limits:** You may retrieve each segment a maximum of 20 times per minute.
 
  * ### Response Codes
  * Code|Description

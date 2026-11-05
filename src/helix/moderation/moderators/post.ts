@@ -47,7 +47,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Add Moderator](https://dev.twitch.tv/docs/api/reference/#add-channel-moderator)
  * Adds a moderator to the broadcaster’s chat room.
 
- * **Rate Limits**: The broadcaster may add a maximum of 10 moderators within a 10-second window.
+ * **Rate Limits:** The broadcaster may add a maximum of 10 moderators within a 10-second window.
 
  * ### Response Codes
  * Code|Description

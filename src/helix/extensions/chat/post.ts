@@ -59,7 +59,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Send Extension Chat Message](https://dev.twitch.tv/docs/api/reference/#send-extension-chat-message)
  * Sends a message to the specified broadcaster’s chat room. The extension’s name is used as the username for the message in the chat room. To send a chat message, your extension must enable **Chat Capabilities** (under your extension’s **Capabilities** tab).
 
- * **Rate Limits**: You may send a maximum of 12 messages per minute per channel.
+ * **Rate Limits:** You may send a maximum of 12 messages per minute per channel.
 
  * ### Response Codes
  * Code|Description

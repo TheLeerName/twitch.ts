@@ -38,7 +38,7 @@ export interface RequestBody {
 	tags?: string[];
 	/**
 	 * List of labels that should be set as the Channel’s CCLs.
-	 * **Note:** To clear CCLs for a channel, set all `is_enabled` for all possible CCLs to `false`
+	 * **NOTE:** To clear CCLs for a channel, set all `is_enabled` for all possible CCLs to `false`
 	 */
 	content_classification_labels?: {
 		/**
@@ -92,7 +92,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Modify Channel Information](https://dev.twitch.tv/docs/api/reference/#modify-channel-information)
  * Updates a channel’s properties.
 
- * **NOTE**: All fields in request body are optional, but you must specify at least one field.
+ * **NOTE:** All fields in request body are optional, but you must specify at least one field.
 
  * ### Response Codes
  * HTTP Code|Description

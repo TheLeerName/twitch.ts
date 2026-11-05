@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [extension.bits_transaction.create](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#extensionbits_transactioncreate)
  * Sends a notification when a new transaction is created for a Twitch Extension.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * The OAuth token client ID must match the Extension client ID.
@@ -28,7 +28,7 @@ export interface Condition {
  * ## [extension.bits_transaction.create](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#extensionbits_transactioncreate)
  * Sends a notification when a new transaction is created for a Twitch Extension.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * The OAuth token client ID must match the Extension client ID.

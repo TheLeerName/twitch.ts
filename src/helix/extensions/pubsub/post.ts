@@ -61,7 +61,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Send Extension PubSub Message](https://dev.twitch.tv/docs/api/reference/#send-extension-pubsub-message)
  * Sends a message to one or more viewers. You can send messages to a specific channel or to all channels where your extension is active. This endpoint uses the same mechanism as the [send](https://dev.twitch.tv/docs/extensions/reference#send) JavaScript helper function used to send messages.
 
- * **Rate Limits**: You may send a maximum of 100 messages per minute per combination of extension client ID and broadcaster ID.
+ * **Rate Limits:** You may send a maximum of 100 messages per minute per combination of extension client ID and broadcaster ID.
 
  * ### Response Codes
  * Code|Description

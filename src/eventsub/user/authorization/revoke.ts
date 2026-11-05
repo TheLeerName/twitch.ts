@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [user.authorization.revoke](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke)
  * Sends a notification when a user’s authorization has been revoked for your client id. Use this webhook to meet government requirements for handling user data, such as GDPR, LGPD, or CCPA.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * Provided `client_id` must match the client id in the application access token.
@@ -28,7 +28,7 @@ export interface Condition {
  * ## [user.authorization.revoke](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationrevoke)
  * Sends a notification when a user’s authorization has been revoked for your client id. Use this webhook to meet government requirements for handling user data, such as GDPR, LGPD, or CCPA.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * Provided `client_id` must match the client id in the application access token.

@@ -24,13 +24,17 @@ export interface RequestBody {
 		id: string;
 		/** The transport details that you want Twitch to use when sending you notifications. */
 		transport: {
-			/**
+			/** 
 			 * The transport method. Possible values are: 
-			 * - webhook
-			 * - websocket
+			 * - `webhook`
+			 * - `websocket`
 			 */
 			method?: "webhook" | "websocket";
-			/** The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443. See Processing an event. Specify this field only if method is set to webhook. **NOTE:** Redirects are not followed. */
+			/** 
+			 * The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443. See Processing an event. Specify this field only if method is set to webhook.
+			 * 
+			 * **NOTE:** Redirects are not followed.
+			 */
 			callback?: string;
 			/** The secret used to verify the signature. The secret must be an ASCII string that’s a minimum of 10 characters long and a maximum of 100 characters long. For information about how the secret is used, see Verifying the event message. Specify this field only if method is set to webhook. */
 			secret?: string;

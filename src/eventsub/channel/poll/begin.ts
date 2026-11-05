@@ -74,7 +74,7 @@ export interface ChoiceWithoutVotes {
 	title: string;
 }
 
-/** **NOTE**: Bits voting is not supported. */
+/** **NOTE:** Bits voting is not supported. */
 export interface BitsVoting {
 	/** Not used; will be set to `false`. */
 	is_enabled: false;

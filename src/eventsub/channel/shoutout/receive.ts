@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [channel.shoutout.receive](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutreceive)
  * Sends a notification when the specified broadcaster receives a Shoutout.
 
- * **NOTE**: Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
+ * **NOTE:** Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
 
  * ### Authorization
  * Requires the `moderator:read:shoutouts` or `moderator:manage:shoutouts` scope.
@@ -34,7 +34,7 @@ export interface Condition {
  * ## [channel.shoutout.receive](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelshoutoutreceive)
  * Sends a notification when the specified broadcaster receives a Shoutout.
 
- * **NOTE**: Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
+ * **NOTE:** Sent only if Twitch posts the Shoutout to the broadcaster’s activity feed.
 
  * ### Authorization
  * Requires the `moderator:read:shoutouts` or `moderator:manage:shoutouts` scope.

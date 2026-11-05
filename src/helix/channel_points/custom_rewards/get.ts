@@ -129,7 +129,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get Custom Reward](https://dev.twitch.tv/docs/api/reference/#get-custom-reward)
  * Gets a list of custom rewards that the specified broadcaster created.
 
- * **NOTE**: A channel may offer a maximum of 50 rewards, which includes both enabled and disabled rewards.
+ * **NOTE:** A channel may offer a maximum of 50 rewards, which includes both enabled and disabled rewards.
 
  * ### Response Codes
  * HTTP Code|Meaning

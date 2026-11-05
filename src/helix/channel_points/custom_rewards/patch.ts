@@ -171,7 +171,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Update Custom Reward](https://dev.twitch.tv/docs/api/reference/#update-custom-reward)
  * Updates a custom reward. The app used to create the reward is the only app that may update the reward.
 
- * **NOTE**: The body of the request should contain only the fields you’re updating.
+ * **NOTE:** The body of the request should contain only the fields you’re updating.
 
  * ### Response Codes
  * HTTP Code|Description

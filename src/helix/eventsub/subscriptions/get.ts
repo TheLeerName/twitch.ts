@@ -168,7 +168,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get EventSub Subscriptions](https://dev.twitch.tv/docs/api/reference/#get-eventsub-subscriptions)
  * Gets a list of EventSub subscriptions that the client in the access token created.
 
- * **NOTE**: Use the `status`, `type`, `user_id`, `subscription_id`, and `conduit_id` query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
+ * **NOTE:** Use the `status`, `type`, `user_id`, `subscription_id`, and `conduit_id` query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
 
  * ### Response Codes
  * Code|Description

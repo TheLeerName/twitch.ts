@@ -26,9 +26,9 @@ export interface RequestQueryParameters {
 	 * - FULFILLED
 	 * - UNFULFILLED
 
-	 * **NOTE**: This field is required only if you don’t specify the `id` query parameter.
+	 * **NOTE:** This field is required only if you don’t specify the `id` query parameter.
 
-	 * **NOTE**: Canceled and fulfilled redemptions are returned for only a few days after they’re canceled or fulfilled.
+	 * **NOTE:** Canceled and fulfilled redemptions are returned for only a few days after they’re canceled or fulfilled.
 	 */
 	status: "CANCELED" | "FULFILLED" | "UNFULFILLED";
 	/**

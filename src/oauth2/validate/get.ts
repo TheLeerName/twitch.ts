@@ -64,7 +64,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Validating Tokens](https://dev.twitch.tv/docs/authentication/validate-tokens/)
  * The Twitch authorization service provides this endpoint that you can use to validate your OAuth access token or discover information about the token, such as when it expires, its scopes, and the user that authorized the client to access their resources.
 
- * **NOTE**: This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
+ * **NOTE:** This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, ResponseBodyError>> {
 	return Main.axiosRequest(prepareAxiosConfig(params));

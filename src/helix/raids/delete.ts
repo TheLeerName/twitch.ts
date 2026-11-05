@@ -46,7 +46,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * You can cancel a raid at any point up until the broadcaster clicks **Raid Now** in the Twitch UX or the 90-second countdown expires.
 
- * **Rate Limit**: The limit is 10 requests within a 10-minute window.
+ * **Rate Limit:** The limit is 10 requests within a 10-minute window.
 
  * ### Response Codes
  * Code|Description

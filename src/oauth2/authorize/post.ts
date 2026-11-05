@@ -41,7 +41,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
 /**
  * ## [Getting a user access token](https://dev.twitch.tv/docs/cli/mock-api-command/#getting-a-user-access-token)
- * **NOTE**: This endpoint can be used only on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/). For getting user access token on real API, check test with Getting user access token via Authorization Code.
+ * **NOTE:** This endpoint can be used only on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/). For getting user access token on real API, check test with Getting user access token via Authorization Code.
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<ResponseBody, Main.ResponseBodyError>> {
 	return Main.axiosRequest(prepareAxiosConfig(params));

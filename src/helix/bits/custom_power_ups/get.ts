@@ -124,7 +124,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get Custom Power-up](https://dev.twitch.tv/docs/api/reference/#get-custom-power-up)
  * Gets a list of custom Power-ups that the specified broadcaster created.
 
- * **NOTE**: A channel may offer a maximum of 50 custom Power-ups, which includes both enabled and disabled Power-ups.
+ * **NOTE:** A channel may offer a maximum of 50 custom Power-ups, which includes both enabled and disabled Power-ups.
 
  * ### Response Codes
  * HTTP Code|Meaning

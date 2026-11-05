@@ -47,7 +47,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Remove Moderator](https://dev.twitch.tv/docs/api/reference/#remove-channel-moderator)
  * Removes a moderator from the broadcaster’s chat room.
 
- * **Rate Limits**: The broadcaster may remove a maximum of 10 moderators within a 10-second window.
+ * **Rate Limits:** The broadcaster may remove a maximum of 10 moderators within a 10-second window.
 
  * ### Response Codes
  * Code|Description

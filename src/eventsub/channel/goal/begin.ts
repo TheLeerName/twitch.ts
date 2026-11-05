@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [channel.goal.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalbegin)
  * Notifies the subscriber when the specified broadcaster begins a goal.
 
- * **NOTE**: It’s possible to receive this event after receiving {@link Main.EventSub.ChannelGoalProgress | Progress} events.
+ * **NOTE:** It’s possible to receive this event after receiving {@link Main.EventSub.ChannelGoalProgress | Progress} events.
 
  * ### Authorization
  * Requires a user OAuth access token with scope set to `channel:read:goals`.
@@ -28,7 +28,7 @@ export interface Condition {
  * ## [channel.goal.begin](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalbegin)
  * Notifies the subscriber when the specified broadcaster begins a goal.
 
- * **NOTE**: It’s possible to receive this event after receiving {@link Main.EventSub.ChannelGoalProgress | Progress} events.
+ * **NOTE:** It’s possible to receive this event after receiving {@link Main.EventSub.ChannelGoalProgress | Progress} events.
 
  * ### Authorization
  * Requires a user OAuth access token with scope set to `channel:read:goals`.

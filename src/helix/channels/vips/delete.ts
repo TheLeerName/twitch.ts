@@ -49,7 +49,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * If the broadcaster is removing the user’s VIP status, the ID in the `broadcaster_id` query parameter must match the user ID in the access token; otherwise, if the user is removing their VIP status themselves, the ID in the `user_id` query parameter must match the user ID in the access token.
 
- * **Rate Limits**: The broadcaster may remove a maximum of 10 VIPs within a 10-second window.
+ * **Rate Limits:** The broadcaster may remove a maximum of 10 VIPs within a 10-second window.
 
  * ### Response Codes
  * Code|Description

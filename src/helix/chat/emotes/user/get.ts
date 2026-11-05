@@ -23,7 +23,7 @@ export interface RequestQueryParameters {
 	/**
 	 * The User ID of a broadcaster you wish to get follower emotes of. Using this query parameter will guarantee inclusion of the broadcaster’s follower emotes in the response body.  
 
-	 * **Note:** If the user specified in `user_id` is subscribed to the broadcaster specified, their follower emotes will appear in the response body regardless if this query parameter is used.
+	 * **NOTE:** If the user specified in `user_id` is subscribed to the broadcaster specified, their follower emotes will appear in the response body regardless if this query parameter is used.
 	 */
 	broadcaster_id?: string;
 }

@@ -72,7 +72,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get Chatters](https://dev.twitch.tv/docs/api/reference/#get-chatters)
  * Gets the list of users that are connected to the broadcaster’s chat session.
 
- * **NOTE**: There is a delay between when users join and leave a chat and when the list is updated accordingly.
+ * **NOTE:** There is a delay between when users join and leave a chat and when the list is updated accordingly.
 
  * To determine whether a user is a moderator or VIP, use the {@link Helix.GetModerators | Get Moderators} and {@link Helix.GetVIPs | Get VIPs} endpoints. You can check the roles of up to 100 users.
 

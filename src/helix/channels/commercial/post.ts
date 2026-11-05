@@ -60,9 +60,9 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Start Commercial](https://dev.twitch.tv/docs/api/reference/#start-commercial)
  * Starts a commercial on the specified channel.
 
- * **NOTE**: Only partners and affiliates may run commercials and they must be streaming live at the time.
+ * **NOTE:** Only partners and affiliates may run commercials and they must be streaming live at the time.
 
- * **NOTE**: Only the broadcaster may start a commercial; the broadcaster’s editors and moderators may not start commercials on behalf of the broadcaster.
+ * **NOTE:** Only the broadcaster may start a commercial; the broadcaster’s editors and moderators may not start commercials on behalf of the broadcaster.
 
  * ### Response Codes
  * Code|Description

@@ -52,7 +52,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Revoking Access Tokens](https://dev.twitch.tv/docs/authentication/revoke-tokens/)
  * If your app no longer needs an access token, you can revoke it by using this method.
 
- * **NOTE**: This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
+ * **NOTE:** This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
  */
 export async function axiosRequest(params: RequestParameters): Promise<Main.Response<{}, ResponseBodyError>> {
 	return Main.axiosRequest(prepareAxiosConfig(params));

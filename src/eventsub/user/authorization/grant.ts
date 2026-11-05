@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [user.authorization.grant](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationgrant)
  * Sends a notification when a user’s authorization has been granted to your client id.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * Provided `client_id` must match the client id in the application access token.
@@ -28,7 +28,7 @@ export interface Condition {
  * ## [user.authorization.grant](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#userauthorizationgrant)
  * Sends a notification when a user’s authorization has been granted to your client id.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
  * ### Authorization
  * Provided `client_id` must match the client id in the application access token.

@@ -4,7 +4,7 @@ import * as Main from "../../..";
  * ## [channel.goal.progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalprogress)
  * Notifies the subscriber when progress is made towards the specified broadcaster’s goal. Progress could be positive (added followers) or negative (lost followers).
 
- * **NOTE**: It’s possible to receive these events before receiving the {@link Main.EventSub.ChannelGoalBegin | Begin} event.
+ * **NOTE:** It’s possible to receive these events before receiving the {@link Main.EventSub.ChannelGoalBegin | Begin} event.
 
  * ### Authorization
  * Requires a user OAuth access token with scope set to `channel:read:goals`.
@@ -28,7 +28,7 @@ export interface Condition {
  * ## [channel.goal.progress](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#channelgoalprogress)
  * Notifies the subscriber when progress is made towards the specified broadcaster’s goal. Progress could be positive (added followers) or negative (lost followers).
 
- * **NOTE**: It’s possible to receive these events before receiving the {@link Main.EventSub.ChannelGoalBegin | Begin} event.
+ * **NOTE:** It’s possible to receive these events before receiving the {@link Main.EventSub.ChannelGoalBegin | Begin} event.
 
  * ### Authorization
  * Requires a user OAuth access token with scope set to `channel:read:goals`.

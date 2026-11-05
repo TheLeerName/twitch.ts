@@ -55,7 +55,7 @@ export interface PayloadEvent {
 	/** 
 	 * A Boolean value that determines whether Twitch has verified the user’s email address. Is `true` if Twitch has verified the email address; otherwise, `false`.
 
-	 * **NOTE**: Ignore this field if the `email` field contains an empty string.
+	 * **NOTE:** Ignore this field if the `email` field contains an empty string.
 	 */
 	email_verified: boolean;
 	/** The user’s description. */

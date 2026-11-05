@@ -67,7 +67,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * To cancel a pending raid, use the {@link Helix.CancelRaid | Cancel a raid} endpoint.
 
- * **Rate Limit**: The limit is 10 requests within a 10-minute window.
+ * **Rate Limit:** The limit is 10 requests within a 10-minute window.
 
  * ### Response Codes
  * Code|Description

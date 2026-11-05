@@ -120,7 +120,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * When using pagination for clips, note that the maximum number of results returned over multiple requests will be approximately 1,000. If additional results are necessary, paginate over different query parameters such as multiple `started_at` and `ended_at` timeframes to refine the search.
 
- * **NOTE**: The `id`, `game_id`, and `broadcaster_id` query parameters are mutually exclusive.
+ * **NOTE:** The `id`, `game_id`, and `broadcaster_id` query parameters are mutually exclusive.
 
  * ### Response Codes
  * Code|Description

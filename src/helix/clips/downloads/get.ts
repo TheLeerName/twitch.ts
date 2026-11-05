@@ -62,7 +62,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Get Clips Download](https://dev.twitch.tv/docs/api/reference/#get-clips-download)
  * Provides URLs to download the video file(s) for the specified clips. For information about clips, see [How to use clips](https://help.twitch.tv/s/article/how-to-use-clips). These links are temporary and should have a long-term expectation to expire.
 
- * **Rate Limits**: Limited to 100 requests per minute.
+ * **Rate Limits:** Limited to 100 requests per minute.
 
  * ### Response Codes
  * Code|Description

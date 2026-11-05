@@ -47,7 +47,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Delete Channel Stream Schedule Segment](https://dev.twitch.tv/docs/api/reference/#delete-channel-stream-schedule-segment)
  * Removes a broadcast segment from the broadcaster’s streaming schedule.
 
- * **NOTE**: For recurring segments, removing a segment removes all segments in the recurring schedule.
+ * **NOTE:** For recurring segments, removing a segment removes all segments in the recurring schedule.
 
  * ### Response Codes
  * Code|Description

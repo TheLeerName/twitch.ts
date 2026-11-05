@@ -76,7 +76,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Send Chat Announcement](https://dev.twitch.tv/docs/api/reference/#send-chat-announcement)
  * Sends an announcement to the broadcaster’s chat room.
 
- * **Rate Limits**: One announcement may be sent every 2 seconds.
+ * **Rate Limits:** One announcement may be sent every 2 seconds.
 
  * **NOTE:** When sending announcements during a Shared Chat session, behaviors differ depending on your authentication token type:
  * - When using an App Access Token, announcements will only be sent to the source channel (defined by the `broadcaster_id` parameter) by default. Announcements can be sent to all channels by using the `for_source_only` parameter and setting it to **false**.

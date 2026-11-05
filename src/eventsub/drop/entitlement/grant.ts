@@ -4,9 +4,9 @@ import * as Main from "../../..";
  * ## [drop.entitlement.grant](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#dropentitlementgrant)
  * Sends a notification when an entitlement for a Drop is granted to a user.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
- * **NOTE**: Payload structure is different from other subscription types. Events bound for these subscriptions are batched. Developers can expect to receive roughly 0-5 HTTP requests per second. HTTP request bodies will not exceed 250KB.
+ * **NOTE:** Payload structure is different from other subscription types. Events bound for these subscriptions are batched. Developers can expect to receive roughly 0-5 HTTP requests per second. HTTP request bodies will not exceed 250KB.
 
  * ### Authorization
  * App access token required. The client ID associated with the access token must be owned by a user who is part of the specified organization.
@@ -36,9 +36,9 @@ export interface Condition {
  * ## [drop.entitlement.grant](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#dropentitlementgrant)
  * Sends a notification when an entitlement for a Drop is granted to a user.
 
- * **NOTE**: This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
+ * **NOTE:** This subscription type is only supported by webhooks and conduits, and cannot be used with WebSockets.
 
- * **NOTE**: Payload structure is different from other subscription types. Events bound for these subscriptions are batched. Developers can expect to receive roughly 0-5 HTTP requests per second. HTTP request bodies will not exceed 250KB.
+ * **NOTE:** Payload structure is different from other subscription types. Events bound for these subscriptions are batched. Developers can expect to receive roughly 0-5 HTTP requests per second. HTTP request bodies will not exceed 250KB.
 
  * ### Authorization
  * App access token required. The client ID associated with the access token must be owned by a user who is part of the specified organization.

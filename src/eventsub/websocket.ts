@@ -24,7 +24,7 @@ export interface Events {
 	/**
 	 * Calls on getting `session_welcome` message. [Read More](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/#welcome-message)
 
-	 * **NOTE**: For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `isReconnectedByTwitch` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
+	 * **NOTE:** For subscribing to events with `Request.CreateEventSubSubscription`, you must use it **only** if `isReconnectedByTwitch` is `false`, because after reconnecting new connection will include the same subscriptions that the old connection had
 	 * @param isReconnectedByTwitch Is `true`, if {@link session_keepalive} event was emitted before
 	 */
 	session_welcome: (message: Main.EventSub.MessageWelcome, isReconnectedByTwitch: boolean) => void;

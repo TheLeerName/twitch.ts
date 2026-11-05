@@ -60,7 +60,7 @@ export interface User {
 	/**
 	 * **Integer**. The number of times the user’s channel has been viewed.
 
-		*  **NOTE**: This field has been deprecated (see [Get Users API endpoint – “view_count” deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
+		*  **NOTE:** This field has been deprecated (see [Get Users API endpoint – “view_count” deprecation](https://discuss.dev.twitch.tv/t/get-users-api-endpoint-view-count-deprecation/37777)). Any data in this field is not valid and should not be used.
 		*/
 	view_count: number;
 	/**

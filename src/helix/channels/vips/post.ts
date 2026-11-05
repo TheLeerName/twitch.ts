@@ -47,7 +47,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Add VIP](https://dev.twitch.tv/docs/api/reference/#add-channel-vip)
  * Adds the specified user as a VIP in the broadcaster’s channel.
 
- * **Rate Limits**: The broadcaster may add a maximum of 10 VIPs within a 10-second window.
+ * **Rate Limits:** The broadcaster may add a maximum of 10 VIPs within a 10-second window.
 
  * ### Response Codes
  * Code|Description

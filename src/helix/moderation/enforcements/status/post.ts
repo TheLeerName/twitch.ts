@@ -70,7 +70,7 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * AutoMod is a moderation tool that holds inappropriate or harassing chat messages for moderators to review. Moderators approve or deny the messages that AutoMod flags; only approved messages are released to chat. AutoMod detects misspellings and evasive language automatically. For information about AutoMod, see [How to Use AutoMod](https://help.twitch.tv/s/article/how-to-use-automod).
 
- * **Rate Limits**: Rates are limited per channel based on the account type rather than per access token.
+ * **Rate Limits:** Rates are limited per channel based on the account type rather than per access token.
  * Account type|Limit per minute|Limit per hour
  * -|-|-
  * Normal|5|50

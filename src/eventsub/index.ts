@@ -85,7 +85,7 @@ export interface TransportWebHook {
 	/**
 	 * The callback URL where the notifications are sent. The URL must use the HTTPS protocol and port 443. See [Processing an event](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#processing-an-event).
 	 * 
-	 * **NOTE**: Redirects are not followed.
+	 * **NOTE:** Redirects are not followed.
 	 */
 	callback: string;
 	/** The secret used to verify the signature. The secret must be an ASCII string that’s a minimum of 10 characters long and a maximum of 100 characters long. For information about how the secret is used, see [Verifying the event message](https://dev.twitch.tv/docs/eventsub/handling-webhook-events#verifying-the-event-message). */
