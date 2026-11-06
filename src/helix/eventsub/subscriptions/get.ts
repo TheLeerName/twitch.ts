@@ -170,6 +170,8 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
 
  * **NOTE:** Use the `status`, `type`, `user_id`, `subscription_id`, and `conduit_id` query parameters to filter the list of subscriptions that are returned. The filters are mutually exclusive; the request fails if you specify more than one filter.
 
+ * **NOTE:** This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
+
  * ### Response Codes
  * Code|Description
  * -|-

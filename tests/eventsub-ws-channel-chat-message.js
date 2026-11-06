@@ -1,6 +1,6 @@
 // @ts-check
 
-const { Counter } = require(".");
+const { Counter, options } = require(".");
 const Twitch = require("../dist");
 const readline = require("readline/promises");
 const axios = require("axios");
@@ -32,14 +32,17 @@ async function main(token, broadcaster_id) {
 		return;
 	}
 	process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-	if (!resultValidate.scopes || !resultValidate.scopes.includes("user:read:chat"))
+	if (!options.mockAPIEnabled && (!resultValidate.scopes || !resultValidate.scopes.includes("user:read:chat")))
 		return console.error("Token must contain user:read:chat scope!");
 	if (resultValidate.login == null)
 		return console.error("Token must be user access token for using EventSub in WebSockets!");
 
 	console.log(`  CLIENT_ID: ${resultValidate.client_id}`);
-	if (resultValidate.scopes != null)
-		console.log(`  SCOPES: ${resultValidate.scopes.join(", ")}`);
+	if (resultValidate.scopes != null) {
+		const resultScopes = resultValidate.scopes.filter(v => v.length > 1);
+		if (resultScopes.length > 0)
+			console.log(`  SCOPES: ${resultScopes.join(", ")}`);
+	}
 	console.log(`  EXPIRES_IN: ${resultValidate.expires_in}s - ${new Date(Date.now() + resultValidate.expires_in * 1000).toString()}`);
 	console.log(`  IS_USER_ACCESS_TOKEN: true`);
 	console.log(`  USER_ID: ${resultValidate.user_id}`);
@@ -56,20 +59,23 @@ async function main(token, broadcaster_id) {
 		if (!resultSearch.ok)
 			return `Error ${resultSearch.status}: ${resultSearch.message}`;
 		console.log("");
-		for (const entry of resultSearch.data)
-			console.log(`${resultSearch.data.indexOf(entry)}. ${entry.display_name} (id: ${entry.id})${entry.is_live ? " LIVE" : ""} ${entry.tags.join(" ")}`);
-		const index = await (async() => {
-			const rl = readline.createInterface({input: process.stdin, output: process.stdout});
-			const query = await rl.question(`Choose (0-${resultSearch.data.length - 1}): `);
-			rl.close();
-			return parseInt(query);
-		})();
-		if (isNaN(index))
-			return "Input is NaN!";
-		const broadcaster_id = resultSearch.data[index]?.id;
-		if (!broadcaster_id)
-			return "Input is outside bounds!";
-		return broadcaster_id;
+		if (resultSearch.data.length > 1) {
+			for (const entry of resultSearch.data)
+				console.log(`${resultSearch.data.indexOf(entry)}. ${entry.display_name} (id: ${entry.id})${entry.is_live ? " LIVE" : ""} ${entry.tags.join(" ")}`);
+			const index = await (async() => {
+				const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+				const query = await rl.question(`Choose (0-${resultSearch.data.length - 1}): `);
+				rl.close();
+				return parseInt(query);
+			})();
+			if (isNaN(index))
+				return "Input is NaN!";
+			const broadcaster_id = resultSearch.data[index]?.id;
+			if (!broadcaster_id)
+				return "Input is outside bounds!";
+			return broadcaster_id;
+		}
+		return resultSearch.data[0].id;
 	})();
 	if (broadcaster_id === "")
 		return console.error("Must not be empty string!");
@@ -81,21 +87,28 @@ async function main(token, broadcaster_id) {
 	const ws = new Twitch.EventSub.WebSocket();
 	ws.on("session_welcome", async(message, isReconnected) => {
 		if (!isReconnected) {
-			process.stdout.write("Subscribing to event channel.chat.message... ");
-			counter.reset();
-			const result = await Twitch.Helix.CreateEventSubSubscription.axiosRequest({
-				client_id: resultValidate.client_id,
-				token,
-				data: Twitch.EventSub.ChannelChatMessage.RequestBody({broadcaster_user_id: broadcaster_id, user_id: resultValidate.user_id}, {method: "websocket", session_id: ws.session.id}),
-			});
-			if (!result.ok) {
-				console.error(`Error ${result.status}: ${result.message}`);
-				process.exit(1);
+			if (!options.mockAPIEnabled) {
+				process.stdout.write("Subscribing to event channel.chat.message... ");
+				counter.reset();
+				const result = await Twitch.Helix.CreateEventSubSubscription.axiosRequest({
+					client_id: resultValidate.client_id,
+					token,
+					data: Twitch.EventSub.ChannelChatMessage.RequestBody({broadcaster_user_id: broadcaster_id, user_id: resultValidate.user_id}, {method: "websocket", session_id: ws.session.id}),
+				});
+				console.log(JSON.stringify(result));
+				if (!result.ok) {
+					console.error(`Error ${result.status}: ${result.message}`);
+					process.exit(1);
+				}
+				process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
+				console.log(`  total_cost: ${result.total_cost} / ${result.max_total_cost}`);
 			}
-			process.stdout.write(`Finished! (${counter.stamp()}ms)\n`);
-			console.log(`  total_cost: ${result.total_cost} / ${result.max_total_cost}`);
 			console.log(`Listening for events...`);
 		}
+	});
+	ws.on("notification", message => {
+		if (message.metadata.subscription_type === "channel.chat.message") return;
+		console.log(`  ${message.metadata.subscription_type}: ${JSON.stringify(message.payload.event)}`);
 	});
 	ws.on("channel.chat.message", message => {
 		console.log(`  ${message.payload.event.broadcaster_user_name}: ${message.payload.event.message.text}`);

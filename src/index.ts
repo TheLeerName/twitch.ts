@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 export namespace Options {
-	export let apiHelixPath = "https://api.twitch.tv/helix/";
+	export let apiPath = "https://api.twitch.tv/";
+	export let apiHelixPath = `${apiPath}helix/`;
 	export let idOAuth2Path = "https://id.twitch.tv/oauth2/";
 	export let eventSubWSPath = "wss://eventsub.wss.twitch.tv/ws";
 	/** Change this with `setTwitchCLIMode` */
@@ -10,12 +11,14 @@ export namespace Options {
 	export function setTwitchCLIMode(twitchCLIMode: boolean) {
 		Options.twitchCLIMode = twitchCLIMode;
 		if (twitchCLIMode) {
-			Options.apiHelixPath = "http://localhost:8080/mock/";
-			Options.idOAuth2Path = "http://localhost:8080/auth/";
+			Options.apiPath = "http://localhost:8080/";
+			Options.apiHelixPath = `${Options.apiPath}mock/`;
+			Options.idOAuth2Path = `${Options.apiPath}auth/`;
 			Options.eventSubWSPath = "ws://127.0.0.1:8080/ws";
 		}
 		else {
-			Options.apiHelixPath = "https://api.twitch.tv/helix/";
+			Options.apiPath = "https://api.twitch.tv/";
+			Options.apiHelixPath = `${Options.apiPath}helix/`;
 			Options.idOAuth2Path = "https://id.twitch.tv/oauth2/";
 			Options.eventSubWSPath = "wss://eventsub.wss.twitch.tv/ws";
 		}
@@ -43,8 +46,12 @@ export async function axiosRequest<TData, TError extends ResponseBodyError>(conf
 	}
 	catch(error) {
 		if (axios.isAxiosError(error)) {
-			const axiosError = error as AxiosError<TError>;
-			return {ok: false, ...axiosError.response?.data ?? {status: axiosError.response?.status ?? 500, message: axiosError.message}};
+			const axiosError = error as AxiosError;
+			if (!axiosError.response)
+				return {ok: false, status: 500, message: axiosError.message};
+			if (typeof axiosError.response.data === "object")
+				return {ok: false, status: axiosError.response.status, message: axiosError.message, ...axiosError.response.data};
+			return {ok: false, status: axiosError.response.status, message: `${axiosError.response.data}`};
 		}
 		throw error;
 	}

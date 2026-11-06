@@ -45,6 +45,8 @@ export function prepareAxiosConfig(params: RequestParameters): Main.AxiosRequest
  * ## [Delete EventSub Subscription](https://dev.twitch.tv/docs/api/reference/#delete-eventsub-subscription)
  * Deletes an EventSub subscription.
 
+ * **NOTE:** This endpoint cant be used on mock API of [Twitch CLI](https://dev.twitch.tv/docs/cli/).
+
  * ### Response Codes
  * Code|Description
  * -|-
