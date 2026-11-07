@@ -3,7 +3,7 @@ import * as Main from "..";
 import ReconnectingWebSocket, { Options as _Options } from "reconnecting-websocket";
 
 export interface Options extends _Options {
-	dont_open_on_start: boolean;
+	dont_open_on_start?: boolean;
 }
 
 /** An object that contains information about the connection. */
