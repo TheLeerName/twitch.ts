@@ -9,6 +9,21 @@ const axiosRetry = require("axios-retry");
 
 /**
  * 
+ * @param {URL} url 
+ * @returns number
+ */
+function getPortInURL(url) {
+	if (url.port.length > 0)
+		return parseInt(url.port);
+	if (url.protocol === "https:" || url.protocol === "wss:")
+		return 443;
+	if (url.protocol === "ftp:")
+		return 21;
+	return 80; // if (url.protocol === "http:" || url.protocol === "ws:")
+}
+
+/**
+ * 
  * @param {string} client_id 
  * @param {string} client_secret 
  * @param {string} redirect_uri 
@@ -89,7 +104,7 @@ async function main(client_id, client_secret, redirect_uri, scopes) {
 				server.close();
 				resolve(response.code);
 			});
-			server.listen(parseInt(redirect_uri_URL.port), redirect_uri_URL.hostname, () => {
+			server.listen(getPortInURL(redirect_uri_URL), redirect_uri_URL.hostname, () => {
 				process.stdout.write(`Started on ${redirect_uri} (${counter.stamp()}ms)\nClick the link and authorize the app: ${Twitch.OAuth2.GetAuthorizationCode.makeURL({client_id, redirect_uri, scope: scopes})}\n`);
 			});
 		});
