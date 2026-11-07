@@ -449,6 +449,7 @@ export function isMessageRevocation(obj: Message): obj is MessageRevocation {
 
 export {
 	default as WebSocket,
+	Options as WebSocketOptions,
 	Session as WebSocketSession,
 	Events as WebSocketEvents,
 } from "./websocket";
