@@ -1,6 +1,10 @@
 import { EventEmitter } from "node:stream";
 import * as Main from "..";
-import ReconnectingWebSocket, { Options } from "reconnecting-websocket";
+import ReconnectingWebSocket, { Options as _Options } from "reconnecting-websocket";
+
+export interface Options extends _Options {
+	dont_open_on_start: boolean;
+}
 
 /** An object that contains information about the connection. */
 export interface Session {
@@ -122,6 +126,7 @@ export default class WebSocket extends EventEmitter {
 	readonly ws!: ReconnectingWebSocket;
 	/** EventSub session, do not use it **before** first `session_welcome` message. */
 	readonly session!: Session;
+	opened = false;
 
 	/** Returns connected timestamp of this websocket in ISO format (`session_reconnect` will reset this) */
 	getConnectedTimestampISO(): string {
@@ -140,16 +145,25 @@ export default class WebSocket extends EventEmitter {
 		super();
 		this.protocols = protocols;
 		this.options = options;
+		if (options == null || !options.dont_open_on_start)
+			this.open();
+	}
+
+	open() {
+		if (this.opened) return;
 		this.setupWebSocket();
 		this.ws.onopen = _ => this.storeFirstConnectedTimestamp();
+		this.opened = true;
 	}
 
 	/** Closes the connection with code `1000` */
 	close() {
+		if (!this.opened) return;
 		this.emit("close", 1000, `client closed the connection`);
 		this.ws.onclose = _ => {};
 		this.ws.onmessage = _ => {};
 		this.ws.close();
+		this.opened = false;
 	}
 
 	private keepaliveTimeout?: NodeJS.Timeout | number;

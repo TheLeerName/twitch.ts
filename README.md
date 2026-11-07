@@ -4,7 +4,7 @@
 - using ReconnectingWebSocket to do WebSocket connections
 
 ## Install
-- `npm i --allow-git=all github:TheLeerName/twitch.ts#v2.0.1`
+- `npm i --allow-git=all github:TheLeerName/twitch.ts#v2.0.2`
 
 ## Examples
 - Getting data of current livestream on ironmouse channel
