@@ -21,7 +21,7 @@ export interface RequestQueryParameters {
 	/** Filters the list to include only the specified subscribers. You may specify a maximum of 100 subscribers. */
 	user_id?: string | string[];
 	/** The maximum number of items to return per page in the response. The minimum page size is 1 item per page and the maximum is 100 items per page. The default is 20. */
-	first?: string;
+	first?: number;
 	/** The cursor used to get the next page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */
 	after?: string;
 	/** The cursor used to get the previous page of results. Do not specify if you set the `user_id` query parameter. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination) */

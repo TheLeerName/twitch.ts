@@ -80,7 +80,7 @@ export interface RequestQueryParameters {
 
 	 * Specify this parameter only if you specify the `game_id` or `user_id` query parameter.
 	 */
-	first?: string;
+	first?: number;
 	/**
 	 * The cursor used to get the next page of results. The **Pagination** object in the response contains the cursor’s value. [Read More](https://dev.twitch.tv/docs/api/guide#pagination)
 
