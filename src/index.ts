@@ -29,29 +29,27 @@ export interface RequestParameters {
 	config?: AxiosRequestConfig;
 }
 
-export interface ResponseBodyError {
-	/** HTTP error status code. */
-	status: number;
+export interface ResponseBodyError extends Pick<axios.AxiosResponse, "headers" | "status"> {
 	/** HTTP error message. */
 	message: string;
 }
 
 export type Response<TData, TError extends ResponseBodyError> = 
-| (TData &  {ok: true;  status: number;})
-| (TError & {ok: false; status: number;});
+| (TData & {ok: true; status: number; headers: axios.AxiosResponse["headers"];})
+| (TError & {ok: false;});
 export async function axiosRequest<TData, TError extends ResponseBodyError>(config: AxiosRequestConfig): Promise<Response<TData, TError>> {
 	try {
 		const response = await axios<TData>(config);
-		return {ok: true, status: response.status, ...response.data};
+		return {ok: true, status: response.status, headers: response.headers, ...response.data};
 	}
 	catch(error) {
 		if (axios.isAxiosError(error)) {
 			const axiosError = error as AxiosError;
 			if (!axiosError.response)
-				return {ok: false, status: 500, message: axiosError.message};
+				return {ok: false, status: 500, message: axiosError.message, headers: {}};
 			if (typeof axiosError.response.data === "object")
-				return {ok: false, status: axiosError.response.status, message: axiosError.message, ...axiosError.response.data};
-			return {ok: false, status: axiosError.response.status, message: `${axiosError.response.data}`};
+				return {ok: false, status: axiosError.response.status, message: axiosError.message, headers: axiosError.response.headers, ...axiosError.response.data};
+			return {ok: false, status: axiosError.response.status, message: `${axiosError.response.data}`, headers: axiosError.response.headers};
 		}
 		throw error;
 	}

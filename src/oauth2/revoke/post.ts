@@ -13,9 +13,7 @@ export interface RequestQueryParameters {
 
 export type RequestParameters = Main.RequestParameters & RequestQueryParameters;
 
-export interface ResponseBodyError {
-	/** HTTP error status code. */
-	status: number;
+export interface ResponseBodyError extends Main.ResponseBodyError {
 	/**
 	 * HTTP error message. Can be:
 	 * Value|Reason
